@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- network functions' replacements.
  *
- * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -28,6 +28,7 @@
 
 #define _BSD_SOURCE 1
 #define _SVID_SOURCE 1
+#define _DEFAULT_SOURCE 1
 
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
@@ -171,97 +172,46 @@ typedef unsigned short int __u16;
 
 #include "lhip_priv.h"
 
-#ifndef HAVE_GETIPNODEBYNAME
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
-
-extern struct hostent *getipnodebyname LHIP_PARAMS ((const char *name,
-	int af, int flags, int *error_num));
-
-# ifdef __cplusplus
-}
-# endif
-
 #endif
 
+#ifndef HAVE_GETIPNODEBYNAME
+extern struct hostent *getipnodebyname LHIP_PARAMS ((const char *name,
+	int af, int flags, int *error_num));
+#endif
 #ifndef HAVE_GETIPNODEBYADDR
-# ifdef __cplusplus
-extern "C" {
-# endif
-
 extern struct hostent *getipnodebyaddr LHIP_PARAMS ((const void *addr,
 	size_t len, int af, int *error_num));
+#endif
+#ifndef HAVE_GETHOSTBYADDR_R
+extern int gethostbyaddr_r LHIP_PARAMS ((const void *addr, socklen_t len, int type,
+               struct hostent *ret, char *buf, size_t buflen,
+               struct hostent **result, int *h_errnop));
+#endif
+#ifndef HAVE_GETHOSTBYNAME_R
+extern int gethostbyname_r LHIP_PARAMS ((const char *name,
+               struct hostent *ret, char *buf, size_t buflen,
+               struct hostent **result, int *h_errnop));
+#endif
+#ifndef HAVE_GETHOSTBYNAME2_R
+extern int gethostbyname2_r LHIP_PARAMS ((const char *name, int af,
+               struct hostent *ret, char *buf, size_t buflen,
+               struct hostent **result, int *h_errnop));
+#endif
+#ifndef HAVE_GETHOSTENT_R
+extern int gethostent_r LHIP_PARAMS ((
+               struct hostent *ret, char *buf, size_t buflen,
+               struct hostent **result, int *h_errnop));
+#endif
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
-
 #endif
 
 static const unsigned char __lhip_zeroaddr_ipv4[4] = {0, 0, 0, 0};
 static const unsigned char __lhip_zeroaddr_ipv6[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static const char local_name[] = "localhost";
-
-#ifndef HAVE_GETHOSTBYADDR_R
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-extern int gethostbyaddr_r LHIP_PARAMS ((const void *addr, socklen_t len, int type,
-               struct hostent *ret, char *buf, size_t buflen,
-               struct hostent **result, int *h_errnop));
-
-# ifdef __cplusplus
-}
-# endif
-
-#endif
-
-#ifndef HAVE_GETHOSTBYNAME_R
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-extern int gethostbyname_r LHIP_PARAMS ((const char *name,
-               struct hostent *ret, char *buf, size_t buflen,
-               struct hostent **result, int *h_errnop));
-
-# ifdef __cplusplus
-}
-# endif
-
-#endif
-
-#ifndef HAVE_GETHOSTBYNAME2_R
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-extern int gethostbyname2_r LHIP_PARAMS ((const char *name, int af,
-               struct hostent *ret, char *buf, size_t buflen,
-               struct hostent **result, int *h_errnop));
-
-# ifdef __cplusplus
-}
-# endif
-
-#endif
-
-#ifndef HAVE_GETHOSTENT_R
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-extern int gethostent_r LHIP_PARAMS ((
-               struct hostent *ret, char *buf, size_t buflen,
-               struct hostent **result, int *h_errnop));
-
-# ifdef __cplusplus
-}
-# endif
-
-#endif
 
 #ifndef AF_NETLINK
 # ifdef AF_ROUTE

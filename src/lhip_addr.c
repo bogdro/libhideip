@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- getting the local address, checking for matches and anonymizing.
  *
- * Copyright (C) 2011-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2011-2019 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -168,11 +168,7 @@ __lhip_check_hostent_match LHIP_PARAMS ((
 
 /* =============================================================== */
 
-void __lhip_read_local_addresses (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+void __lhip_read_local_addresses (LHIP_VOID)
 {
 	LHIP_MAKE_ERRNO_VAR(err);
 #ifdef HAVE_ARPA_INET_H
@@ -462,7 +458,7 @@ void __lhip_read_local_addresses (
 	fflush (stderr);
 	for ( i = 0; i < __lhip_number_of_hostnames; i++ )
 	{
-		fprintf (stderr, "LibHideIP: 6+%d: name=%s, h_addr_list=0x%x, h_addrtype=%d, " \
+		fprintf (stderr, "LibHideIP: 6+%lu: name=%s, h_addr_list=0x%x, h_addrtype=%d, " \
 			 "AF_INET=%d, AF_INET6=%d, h_length=%d\n", i,
 			(__lhip_our_names_addr[i].h_name == NULL)? "null" :
 				__lhip_our_names_addr[i].h_name,
@@ -496,11 +492,7 @@ void __lhip_read_local_addresses (
 /* =============================================================== */
 
 struct hostent *
-__lhip_get_our_name_ipv4 (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+__lhip_get_our_name_ipv4 (LHIP_VOID)
 {
 	return __lhip_our_real_name_ipv4;
 }
@@ -508,11 +500,7 @@ __lhip_get_our_name_ipv4 (
 /* =============================================================== */
 
 struct hostent *
-__lhip_get_our_name_ipv6 (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+__lhip_get_our_name_ipv6 (LHIP_VOID)
 {
 	return __lhip_our_real_name_ipv6;
 }
@@ -542,7 +530,7 @@ __lhip_check_hostent_match (
 	{
 		return 1;
 	}
-	if ( ((host1 == NULL) && (host2 != NULL))
+	else if ( ((host1 == NULL) && (host2 != NULL))
 		|| ((host1 != NULL) && (host2 == NULL)) )
 	{
 		return 0;
@@ -951,13 +939,54 @@ __lhip_check_hostname_match (
 
 /* =============================================================== */
 
-void __lhip_free_local_addresses (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+void __lhip_free_local_addresses (LHIP_VOID)
 {
-	/*freeaddrinfo (__lhip_ai_all);*/
+#ifdef HAVE_MALLOC
+	size_t i, j;
+
+	if ( __lhip_our_names_addr != NULL )
+	{
+		for ( i = 0; i < __lhip_number_of_hostnames; i++ )
+		{
+			if ( __lhip_our_names_addr[i].h_name != NULL )
+			{
+				free (__lhip_our_names_addr[i].h_name);
+				__lhip_our_names_addr[i].h_name = NULL;
+			}
+			if ( __lhip_our_names_addr[i].h_aliases != NULL )
+			{
+				j = 0;
+				while ( __lhip_our_names_addr[i].h_aliases[j] != NULL )
+				{
+					free (__lhip_our_names_addr[i].h_aliases[j]);
+					__lhip_our_names_addr[i].h_aliases[j] = NULL;
+					j++;
+				}
+				free (__lhip_our_names_addr[i].h_aliases);
+				__lhip_our_names_addr[i].h_aliases = NULL;
+			}
+			if ( __lhip_our_names_addr[i].h_addr_list != NULL )
+			{
+				j = 0;
+				while ( __lhip_our_names_addr[i].h_addr_list[j] != NULL )
+				{
+					free (__lhip_our_names_addr[i].h_addr_list[j]);
+					__lhip_our_names_addr[i].h_addr_list[j] = NULL;
+					j++;
+				}
+				free (__lhip_our_names_addr[i].h_addr_list);
+				__lhip_our_names_addr[i].h_addr_list = NULL;
+			}
+		}
+		free (__lhip_our_names_addr);
+		__lhip_our_names_addr = NULL;
+	}
+	if ( __lhip_ai_all != NULL )
+	{
+		freeaddrinfo (__lhip_ai_all);
+		__lhip_ai_all = NULL;
+	}
+#endif
 }
 
 /* =============================================================== */
@@ -1019,7 +1048,7 @@ __lhip_add_local_address (
 		if ( host->h_name != NULL )
 		{
 			__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
-				= __lhip_duplicate_string (host->h_name);
+				= LHIP_STRDUP (host->h_name);
 		}
 		j = 0;
 		if ( host->h_aliases != NULL )
@@ -1037,7 +1066,7 @@ __lhip_add_local_address (
 			for ( i = 0; i < j; i++ )
 			{
 				__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] =
-					__lhip_duplicate_string (host->h_aliases[i]);
+					LHIP_STRDUP (host->h_aliases[i]);
 			}
 			/* end-of-list marker */
 			__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[j] = NULL;

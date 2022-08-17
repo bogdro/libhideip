@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- address resolving functions' replacements.
  *
- * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -72,6 +72,36 @@ struct hostent
 
 #include "lhip_priv.h"
 
+#if (!defined HAVE_RES_NQUERY) && (!defined res_nquery)
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+extern int res_nquery LHIP_PARAMS ((res_state statep,
+	const char *dname, int class, int type,
+	unsigned char *answer, int anslen));
+
+extern int res_nsearch LHIP_PARAMS ((res_state statep,
+	const char *dname, int class, int type,
+	unsigned char *answer, int anslen));
+
+extern int res_nquerydomain LHIP_PARAMS ((res_state statep,
+	const char *name, const char *domain,
+	int class, int type, unsigned char *answer,
+	int anslen));
+
+extern int res_nmkquery LHIP_PARAMS ((res_state statep,
+	int op, const char *dname, int class,
+	int type, const unsigned char *data, int datalen,
+	const unsigned char *newrr,
+	unsigned char *buf, int buflen));
+
+
+# ifdef __cplusplus
+}
+# endif
+#endif
+
 static char __lhip_name_copy[LHIP_MAXPATHLEN];
 
 /* =============================================================== */
@@ -94,7 +124,7 @@ static int __lhip_is_forbidden_name (
 #endif
 {
 	struct hostent h;
-	unsigned int i, j;
+	size_t i, j;
 	const char * forbidden_names[] =
 		{ "127.0.0.1", "::1", "0.0.0.0", "::0",
 		"localhost", "localhost6", "localhost.", "localhost6." };
@@ -204,6 +234,46 @@ res_query (
 /* =============================================================== */
 
 int
+res_nquery (
+#ifdef LHIP_ANSIC
+	res_state statep, const char *dname, int class, int type, unsigned char *answer, int anslen)
+#else
+	statep, dname, class, type, answer, anslen)
+	res_state statep;
+	const char *dname;
+	int class;
+	int type;
+	unsigned char *answer;
+	int anslen;
+#endif
+{
+	__lhip_main ();
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: res_nquery(%s)\n", (dname != NULL)? dname : "null");
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_res_nquery_location () == NULL )
+	{
+		return -1;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		return (*__lhip_real_res_nquery_location ()) (statep, dname, class, type, answer, anslen);
+	}
+
+	if ( __lhip_is_forbidden_name (dname) != 0 )
+	{
+		return -1;
+	}
+	return (*__lhip_real_res_nquery_location ()) (statep, dname, class, type, answer, anslen);
+}
+
+/* =============================================================== */
+
+int
 res_search (
 #ifdef LHIP_ANSIC
 	const char *dname, int class, int type, unsigned char *answer, int anslen)
@@ -239,6 +309,47 @@ res_search (
 	}
 
 	return (*__lhip_real_res_search_location ()) (dname, class, type, answer, anslen);
+}
+
+/* =============================================================== */
+
+int
+res_nsearch (
+#ifdef LHIP_ANSIC
+	res_state statep, const char *dname, int class, int type, unsigned char *answer, int anslen)
+#else
+	statep, dname, class, type, answer, anslen)
+	res_state statep;
+	const char *dname;
+	int class;
+	int type;
+	unsigned char *answer;
+	int anslen;
+#endif
+{
+	__lhip_main ();
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: res_nsearch(%s)\n", (dname != NULL)? dname : "null");
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_res_nsearch_location () == NULL )
+	{
+		return -1;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		return (*__lhip_real_res_nsearch_location ()) (statep, dname, class, type, answer, anslen);
+	}
+
+	if ( __lhip_is_forbidden_name (dname) != 0 )
+	{
+		return -1;
+	}
+
+	return (*__lhip_real_res_nsearch_location ()) (statep, dname, class, type, answer, anslen);
 }
 
 /* =============================================================== */
@@ -284,6 +395,50 @@ res_querydomain (
 }
 
 /* =============================================================== */
+
+int
+res_nquerydomain (
+#ifdef LHIP_ANSIC
+	res_state statep, const char *name, const char *domain, int class, int type, unsigned char *answer, int anslen)
+#else
+	statep, name, domain, class, type, answer, anslen)
+	res_state statep;
+	const char *name;
+	const char *domain;
+	int class;
+	int type;
+	unsigned char *answer;
+	int anslen;
+#endif
+{
+	__lhip_main ();
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: res_nquerydomain(%s, %s)\n", (name != NULL)? name : "null",
+		(domain!=NULL)? domain : "null");
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_res_nquerydomain_location () == NULL )
+	{
+		return -1;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		return (*__lhip_real_res_nquerydomain_location ()) (statep, name, domain, class, type, answer, anslen);
+	}
+
+	if ( __lhip_is_forbidden_name (name) != 0 )
+	{
+		return -1;
+	}
+
+	return (*__lhip_real_res_nquerydomain_location ()) (statep, name, domain, class, type, answer, anslen);
+}
+
+/* =============================================================== */
+
 int
 res_mkquery (
 #ifdef LHIP_ANSIC
@@ -327,4 +482,53 @@ res_mkquery (
 
 	return (*__lhip_real_res_mkquery_location ())
 		(op, dname, class, type, data, datalen, newrr, buf, buflen);
+}
+
+/* =============================================================== */
+
+int
+res_nmkquery (
+#ifdef LHIP_ANSIC
+	res_state statep, int op, const char *dname, int class, int type,
+	const unsigned char *data, int datalen, const unsigned char *newrr,
+	unsigned char *buf, int buflen)
+#else
+	statep, op, dname, class, type, data, datalen, newrr, buf, buflen)
+	res_state statep;
+	int op;
+	const char *dname;
+	int class;
+	int type;
+	const unsigned char *data;
+	int datalen;
+	const unsigned char *newrr;
+	unsigned char *buf;
+	int buflen;
+#endif
+{
+	__lhip_main ();
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: res_nmkquery(%s)\n", (dname != NULL)? dname : "null");
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_res_nmkquery_location () == NULL )
+	{
+		return -1;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		return (*__lhip_real_res_nmkquery_location ())
+			(statep, op, dname, class, type, data, datalen, newrr, buf, buflen);
+	}
+
+	if ( __lhip_is_forbidden_name (dname) != 0 )
+	{
+		return -1;
+	}
+
+	return (*__lhip_real_res_nmkquery_location ())
+		(statep, op, dname, class, type, data, datalen, newrr, buf, buflen);
 }

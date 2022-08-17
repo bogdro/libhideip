@@ -1,3 +1,113 @@
+2019-02-08	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* LibHideIP version 1.8
+	  Added intercepting new functions. Fixed initialization code - fixed
+	  lookup for fopen(). Improvements in unit tests. Improvements in code
+	  portability and compatibility. Better code maintainability, updated
+	  copyright and documentation.
+	* configure.ac: moved AC_LANG(C) before AC_PROG_LIBTOOL for improved
+	  compatibility. Added checking for the -Wno-nonnull-compare compiler
+	  flag to avoid warnings about defensive programming code. Fixed the
+	  check for -lresolv on some systems, which don't have the "res_query"
+	  binary symbol, but #define it as a preprocessor macro. Added checking
+	  for execveat(), fexecve(), strdup() and snprintf(). Added checking
+	  for the -Wchkp, -Wformat-overflow=2, -Wduplicated-cond, -Wrestrict
+	  and -Woverlength-strings compiler warning options
+	* missing: script updated from new autoconf
+	* src/lhip_main.c (__lhip_main): when the fopen() functions can't be
+	  found by versioned lookup, try normal lookup. This should fix
+	  compatibility with newer systems and make banning work there
+	* src/*.c: defined LHIP_VOID to be void in ANSI C void and use that in
+	  function definitions for better readability
+	* src/lhip_net.c, src/lhip_opens.c, src/lhip_pcap.c: simplified the
+	  missing functions' declarations
+	* src/lhip_exec.c: added defining the constants (_DEFAULT_SOURCE) for
+	  better compatibility with new C libraries
+	* src/lhip_cfg.h.in: added missing constants
+	* src/lhip_main.c (__lhip_main, __lhip_end): opening and closing the
+	  libresolv.so library. Even though it's included in the dependencies,
+	  some systems don't load it, resulting in "function not available"
+	  errors, even though in reality the library was loaded by the program
+	  and the functions would work. If the resolving functions were not
+	  found during the standard search, they are searched for in the open
+	  library. Fix the search when the resolving functions are defined as
+	  preprocessor macros.
+	* src/lhip_main.c (__lhip_end): closing the host entry file on unload
+	* src/lhip_pcap.c: updated declarations of Windows-only functions
+	* src/lhip_exec.c (__lhip_get_target_link_path): rewrite the function
+	  usage to correctly drop the "const" qualifier. Add support for
+	  symlink targets with paths not absolute, but relative to the symlink.
+	  Free the allocated memory on each iteration when it would become
+	  unused and lost. Start with duplicating the parameter so that it
+	  can be passed as a literal.
+	* src/lhip_exec.c (__lhip_is_forbidden_program): change variables'
+	  types to more correct ones (size_t), matching their usage. Fix
+	  separating the program's name from its arguments.
+	* src/lhip_resolve.c (__lhip_is_forbidden_name), src/lhip_ioctl.c
+	  (ioctl): change variables' types to more correct ones (size_t),
+	  matching their usage
+	* src/lhip_main.c: define __lhip_duplicate_string only when strdup()
+	  is not available. Fix using LSR_ANSIC
+	* src/lhip_priv.h: define LHIP_STRDUP to be either strdup or the
+	  __lhip_duplicate_string() function
+	* src/lhip_addr.c (__lhip_add_local_address), src/lhip_exec.c
+	  (__lhip_is_forbidden_file): start using LHIP_STRDUP
+	* src/lhip_addr.c (__lhip_read_local_addresses): corrected debugging
+	  display (just in case)
+	* src/lhip_addr.c (__lhip_check_hostent_match): made the conditions
+	  more correct for validation tools
+	* src/lhip_addr.c (__lhip_free_local_addresses): freeing the memory
+	  during library unload
+	* src/lhip_opens.c: created generic 32-/64-bit functions with common
+	  code to be called from the intercepted functions
+	* src/lhip_opens.c (generic_freopen): closing the original stream even
+	  if opening the new one is forbidden - prevents resource leaks
+	* src/lhip_opens.c (open, open64, openat, openat64), src/lhip_ioctl.c
+	  (ioctl): move the logger after parameter initialization to display
+	  it properly in code based on old-style varargs
+	* src/lhip_main.c, src/lhip_priv.h, src/lhip_exec.c,
+	  test/lhiptest_exec.c: added intercepting execveat() and fexecve()
+	* src/lhip_main.c, src/lhip_priv.h, src/lhip_resolve.c,
+	  test/lhiptest_resolve.c: added intercepting res_nquery, res_nsearch,
+	  res_nquerydomain and res_nmkquery
+	* src/lhip_main.c, src/lhip_priv.h, src/lhip_pcap.c,
+	  test/lhiptest_pcap.c: add support for new libpcap functions (with
+	  time stamp precision)
+	* libhideip.spec.in: made the spec file more portable (assuming that
+	  the required macros are properly defined on the target systems) and
+	  removed some rpmlint warnings and errors
+	* doc/libhideip.texi.in, doc/libhideip.3: added new URLs, updated the
+	  description
+	* test/*.c, test/Makefile.am: split the unit tests into separate
+	  files, one for each functionality/compilation unit with intercepted
+	  functions. Added defining the constants (_DEFAULT_SOURCE) for
+	  better compatibility with new C libraries
+	* test/lhiptest_ioctl.c (test_ioctl_banned1, test_ioctl_banned3,
+	  test_ioctl_banned3_ipv6): Use another default devices if "eth0" is
+	  not present
+	* test/lhiptest_net.c (verify_hostent): allowing all of "localhost",
+	  "localhost6", "127.0.0.1" and "::1" to be valid results. Some systems
+	  don't resolve "::1" to "localhost" or "localhost6" and leave the IP
+	  address as the result. This should fix IPv6 tests, like
+	  test_gethostbyname2_banned6 and test_gethostbyname2_r_banned6
+	* test/lhiptest_exec.c (test_system): call "/bin/cat" instead of just
+	  "cat", because that doesn't work on some systems (probably those
+	  where /bin/cat is a symlink to 'coreutils')
+	* test/lhiptest_exec.c (test_execve_banned): don't pass NULL as the
+	  program's environment - pass an array with one NULL instead
+	* test/lhiptest_exec.c (test_system_banned2): a new test to check for
+	  the found bug in __lhip_is_forbidden_program()
+	* test/lhiptest_exec.c: fix testing if the banned program wasn't
+	  indeed run
+	* test/lhiptest_exec.c: remove unused variables
+	* test/lhiptest_resolve.c: explicitly calling res_init()
+	* test/lhiptest_net.c (test_recvmsg, test_sendmsg): change variables'
+	  types to more correct ones
+	* test/lhiptest_ioctl.c (test_ioctl_banned2, test_ioctl_banned2_ipv6,
+	  test_ioctl_banned5, test_ioctl_banned5_ipv6): change variables'
+	  types to more correct ones
+	* test/lhiptest_banning.c: a new unit test for testing banning
+
 2017-04-25	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* LibHideIP version 1.5
@@ -60,7 +170,7 @@
 	* src/lhip_main.c, src/lhip_priv.h: added __lhip_duplicate_string()
 	* src/lhip_addr.c (__lhip_add_local_address): using the new
 	  __lhip_duplicate_string() function to add new addresses
-	* src/lhip_addr.c (__lhip_change_data): makeing sure that name is
+	* src/lhip_addr.c (__lhip_change_data): making sure that name is
 	  zero-terminated, small speed improvement
 	* src/lhip_net.c (gethostname): wipe the real hostname if the option
 	  --enable-gui-applications=yes was not provided.

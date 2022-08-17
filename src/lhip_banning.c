@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- private file and program banning functions.
  *
- * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -88,11 +88,7 @@
 /* =============================================================== */
 
 int GCC_WARN_UNUSED_RESULT
-__lhip_check_prog_ban (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+__lhip_check_prog_ban (LHIP_VOID)
 {
 	int	ret = 0;	/* DEFAULT: NO, this program is not banned */
 	LHIP_MAKE_ERRNO_VAR(err);
@@ -113,12 +109,9 @@ __lhip_check_prog_ban (
 		return 0;
 	}
 
-	if ( __lhip_real_fopen_location () != NULL )
-	{
-		ret = __banning_is_banned ("libhideip.progban",
-			LHIP_BANNING_USERFILE, LHIP_BANNING_ENV,
-			__banning_exename);
-	}
+	ret = __banning_is_banned ("libhideip.progban",
+		LHIP_BANNING_USERFILE, LHIP_BANNING_ENV,
+		__banning_exename);
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: __lhip_check_prog_ban()=%d\n", ret);
 	fflush (stderr);

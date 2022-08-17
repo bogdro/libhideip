@@ -223,6 +223,13 @@ typedef unsigned int bpf_u_int32;
 #  endif
 # endif
 
+# if (!defined HAVE_RES_NQUERY) && (!defined res_nquery)
+typedef struct {
+	char dummy;
+} * res_state;
+# endif
+
+
 /* --- Function typedefs. */
 /* network-related functions: */
 typedef struct hostent * (*shp_vp_sl_i)		LHIP_PARAMS ((const void * addr, socklen_t len, int type));
@@ -254,6 +261,10 @@ typedef int (*i_cp_cp_sap_sapp)			LHIP_PARAMS ((const char *node, const char *se
 							struct addrinfo **res));
 typedef int (*i_cp_cpp_cpp)			LHIP_PARAMS ((const char *filename, char *const argv[],
 							char *const envp[]));
+typedef int (*i_i_cpp_cpp)			LHIP_PARAMS ((int fd, char *const argv[],
+							char *const envp[]));
+typedef int (*i_i_cp_cpp_cpp_i)			LHIP_PARAMS ((int dirfd, const char *filename,
+							char *const argv[], char *const envp[], int flags));
 typedef int (*i_cp)				LHIP_PARAMS ((const char *command));
 typedef int (*i_i_i_va)				LHIP_PARAMS ((int d, unsigned long int request, ...));
 typedef int (*i_i_i_i)				LHIP_PARAMS ((int domain, int type, int protocol));
@@ -281,23 +292,38 @@ typedef int	(*i_i_cp_i_)			LHIP_PARAMS ((const int dir_fd, const char * const pa
 /* name resolving functions: */
 typedef int (*ccp_i_ucp_i)			LHIP_PARAMS ((const char *dname, int class, int type,
 							unsigned char *answer, int anslen));
-typedef int (*ccp_cpp_i_ucp_i)			LHIP_PARAMS ((const char *name, const char *domain, int class,
-							int type, unsigned char *answer, int anslen));
+typedef int (*r_ccp_i_ucp_i)			LHIP_PARAMS ((res_state state, const char *dname,
+							int class, int type, unsigned char *answer,
+					     		int anslen));
+typedef int (*ccp_cpp_i_ucp_i)			LHIP_PARAMS ((const char *name, const char *domain,
+							int class, int type, unsigned char *answer,
+					       		int anslen));
+typedef int (*r_ccp_cpp_i_ucp_i)		LHIP_PARAMS ((res_state state, const char *name,
+							const char *domain, int class, int type,
+							unsigned char *answer, int anslen));
 typedef int (*i_ccp_i_i_cucp_i_cucp_ucp_i)	LHIP_PARAMS ((int op, const char *dname, int class, int type,
 							const unsigned char *data, int datalen,
 							const unsigned char *newrr, unsigned char *buf,
 							int buflen));
+typedef int (*r_i_ccp_i_i_cucp_i_cucp_ucp_i)	LHIP_PARAMS ((res_state state, int op, const char *dname,
+							int class, int type, const unsigned char *data,
+							int datalen, const unsigned char *newrr,
+							unsigned char *buf, int buflen));
 /* libpcap functions: */
 typedef char * (*cp_cp)				LHIP_PARAMS ((char *errbuf));
 typedef int (*i_ccp_uip_uip_cp)			LHIP_PARAMS ((const char * device, bpf_u_int32 * netp,
 							bpf_u_int32 * maskp, char * errbuf));
 
 typedef pcap_t * (*pp_ccp_cp)			LHIP_PARAMS ((const char * source, char * errbuf));
+typedef pcap_t * (*pp_ccp_ui_cp)		LHIP_PARAMS ((const char * source, u_int t, char * errbuf));
 typedef pcap_t * (*pp_i_i)			LHIP_PARAMS ((int linktype, int snaplen));
+typedef pcap_t * (*pp_i_i_ui)			LHIP_PARAMS ((int linktype, int snaplen, u_int t));
 typedef pcap_t * (*pp_ccp_i_i_i_cp)		LHIP_PARAMS ((const char * device, int snaplen,
 							int promisc, int to_ms, char * errbuf));
 typedef pcap_t * (*pp_Fp_cp)			LHIP_PARAMS ((FILE * fp, char * errbuf));
+typedef pcap_t * (*pp_Fp_ui_cp)			LHIP_PARAMS ((FILE * fp, u_int t, char * errbuf));
 typedef pcap_t * (*pp_ipt_cp)			LHIP_PARAMS ((intptr_t a, char * errbuf));
+typedef pcap_t * (*pp_ipt_ui_cp)		LHIP_PARAMS ((intptr_t a, u_int t, char * errbuf));
 typedef int (*i_ifpp_cp)			LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
 
 # ifdef __cplusplus
@@ -319,6 +345,8 @@ extern GCC_WARN_UNUSED_RESULT i_sipp				__lhip_real_getifaddrs_location LHIP_PAR
 extern GCC_WARN_UNUSED_RESULT i_ssp_sl_cp_s_cp_s_i		__lhip_real_getnameinfo_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_cp_cp_sap_sapp			__lhip_real_getaddrinfo_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_cp_cpp_cpp			__lhip_real_execve_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_cpp_cpp			__lhip_real_fexecve_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_cp_cpp_cpp_i			__lhip_real_execveat_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_cp				__lhip_real_system_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_i_i_va				__lhip_real_ioctl_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_i_i_i				__lhip_real_socket_location LHIP_PARAMS ((void));
@@ -345,19 +373,27 @@ extern GCC_WARN_UNUSED_RESULT i_i_cp_i_				__lhip_real_openat_location LHIP_PARA
 
 /* name resolving functions: */
 extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_query_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT r_ccp_i_ucp_i			__lhip_real_res_nquery_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_search_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT r_ccp_i_ucp_i			__lhip_real_res_nsearch_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT ccp_cpp_i_ucp_i			__lhip_real_res_querydomain_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT r_ccp_cpp_i_ucp_i			__lhip_real_res_nquerydomain_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT r_i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_nmkquery_location LHIP_PARAMS ((void));
 
 /* libpcap functions: */
 extern GCC_WARN_UNUSED_RESULT cp_cp				__lhip_real_pcap_lookupdev_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_ccp_uip_uip_cp			__lhip_real_pcap_lookupnet_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_create_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT pp_i_i				__lhip_real_pcap_open_dead_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_i_i_ui				__lhip_real_pcap_o_d_tstamp_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT pp_ccp_i_i_i_cp			__lhip_real_pcap_open_live_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_open_offline_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_ui_cp			__lhip_real_pcap_open_offline_ts_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT pp_Fp_cp				__lhip_real_pcap_fopen_offline_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_Fp_ui_cp			__lhip_real_pcap_fopen_offline_ts_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT pp_ipt_cp				__lhip_real_pcap_hopen_offline_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ipt_ui_cp			__lhip_real_pcap_hopen_offline_ts_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_ifpp_cp				__lhip_real_pcap_findalldevs_location LHIP_PARAMS ((void));
 
 /* The library functions: */
@@ -406,7 +442,12 @@ extern void __lhip_mem_set LHIP_PARAMS ((void * const dest,
 #  define LHIP_MEMSET __lhip_mem_set
 # endif
 
+# ifdef HAVE_STRDUP
+#  define LHIP_STRDUP strdup
+# else
 extern char * __lhip_duplicate_string LHIP_PARAMS ((const char src[]));
+#  define LHIP_STRDUP __lhip_duplicate_string
+# endif
 
 
 # ifdef __cplusplus
@@ -459,6 +500,12 @@ extern char * __lhip_duplicate_string LHIP_PARAMS ((const char src[]));
 #   warning x Glibc version 2.11 has a bug in dl(v)sym. Read the documentation.
 #   warning x
 #  endif
+# endif
+
+# ifdef LHIP_ANSIC
+#  define LHIP_VOID void
+# else
+#  define LHIP_VOID
 # endif
 
 #endif /* _LHIP_HEADER */

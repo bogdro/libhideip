@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- file opening functions' replacements.
  *
- * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -81,72 +81,89 @@ extern int open64 LHIP_PARAMS ((const char * const path, const int flags, ... ))
 
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef HAVE_OPENAT
-# ifdef __cplusplus
-extern "C" {
-# endif
-
 extern int openat LHIP_PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
-
-# ifdef __cplusplus
-}
-# endif
-
 #endif
-
 #ifndef HAVE_OPENAT64
-# ifdef __cplusplus
-extern "C" {
-# endif
-
 extern int openat64 LHIP_PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
-
-# ifdef __cplusplus
-}
-# endif
-
 #endif
-
 /*
 #ifndef HAVE_FOPEN64
-# ifdef __cplusplus
-extern "C" {
-# endif
-
 extern FILE* fopen64 LHIP_PARAMS ((const char * const name, const char * const mode));
-
-# ifdef __cplusplus
-}
-# endif
-
 #endif
 
 #ifndef HAVE_FREOPEN64
-# ifdef __cplusplus
-extern "C" {
-# endif
-
 extern FILE* freopen64 LHIP_PARAMS ((const char * const path, const char * const mode, FILE * stream));
-
-# ifdef __cplusplus
-}
-# endif
-
 #endif
 
 #ifndef HAVE_OPEN64
-# ifdef __cplusplus
-extern "C" {
-# endif
-
 extern int open64 LHIP_PARAMS ((const char * const path, const int flags, ... ));
-
-# ifdef __cplusplus
-}
-# endif
-
 #endif
 */
+
+#ifdef __cplusplus
+}
+#endif
+
+/* ======================================================= */
+
+#ifndef LHIP_ANSIC
+static FILE* generic_fopen LHIP_PARAMS((
+	const char * const name, const char * const mode,
+	const fp_cp_cp real_fopen));
+#endif
+
+static FILE*
+generic_fopen (
+#ifdef LHIP_ANSIC
+	const char * const name, const char * const mode,
+	const fp_cp_cp real_fopen)
+#else
+	name, mode, real_fopen)
+	const char * const name;
+	const char * const mode;
+	const fp_cp_cp real_fopen;
+#endif
+{
+	LHIP_MAKE_ERRNO_VAR(err);
+
+	if ( real_fopen == NULL )
+	{
+		LHIP_SET_ERRNO_MISSING();
+		return NULL;
+	}
+
+	if ( name == NULL )
+	{
+		LHIP_SET_ERRNO (err);
+		return (*real_fopen) (name, mode);
+	}
+
+	if ( name[0] == '\0' /*strlen (name) == 0*/ )
+	{
+		LHIP_SET_ERRNO (err);
+		return (*real_fopen) (name, mode);
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		LHIP_SET_ERRNO (err);
+		return (*real_fopen) (name, mode);
+	}
+
+	if ( __lhip_is_forbidden_file (name) != 0 )
+	{
+		LHIP_SET_ERRNO_PERM();
+		return NULL;
+	}
+	LHIP_SET_ERRNO (err);
+	return (*real_fopen) (name, mode);
+}
 
 /* ======================================================= */
 
@@ -167,48 +184,15 @@ fopen64 (
 #if (defined __GNUC__) && (!defined fopen64)
 # pragma GCC poison fopen64
 #endif
-	LHIP_MAKE_ERRNO_VAR(err);
-
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: fopen64(%s, %s)\n", (name == NULL)? "null" : name,
+	fprintf (stderr, "libhideip: fopen64(%s, %s)\n",
+		(name == NULL)? "null" : name,
 		(mode == NULL)? "null" : mode);
 	fflush (stderr);
 #endif
-
-	if ( __lhip_real_fopen64_location () == NULL )
-	{
-		LHIP_SET_ERRNO_MISSING();
-		return NULL;
-	}
-
-	if ( name == NULL )
-	{
-		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_fopen64_location ()) (name, mode);
-	}
-
-	if ( name[0] == '\0' /*strlen (name) == 0*/ )
-	{
-		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_fopen64_location ()) (name, mode);
-	}
-
-	if ( (__lhip_check_prog_ban () != 0)
-		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
-	{
-		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_fopen64_location ()) (name, mode);
-	}
-
-	if ( __lhip_is_forbidden_file (name) != 0 )
-	{
-		LHIP_SET_ERRNO_PERM();
-		return NULL;
-	}
-	LHIP_SET_ERRNO (err);
-	return (*__lhip_real_fopen64_location ()) (name, mode);
+	return generic_fopen (name, mode, __lhip_real_fopen64_location ());
 }
 
 /* ======================================================= */
@@ -230,50 +214,79 @@ fopen (
 #if (defined __GNUC__) && (!defined fopen)
 # pragma GCC poison fopen
 #endif
-	LHIP_MAKE_ERRNO_VAR(err);
-
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: fopen(%s, %s)\n", (name == NULL)? "null" : name,
+	fprintf (stderr, "libhideip: fopen(%s, %s)\n",
+		(name == NULL)? "null" : name,
 		(mode == NULL)? "null" : mode);
 	fflush (stderr);
 #endif
+	return generic_fopen (name, mode, __lhip_real_fopen_location ());
+}
 
-	if ( __lhip_real_fopen_location () == NULL )
+/* ======================================================= */
+
+#ifndef LHIP_ANSIC
+static FILE* generic_freopen LHIP_PARAMS((
+	const char * const name, const char * const mode, FILE * stream,
+	const fp_cp_cp_fp real_freopen));
+#endif
+
+static FILE*
+generic_freopen (
+#ifdef LHIP_ANSIC
+	const char * const path, const char * const mode, FILE * stream,
+	const fp_cp_cp_fp real_freopen)
+#else
+	path, mode, stream, real_freopen)
+	const char * const path;
+	const char * const mode;
+	FILE * stream;
+	const fp_cp_cp_fp real_freopen;
+#endif
+{
+	LHIP_MAKE_ERRNO_VAR(err);
+
+	if ( real_freopen == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return NULL;
 	}
 
-	if ( name == NULL )
+	if ( path == NULL )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_fopen_location ()) (name, mode);
+		return (*real_freopen) ( path, mode, stream );
 	}
 
-	if ( name[0] == '\0' /*strlen (name) == 0*/ )
+	if ( path[0] == '\0' /*(strlen (path) == 0)*/ )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_fopen_location ()) (name, mode);
+		return (*real_freopen) ( path, mode, stream );
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_fopen_location ()) (name, mode);
+		return (*real_freopen) ( path, mode, stream );
 	}
 
-	if ( __lhip_is_forbidden_file (name) != 0 )
+	if ( __lhip_is_forbidden_file (path) != 0 )
 	{
+		if ( stream != NULL )
+		{
+			fclose (stream);
+		}
 		LHIP_SET_ERRNO_PERM();
 		return NULL;
 	}
 
 	LHIP_SET_ERRNO (err);
-	return (*__lhip_real_fopen_location ()) (name, mode);
+	return (*real_freopen) ( path, mode, stream );
 }
+
 /* ======================================================= */
 
 #ifdef freopen64
@@ -283,10 +296,10 @@ fopen (
 FILE*
 freopen64 (
 #ifdef LHIP_ANSIC
-	const char * const path, const char * const mode, FILE * stream)
+	const char * const name, const char * const mode, FILE * stream)
 #else
-	path, mode, stream)
-	const char * const path;
+	name, mode, stream)
+	const char * const name;
 	const char * const mode;
 	FILE * stream;
 #endif
@@ -294,49 +307,17 @@ freopen64 (
 #if (defined __GNUC__) && (!defined freopen64)
 # pragma GCC poison freopen64
 #endif
-	LHIP_MAKE_ERRNO_VAR(err);
-
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: freopen64(%s, %s, %ld)\n",
-		(path == NULL)? "null" : path, (mode == NULL)? "null" : mode, (long int)stream);
+		(name == NULL)? "null" : name,
+		(mode == NULL)? "null" : mode,
+		(long int)stream);
 	fflush (stderr);
 #endif
-
-	if ( __lhip_real_freopen64_location () == NULL )
-	{
-		LHIP_SET_ERRNO_MISSING();
-		return NULL;
-	}
-
-	if ( path == NULL )
-	{
-		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
-	}
-
-	if ( path[0] == '\0' /*(strlen (path) == 0)*/ )
-	{
-		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
-	}
-
-	if ( (__lhip_check_prog_ban () != 0)
-		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
-	{
-		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
-	}
-
-	if ( __lhip_is_forbidden_file (path) != 0 )
-	{
-		LHIP_SET_ERRNO_PERM();
-		return NULL;
-	}
-
-	LHIP_SET_ERRNO (err);
-	return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
+	return generic_freopen (name, mode, stream,
+		__lhip_real_freopen64_location ());
 }
 
 /* ======================================================= */
@@ -359,49 +340,75 @@ freopen (
 #if (defined __GNUC__) && (!defined freopen)
 # pragma GCC poison freopen
 #endif
-	LHIP_MAKE_ERRNO_VAR(err);
-
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: freopen(%s, %s, %ld)\n",
-		(name == NULL)? "null" : name, (mode == NULL)? "null" : mode, (long int)stream);
+		(name == NULL)? "null" : name,
+		(mode == NULL)? "null" : mode,
+		(long int)stream);
 	fflush (stderr);
 #endif
+	return generic_freopen (name, mode, stream,
+		__lhip_real_freopen_location ());
+}
 
-	if ( __lhip_real_freopen_location () == NULL )
+/* ======================================================= */
+
+#ifndef LHIP_ANSIC
+static int generic_open LHIP_PARAMS((
+	const char * const path, const int flags,
+	const mode_t mode, const i_cp_i_ real_open));
+#endif
+
+static int
+generic_open (
+#ifdef LHIP_ANSIC
+	const char * const path, const int flags,
+	const mode_t mode, const i_cp_i_ real_open)
+#else
+	path, flags, mode, real_open)
+	const char * const path;
+	const int flags;
+	const mode_t mode;
+	const i_cp_i_ real_open;
+#endif
+{
+	LHIP_MAKE_ERRNO_VAR(err);
+
+	if ( real_open == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
-		return NULL;
+		return -1;
 	}
 
-	if ( name == NULL )
+	if ( path == NULL )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_freopen_location ()) ( name, mode, stream );
+		return (*real_open) ( path, flags, mode );
 	}
 
-	if ( name[0] == '\0' /*(strlen (name) == 0)*/ )
+	if ( path[0] == '\0' /*strlen (path) == 0*/ )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_freopen_location ()) ( name, mode, stream );
+		return (*real_open) ( path, flags, mode );
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_freopen_location ()) ( name, mode, stream );
+		return (*real_open) ( path, flags, mode );
 	}
 
-	if ( __lhip_is_forbidden_file (name) != 0 )
+	if ( __lhip_is_forbidden_file (path) != 0 )
 	{
 		LHIP_SET_ERRNO_PERM();
-		return NULL;
+		return -1;
 	}
 
 	LHIP_SET_ERRNO (err);
-	return (*__lhip_real_freopen_location ()) ( name, mode, stream );
+	return (*real_open) ( path, flags, mode );
 }
 
 /* ======================================================= */
@@ -447,17 +454,6 @@ open64 (
 
 	__lhip_main ();
 
-#ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: open64(%s, 0%o, ...)\n", (path == NULL)? "null" : path, flags);
-	fflush (stderr);
-#endif
-
-	if ( __lhip_real_open64_location () == NULL )
-	{
-		LHIP_SET_ERRNO_MISSING();
-		return -1;
-	}
-
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 # ifdef LHIP_ANSIC
 	va_start (args, flags);
@@ -472,60 +468,18 @@ open64 (
 	}
 #endif
 
-	if ( path == NULL )
-	{
-		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_open64_location ()) ( path, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: open64(%s, 0%o, ...)\n",
+		(path == NULL)? "null" : path, flags);
+	fflush (stderr);
 #endif
-		return ret_fd;
-	}
 
-	if ( path[0] == '\0' /*strlen (path) == 0*/ )
-	{
-		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_open64_location ()) ( path, flags, mode );
+	ret_fd = generic_open (path, flags, mode, __lhip_real_open64_location ());
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
-#endif
-		return ret_fd;
-	}
-
-	if ( (__lhip_check_prog_ban () != 0)
-		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
-	{
-		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_open64_location ()) ( path, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
-#endif
-		return ret_fd;
-	}
-
-	if ( __lhip_is_forbidden_file (path) != 0 )
-	{
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		va_end (args);
-#endif
-		LHIP_SET_ERRNO_PERM();
-		return -1;
-	}
-
-	LHIP_SET_ERRNO (err);
-	ret_fd = (*__lhip_real_open64_location ()) ( path, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-	LHIP_GET_ERRNO (err);
+	LHIP_GET_ERRNO(err);
 	va_end (args);
 	LHIP_SET_ERRNO (err);
 #endif
-
 	return ret_fd;
 }
 
@@ -565,17 +519,6 @@ open (
 
 	__lhip_main ();
 
-#ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: open(%s, 0%o, ...)\n", (name == NULL)? "null" : name, flags);
-	fflush (stderr);
-#endif
-
-	if ( __lhip_real_open_location () == NULL )
-	{
-		LHIP_SET_ERRNO_MISSING();
-		return -1;
-	}
-
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 # ifdef LHIP_ANSIC
 	va_start (args, flags);
@@ -590,62 +533,72 @@ open (
 	}
 #endif
 
-	if ( name == NULL )
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: open(%s, 0%o, ...)\n",
+		(name == NULL)? "null" : name, flags);
+	fflush (stderr);
+#endif
+
+	ret_fd = generic_open (name, flags, mode, __lhip_real_open_location ());
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+	LHIP_GET_ERRNO (err);
+	va_end (args);
+	LHIP_SET_ERRNO (err);
+#endif
+	return ret_fd;
+}
+
+/* ======================================================= */
+
+#ifndef LHIP_ANSIC
+static int generic_openat LHIP_PARAMS((
+	const int dirfd, const char * const path, const int flags,
+	const mode_t mode, const i_i_cp_i_ real_openat));
+#endif
+
+static int
+generic_openat (
+#ifdef LHIP_ANSIC
+	const int dirfd, const char * const pathname, const int flags,
+	const mode_t mode, const i_i_cp_i_ real_openat)
+#else
+	dirfd, pathname, flags, mode, real_openat)
+	const int dirfd;
+	const char * const pathname;
+	const int flags;
+	const mode_t mode;
+	const i_i_cp_i_ real_openat;
+#endif
+{
+	LHIP_MAKE_ERRNO_VAR(err);
+
+	if ( pathname == NULL )
 	{
 		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_open_location ()) ( name, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
-#endif
-		return ret_fd;
+		return (*real_openat) ( dirfd, pathname, flags, mode );
 	}
 
-	if ( name[0] == '\0' /*strlen (name) == 0*/ )
+	if ( pathname[0] == '\0' /*strlen (pathname) == 0*/ )
 	{
 		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_open_location ()) ( name, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
-#endif
-		return ret_fd;
+		return (*real_openat) ( dirfd, pathname, flags, mode );
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_open_location ()) ( name, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
-#endif
-		return ret_fd;
+		return (*real_openat) ( dirfd, pathname, flags, mode );
 	}
 
-	if ( __lhip_is_forbidden_file (name) != 0 )
+	if ( __lhip_is_forbidden_file (pathname) != 0 )
 	{
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		va_end (args);
-#endif
 		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
 
-
 	LHIP_SET_ERRNO (err);
-	ret_fd = (*__lhip_real_open_location ()) ( name, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-	LHIP_GET_ERRNO (err);
-	va_end (args);
-	LHIP_SET_ERRNO (err);
-#endif
-
-	return ret_fd;
+	return (*real_openat) ( dirfd, pathname, flags, mode );
 }
 
 /* ======================================================= */
@@ -686,18 +639,6 @@ openat64 (
 
 	__lhip_main ();
 
-#ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: openat64(%d, %s, 0%o, ...)\n",
-		dirfd, (pathname == NULL)? "null" : pathname, flags);
-	fflush (stderr);
-#endif
-
-	if ( __lhip_real_openat64_location () == NULL )
-	{
-		LHIP_SET_ERRNO_MISSING();
-		return -1;
-	}
-
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 # ifdef LHIP_ANSIC
 	va_start (args, flags);
@@ -712,55 +653,14 @@ openat64 (
 		mode = va_arg (args, mode_t);
 	}
 #endif
-
-	if ( pathname == NULL )
-	{
-		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_openat64_location ()) ( dirfd, pathname, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: openat64(%d, %s, 0%o, ...)\n",
+		dirfd, (pathname == NULL)? "null" : pathname, flags);
+	fflush (stderr);
 #endif
-		return ret_fd;
-	}
 
-	if ( pathname[0] == '\0' /*strlen (pathname) == 0*/ )
-	{
-		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_openat64_location ()) ( dirfd, pathname, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
-#endif
-		return ret_fd;
-	}
-
-	if ( (__lhip_check_prog_ban () != 0)
-		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
-	{
-		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_openat64_location ()) ( dirfd, pathname, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
-#endif
-		return ret_fd;
-	}
-
-	if ( __lhip_is_forbidden_file (pathname) != 0 )
-	{
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		va_end (args);
-#endif
-		LHIP_SET_ERRNO_PERM();
-		return -1;
-	}
-
-	LHIP_SET_ERRNO (err);
-	ret_fd = (*__lhip_real_openat64_location ()) ( dirfd, pathname, flags, mode );
+	ret_fd = generic_openat (dirfd, pathname, flags, mode,
+		__lhip_real_openat64_location ());
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	LHIP_GET_ERRNO (err);
 	va_end (args);
@@ -814,18 +714,6 @@ openat (
 
 	__lhip_main ();
 
-#ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: openat(%d, %s, 0%o, ...)\n", dirfd,
-		(pathname == NULL)? "null" : pathname, flags);
-	fflush (stderr);
-#endif
-
-	if ( __lhip_real_openat_location () == NULL )
-	{
-		LHIP_SET_ERRNO_MISSING();
-		return -1;
-	}
-
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 # ifdef LHIP_ANSIC
 	va_start (args, flags);
@@ -841,55 +729,14 @@ openat (
 	}
 #endif
 
-	if ( pathname == NULL )
-	{
-		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_openat_location ()) ( dirfd, pathname, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: openat(%d, %s, 0%o, ...)\n", dirfd,
+		(pathname == NULL)? "null" : pathname, flags);
+	fflush (stderr);
 #endif
-		return ret_fd;
-	}
 
-	if ( pathname[0] == '\0' /*strlen (pathname) == 0*/ )
-	{
-		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_openat_location ()) ( dirfd, pathname, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
-#endif
-		return ret_fd;
-	}
-
-	if ( (__lhip_check_prog_ban () != 0)
-		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
-	{
-		LHIP_SET_ERRNO (err);
-		ret_fd = (*__lhip_real_openat_location ()) ( dirfd, pathname, flags, mode );
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		LHIP_GET_ERRNO (err);
-		va_end (args);
-		LHIP_SET_ERRNO (err);
-#endif
-		return ret_fd;
-	}
-
-	if ( __lhip_is_forbidden_file (pathname) != 0 )
-	{
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-		va_end (args);
-#endif
-		LHIP_SET_ERRNO_PERM();
-		return -1;
-	}
-
-
-	LHIP_SET_ERRNO (err);
-	ret_fd = (*__lhip_real_openat_location ()) ( dirfd, pathname, flags, mode );
+	ret_fd = generic_openat (dirfd, pathname, flags, mode,
+		__lhip_real_openat_location ());
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	LHIP_GET_ERRNO (err);
 	va_end (args);

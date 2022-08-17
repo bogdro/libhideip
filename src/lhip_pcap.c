@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- libpcap functions' replacements.
  *
- * Copyright (C) 2011-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2011-2019 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -60,11 +60,15 @@ extern int pcap_lookupnet LHIP_PARAMS ((const char * device, bpf_u_int32 * netp,
 	bpf_u_int32 * maskp, char * errbuf));
 extern pcap_t * pcap_create LHIP_PARAMS ((const char * source, char * errbuf));
 extern pcap_t * pcap_open_dead LHIP_PARAMS ((int linktype, int snaplen));
+extern pcap_t * pcap_open_dead_with_tstamp_precision LHIP_PARAMS ((int, int, u_int));
 extern pcap_t * pcap_open_live LHIP_PARAMS ((const char * device, int snaplen,
 	int promisc, int to_ms, char * errbuf));
 extern pcap_t * pcap_open_offline LHIP_PARAMS ((const char * fname, char * errbuf));
+extern pcap_t * pcap_open_offline_with_tstamp_precision LHIP_PARAMS ((const char *, u_int, char *));
 extern pcap_t * pcap_fopen_offline LHIP_PARAMS ((FILE * fp, char * errbuf));
+extern pcap_t * pcap_fopen_offline_with_tstamp_precision LHIP_PARAMS ((FILE *, u_int, char *));
 extern int pcap_findalldevs LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
+
 #  ifdef __cplusplus
 }
 #  endif
@@ -72,8 +76,18 @@ extern int pcap_findalldevs LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
 # endif
 #endif
 
-#if !defined(WIN32)
+#if (!defined _WIN32) && (!defined WIN32)
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 extern pcap_t * pcap_hopen_offline LHIP_PARAMS ((intptr_t a, char * errbuf));
+extern pcap_t * pcap_hopen_offline_with_tstamp_precision LHIP_PARAMS ((intptr_t, u_int, char *));
+
+# ifdef __cplusplus
+}
+# endif
+
 #endif
 
 /* =============================================================== */
@@ -192,7 +206,7 @@ pcap_open_dead (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_open_dead(%d)\n", linktype);
+	fprintf (stderr, "libhideip: pcap_open_dead(%d, %d)\n", linktype, snaplen);
 	fflush (stderr);
 #endif
 
@@ -205,6 +219,41 @@ pcap_open_dead (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_open_dead_location ()) (linktype, snaplen);
+	}
+
+	return NULL;
+}
+
+/* =============================================================== */
+
+pcap_t *
+pcap_open_dead_with_tstamp_precision (
+#ifdef LHIP_ANSIC
+	int linktype, int snaplen, u_int t)
+#else
+	linktype, snaplen, t)
+	int linktype;
+	int snaplen;
+	u_int t;
+#endif
+{
+	__lhip_main ();
+
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: pcap_open_dead_with_tstamp_precision(%d, %d, %d)\n",
+		linktype, snaplen, t);
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_pcap_o_d_tstamp_location () == NULL )
+	{
+		return NULL;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		return (*__lhip_real_pcap_o_d_tstamp_location ()) (linktype, snaplen ,t);
 	}
 
 	return NULL;
@@ -283,6 +332,41 @@ pcap_open_offline (
 /* =============================================================== */
 
 pcap_t *
+pcap_open_offline_with_tstamp_precision (
+#ifdef LHIP_ANSIC
+	const char * fname, u_int t, char * errbuf)
+#else
+	fname, t, errbuf)
+	const char * fname;
+	u_int t;
+	char * errbuf;
+#endif
+{
+	__lhip_main ();
+
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: pcap_open_offline_with_tstamp_precision(%s, %d)\n",
+		(fname == NULL)? "null" : fname, t);
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_pcap_open_offline_ts_location () == NULL )
+	{
+		return NULL;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		return (*__lhip_real_pcap_open_offline_ts_location ()) (fname, t, errbuf);
+	}
+
+	return NULL;
+}
+
+/* =============================================================== */
+
+pcap_t *
 pcap_fopen_offline (
 #ifdef LHIP_ANSIC
 	FILE * fp, char * errbuf)
@@ -316,6 +400,41 @@ pcap_fopen_offline (
 /* =============================================================== */
 
 pcap_t *
+pcap_fopen_offline_with_tstamp_precision (
+#ifdef LHIP_ANSIC
+	FILE * fp, u_int t, char * errbuf)
+#else
+	fp, t, errbuf)
+	FILE * fp;
+	u_int t;
+	char * errbuf;
+#endif
+{
+	__lhip_main ();
+
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: pcap_fopen_offline_with_tstamp_precision(0x%x, %d)\n",
+		(unsigned int)fp, t);
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_pcap_fopen_offline_ts_location () == NULL )
+	{
+		return NULL;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		return (*__lhip_real_pcap_fopen_offline_ts_location ()) (fp, t, errbuf);
+	}
+
+	return NULL;
+}
+
+/* =============================================================== */
+
+pcap_t *
 pcap_hopen_offline (
 #ifdef LHIP_ANSIC
 	intptr_t a, char * errbuf)
@@ -328,7 +447,7 @@ pcap_hopen_offline (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_hopen_offline(0x%x)\n", a);
+	fprintf (stderr, "libhideip: pcap_hopen_offline(0x%lx)\n", (unsigned long int)a);
 	fflush (stderr);
 #endif
 
@@ -341,6 +460,41 @@ pcap_hopen_offline (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_hopen_offline_location ()) (a, errbuf);
+	}
+
+	return NULL;
+}
+
+/* =============================================================== */
+
+pcap_t *
+pcap_hopen_offline_with_tstamp_precision (
+#ifdef LHIP_ANSIC
+	intptr_t a, u_int t, char * errbuf)
+#else
+	a, t, errbuf)
+	intptr_t a;
+	u_int t;
+	char * errbuf;
+#endif
+{
+	__lhip_main ();
+
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: pcap_hopen_offline_with_tstamp_precision(0x%lx, %d)\n",
+		(unsigned long int)a, t);
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_pcap_hopen_offline_ts_location () == NULL )
+	{
+		return NULL;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		return (*__lhip_real_pcap_hopen_offline_ts_location ()) (a, t, errbuf);
 	}
 
 	return NULL;

@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- execution functions' replacements.
  *
- * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -27,7 +27,10 @@
 
 #define _BSD_SOURCE 1
 #define _XOPEN_SOURCE 500
-#define _POSIX_C_SOURCE 200112L
+#define _POSIX_C_SOURCE 200809L
+#define _DEFAULT_SOURCE 1
+#define _ATFILE_SOURCE 1
+#define _GNU_SOURCE 1
 
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>	/* execve(), readlink() */
@@ -61,6 +64,10 @@
 #  include <memory.h>
 # endif
 # include <string.h>
+#endif
+
+#ifdef HAVE_LIBGEN_H
+# include <libgen.h>
 #endif
 
 #include "lhip_priv.h"
@@ -182,13 +189,30 @@ static const char * __lhip_valuable_files[] =
 #ifndef HAVE_MALLOC
 static char __lhip_linkpath[LHIP_MAXPATHLEN + 1];
 static char __lhip_newlinkpath[LHIP_MAXPATHLEN + 1];
+static char __lhip_newlinkdir[LHIP_MAXPATHLEN + 1];
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef HAVE_EXECVEAT
+extern int execveat LHIP_PARAMS ((int dirfd, const char *pathname,
+	char *const argv[], char *const envp[], int flags));
+#endif
+#ifndef HAVE_FEXECVE
+extern int fexecve LHIP_PARAMS ((int fd, char *const argv[], char *const envp[]));
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /* ======================================================= */
 
 #ifndef LHIP_ANSIC
-static const char * __lhip_get_target_link_path
-	LHIP_PARAMS ((const char * const name));
+static char * __lhip_get_target_link_path
+	LHIP_PARAMS ((char * const name));
 #endif
 
 /**
@@ -197,40 +221,62 @@ static const char * __lhip_get_target_link_path
  * \param name The name of the link to traverser.
  * \return The real target's name.
  */
-static const char * __lhip_get_target_link_path (
+static char * __lhip_get_target_link_path (
 #ifdef LHIP_ANSIC
-	const char * const name)
+	char * const name)
 #else
 	name)
-	const char * const name;
+	char * const name;
 #endif
 {
 #if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK) && (defined HAVE_LSTAT)
 	int res;
-	const char * current_name = name;
+	ssize_t lnk_res;
+	char * current_name;
 	off_t lsize;
 	struct stat st;
 # ifdef HAVE_MALLOC
 	char * __lhip_newlinkpath;
+	char * __lhip_newlinkdir;
 # endif
+	char * last_slash;
+	size_t dirname_len;
 
 	if ( name == NULL )
 	{
 		return NULL;
 	}
 
-	res = lstat (current_name, &st);
-	while ( res >= 0 )
+	current_name = LHIP_STRDUP (name);
+	if ( current_name != NULL )
 	{
-		if ( S_ISLNK (st.st_mode) )
+		res = lstat (current_name, &st);
+		while ( res >= 0 )
 		{
+			if ( ! S_ISLNK (st.st_mode) )
+			{
+				break;
+			}
 			lsize = st.st_size;
 			if ( lsize <= 0 )
 			{
 				break;
 			}
+			/* in case the link's target is a relative path,
+			prepare to prepend the link's directory name */
+			last_slash = rindex (current_name, '/');
+			if ( last_slash != NULL )
+			{
+				dirname_len = (size_t)(last_slash - current_name);
+			}
+			else
+			{
+				dirname_len = 0;
+			}
 # ifdef HAVE_MALLOC
-			__lhip_newlinkpath = (char *) malloc ((size_t)(lsize + 1));
+			__lhip_newlinkpath = (char *) malloc ((size_t)(
+				dirname_len + 1
+				+ (size_t)lsize + 1));
 			if ( __lhip_newlinkpath == NULL )
 			{
 				break;
@@ -238,24 +284,97 @@ static const char * __lhip_get_target_link_path (
 # else /* ! HAVE_MALLOC */
 			lsize = sizeof (__lhip_newlinkpath);
 # endif /* HAVE_MALLOC */
-			res = readlink (current_name, __lhip_newlinkpath, (size_t)lsize);
-			if ( (res < 0) || (res > lsize) )
+			LHIP_MEMSET (__lhip_newlinkpath, 0, (size_t)lsize);
+			lnk_res = readlink (current_name, __lhip_newlinkpath, (size_t)lsize);
+			if ( (lnk_res < 0) || (lnk_res > lsize) )
 			{
 				break;
 			}
-			__lhip_newlinkpath[res] = '\0';
+			__lhip_newlinkpath[lnk_res] = '\0';
+			if ( (__lhip_newlinkpath[0] != '/') && (dirname_len > 0) )
+			{
+				/* The link's target is a relative path (no slash) in a
+				different directory (there was a slash in the original path)
+				- append the link's directory name */
+# ifdef HAVE_MALLOC
+				__lhip_newlinkdir = (char *) malloc ((size_t)(
+					dirname_len + 1
+					+ (size_t)lsize + 1));
+				if ( __lhip_newlinkdir == NULL )
+				{
+					free (__lhip_newlinkpath);
+					break;
+				}
+# endif /* HAVE_MALLOC */
+				strncpy (__lhip_newlinkdir, current_name, dirname_len);
+				__lhip_newlinkdir[dirname_len] = '/';
+				__lhip_newlinkdir[dirname_len + 1] = '\0';
+				strncat (__lhip_newlinkdir, __lhip_newlinkpath,
+					(size_t)lsize + 1);
+				__lhip_newlinkdir[dirname_len + 1
+					+ (size_t)lsize] = '\0';
+				strncpy (__lhip_newlinkpath, __lhip_newlinkdir,
+					dirname_len + 1 + (size_t)lsize + 1);
+				__lhip_newlinkpath[dirname_len + 1 +
+					(size_t)lsize] = '\0';
+# ifdef HAVE_MALLOC
+				free (__lhip_newlinkdir);
+# endif /* HAVE_MALLOC */
+			}
+# ifdef HAVE_MALLOC
+			free (current_name);
+# endif /* HAVE_MALLOC */
 			current_name = __lhip_newlinkpath;
+
+			res = lstat (current_name, &st);
 		}
-		else
-		{
-			break;
-		}
-		res = lstat (current_name, &st);
+		return current_name;
 	}
-	return current_name;
+	else
+	{
+		/* memory not allocated - return the original */
+		return name;
+	}
 #else
 	return name;
 #endif /* (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK) && (defined HAVE_LSTAT) */
+}
+
+/* ======================================================= */
+
+#ifndef LHIP_ANSIC
+static char * __lhip_get_target_link_path_fd
+	LHIP_PARAMS ((const int fd));
+#endif
+
+/**
+ * Gets the final target object name of the given link (the name of the
+ *  first object being pointed to, which is not a link).
+ * \param name The name of the link to traverser.
+ * \return The real target's name.
+ */
+static char * __lhip_get_target_link_path_fd (
+#ifdef LHIP_ANSIC
+	const int fd)
+#else
+	fd)
+	const int fd;
+#endif
+{
+	/* strlen(/proc) + strlen(/self) + strlen(/fd/) + strlen(maxint) + '\0' */
+	char linkpath[5 + 5 + 4 + 10 + 1];
+
+	if ( fd < 0 )
+	{
+		return NULL;
+	}
+#ifdef HAVE_SNPRINTF
+	snprintf (linkpath, sizeof(linkpath) - 1, "/proc/self/fd/%d", fd);
+#else
+	sprintf (linkpath, "/proc/self/fd/%d", fd);
+#endif
+	linkpath[sizeof(linkpath) - 1] = '\0';
+	return __lhip_get_target_link_path (linkpath);
 }
 
 /* ======================================================= */
@@ -275,6 +394,7 @@ int __lhip_is_forbidden_file (
 {
 #ifdef HAVE_MALLOC
 	char * __lhip_linkpath;
+	char * name_copy;
 #endif
 	unsigned int j;
 	int ret = 0;
@@ -284,12 +404,18 @@ int __lhip_is_forbidden_file (
 		return 0;
 	}
 #ifdef HAVE_MALLOC
-	__lhip_linkpath = __lhip_get_target_link_path (name);
+	name_copy = LHIP_STRDUP (name);
+	if ( name_copy == NULL )
+	{
+		return 0;
+	}
+	__lhip_linkpath = __lhip_get_target_link_path (name_copy);
 #else
-	strncpy (__lhip_linkpath, __lhip_get_target_link_path (name), sizeof (__lhip_linkpath)-1);
+	strncpy (__lhip_linkpath, name, sizeof (__lhip_linkpath)-1);
+	strncpy (__lhip_linkpath, __lhip_get_target_link_path (__lhip_linkpath), sizeof (__lhip_linkpath)-1);
 	__lhip_linkpath[sizeof (__lhip_linkpath) - 1] = '\0';
 #endif
-	for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
+	for ( j = 0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
 	{
 		if ( strstr (__lhip_linkpath, __lhip_valuable_files[j]) != NULL )
 		{
@@ -298,7 +424,8 @@ int __lhip_is_forbidden_file (
 		}
 	}
 #ifdef HAVE_MALLOC
-	if ( (__lhip_linkpath != NULL) && (__lhip_linkpath != name) )
+	free (name_copy);
+	if ( (__lhip_linkpath != NULL) && (__lhip_linkpath != name_copy) )
 	{
 		free ((void *)__lhip_linkpath);
 	}
@@ -395,7 +522,8 @@ static int __lhip_is_forbidden_program (
 #  endif
 # endif
 #endif
-	unsigned int i, j, k;
+	size_t i, j;
+	unsigned int k;
 	int ret = 0;
 
 	if ( name == NULL )
@@ -404,36 +532,39 @@ static int __lhip_is_forbidden_program (
 	}
 
 #ifdef HAVE_MALLOC
-	__lhip_linkpath = (char *) malloc (LHIP_MAXPATHLEN + 1);
+	j = strlen (name);
+	j = LHIP_MAX (LHIP_MAXPATHLEN, j);
+	__lhip_linkpath = (char *) malloc (j + 1);
 	if ( __lhip_linkpath != NULL )
+#else
+	j = LHIP_MAXPATHLEN;
 #endif
 	{
-		for ( i = 0; i < LHIP_MAXPATHLEN + 1; i++ )
+		for ( i = 0; i < j + 1; i++ )
 		{
 			__lhip_linkpath[i] = '\0';
 		}
 
-		strncpy (__lhip_linkpath, name, LHIP_MAXPATHLEN);
-		__lhip_linkpath[LHIP_MAXPATHLEN] = '\0';
+		strncpy (__lhip_linkpath, name, j);
+		__lhip_linkpath[j] = '\0';
 #if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
 		if ( is_system )
 		{
-			/* system() call - find the full path of the program to run */
+			/* system() call - find the full path of the program to run.
+			   If space is not found, then 'name' is the full program
+			   name and it's already copied to '__lhip_linkpath' */
 			first_char = strchr (name, ' ');
 			if ( first_char != NULL )
 			{
+				/* space found - copy everything before it as the program name */
 				strncpy (__lhip_linkpath, name,
-					LHIP_MIN ((size_t)(first_char - name), LHIP_MAXPATHLEN));
+					LHIP_MIN ((size_t)(first_char - name), j));
+				__lhip_linkpath[first_char - name] = '\0';
 			}
-			else
-			{
-				i = strlen (name);
-				strncpy (__lhip_linkpath, name, LHIP_MIN (i, LHIP_MAXPATHLEN));
-			}
-			__lhip_linkpath[LHIP_MAXPATHLEN] = '\0';
+			__lhip_linkpath[j] = '\0';
 			if ( strncmp (__lhip_linkpath, LHIP_PATH_SEP, strlen(LHIP_PATH_SEP)) != 0 )
 			{
-				/* add path, so we have the full path to the oject and can check its type. */
+				/* add path, so we have the full path to the object and can check its type. */
 # if (defined HAVE_GETENV) && (defined HAVE_SYS_STAT_H)
 				path = getenv ("PATH");
 				if ( path != NULL )
@@ -442,10 +573,10 @@ static int __lhip_is_forbidden_program (
 #  if (defined HAVE_MALLOC)
 					if ( first_char != NULL )
 					{
-						path_dir = (char *) malloc (LHIP_MAXPATHLEN + 1);
+						path_dir = (char *) malloc (j + 1);
 						if ( path_dir != NULL )
 						{
-							for ( i = 0; i < LHIP_MAXPATHLEN + 1; i++ )
+							for ( i = 0; i < j + 1; i++ )
 							{
 								path_dir[i] = '\0';
 							}
@@ -453,9 +584,11 @@ static int __lhip_is_forbidden_program (
 							do
 							{
 								strncpy (path_dir, path,
-									LHIP_MIN ((size_t)(first_char - path), LHIP_MAXPATHLEN));
-								__lhip_append_path (path_dir, __lhip_linkpath, LHIP_MAXPATHLEN);
-								path_dir[LHIP_MAXPATHLEN] = '\0';
+									LHIP_MIN ((size_t)(first_char - path), j));
+								path_dir[LHIP_MIN ((size_t)(first_char - path), j)]
+									= '\0';
+								__lhip_append_path (path_dir, __lhip_linkpath, j);
+								path_dir[j] = '\0';
 								res = stat (path_dir, &st);
 								if ( res >= 0 )
 								{
@@ -474,15 +607,16 @@ static int __lhip_is_forbidden_program (
 						if ( path_dir != NULL )
 						{
 							strncpy (path_dir, path, strlen (path) + 1);
-							__lhip_append_path (path_dir, __lhip_linkpath, LHIP_MAXPATHLEN);
+							path_dir[strlen (path) + 1] = '\0';
+							__lhip_append_path (path_dir, __lhip_linkpath, j);
 							path_dir[strlen (path) + 1 + strlen (__lhip_linkpath)] = '\0';
 						}
 					}
 					/* path_dir, if not NULL, contains "PATH/name" */
 					if ( path_dir != NULL )
 					{
-						strncpy (__lhip_linkpath, path_dir, LHIP_MAXPATHLEN - 1);
-						__lhip_linkpath[LHIP_MAXPATHLEN] = '\0';
+						strncpy (__lhip_linkpath, path_dir, j);
+						__lhip_linkpath[j] = '\0';
 						free (path_dir);
 					}
 #  else
@@ -491,13 +625,16 @@ static int __lhip_is_forbidden_program (
 						strncpy (__lhip_newlinkpath, path,
 							LHIP_MIN ((size_t)(first_char - path),
 							sizeof (__lhip_newlinkpath) - 1));
+						__lhip_newlinkpath[LHIP_MIN ((size_t)(first_char - path),
+							sizeof (__lhip_newlinkpath) - 1)] = '\0';
 					}
 					else
 					{
 						strncpy (__lhip_newlinkpath, path,
 							sizeof (__lhip_newlinkpath) - 1);
+						__lhip_newlinkpath[sizeof (__lhip_newlinkpath) - 1]
+						= '\0';
 					}
-					__lhip_newlinkpath[sizeof (__lhip_newlinkpath) - 1] = '\0';
 					__lhip_append_path (__lhip_newlinkpath,
 						__lhip_linkpath, sizeof (__lhip_newlinkpath));
 					__lhip_newlinkpath[sizeof (__lhip_newlinkpath) - 1] = '\0';
@@ -510,7 +647,9 @@ static int __lhip_is_forbidden_program (
 			} /* if (path is not absolute) */
 		} /* if is_system */
 # ifdef HAVE_MALLOC
-		__lhip_linkpath = __lhip_get_target_link_path (__lhip_linkpath);
+		first_char = __lhip_get_target_link_path (__lhip_linkpath);
+		free ((void *)__lhip_linkpath);
+		__lhip_linkpath = first_char;
 # else
 		strncpy (__lhip_linkpath, __lhip_get_target_link_path (__lhip_linkpath),
 			sizeof (__lhip_linkpath)-1);
@@ -614,6 +753,109 @@ execve (
 		return -1;
 	}
 	return (*__lhip_real_execve_location ()) (filename, argv, envp);
+}
+
+/* =============================================================== */
+
+int
+fexecve (
+#ifdef LHIP_ANSIC
+	int fd, char *const argv[], char *const envp[])
+#else
+	fd, argv, envp)
+	int fd;
+	char *const argv[];
+	char *const envp[];
+#endif
+{
+	char * real_name;
+	int res;
+	LHIP_MAKE_ERRNO_VAR(err);
+
+	__lhip_main ();
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: fexecve(%d)\n", fd);
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_fexecve_location () == NULL )
+	{
+		LHIP_SET_ERRNO_MISSING();
+		return -1;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		LHIP_SET_ERRNO(err);
+		return (*__lhip_real_fexecve_location ()) (fd, argv, envp);
+	}
+
+	real_name = __lhip_get_target_link_path_fd (fd);
+	if ( real_name != NULL )
+	{
+		res = __lhip_is_forbidden_program (real_name, argv, 0);
+		if ( res != 0 )
+		{
+#ifdef HAVE_MALLOC
+			free ((void *)real_name);
+#endif
+			LHIP_SET_ERRNO_PERM();
+			return -1;
+		}
+	}
+	return (*__lhip_real_fexecve_location ()) (fd, argv, envp);
+}
+
+/* =============================================================== */
+
+int
+execveat (
+#ifdef LHIP_ANSIC
+	int dirfd, const char *filename, char *const argv[], char *const envp[], int flags)
+#else
+	dirfd, filename, argv, envp, flags)
+	int dirfd;
+	const char *filename;
+	char *const argv[];
+	char *const envp[];
+	int flags;
+#endif
+{
+	LHIP_MAKE_ERRNO_VAR(err);
+
+	__lhip_main ();
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: execveat(%d, %s)\n", dirfd,
+		(filename == NULL)? "null" : filename);
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_execveat_location () == NULL )
+	{
+		LHIP_SET_ERRNO_MISSING();
+		return -1;
+	}
+
+	if ( filename == NULL )
+	{
+		LHIP_SET_ERRNO(err);
+		return (*__lhip_real_execveat_location ()) (dirfd, filename, argv, envp, flags);
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		LHIP_SET_ERRNO(err);
+		return (*__lhip_real_execveat_location ()) (dirfd, filename, argv, envp, flags);
+	}
+
+	if ( __lhip_is_forbidden_program (filename, argv, 0) != 0 )
+	{
+		LHIP_SET_ERRNO_PERM();
+		return -1;
+	}
+	return (*__lhip_real_execveat_location ()) (dirfd, filename, argv, envp, flags);
 }
 
 /* =============================================================== */

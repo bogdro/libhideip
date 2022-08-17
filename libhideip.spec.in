@@ -1,4 +1,4 @@
-# Special names here like %{__make} come from /usr/lib/rpm/macros
+# Special names here like {__make} come from /usr/lib/rpm/macros, /usr/lib/rpm/macros.rpmbuild
 
 %define version @VERSION@
 %define name libhideip
@@ -9,14 +9,14 @@ Version:	%{version}
 Release:	1
 URL:		http://libhideip.sf.net
 License:	GPLv3+
-# group must be one of the listed in /usr/share/doc/rpm-.../GROUPS
-Group:		System Environment/Libraries
+# group must be one of the listed in /usr/share/doc/rpm-.../GROUPS or /usr/share/rpmlint/config.d/distro.conf
+Group:		System/Libraries
 #Group:		System Utilities
 #Packager:	Bogdan Drozdowski <bogdandr@op.pl>
 #Prefix:		/usr/local
 Source:		%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-build
-BuildRequires:	gcc, glibc, glibc-devel, glibc-headers, make
+BuildRequires:	gcc, glibc, glibc-devel, make
 
 %description
 
@@ -27,41 +27,44 @@ neutral data.
 
 %prep
 %setup -q
+%configure --enable-static --enable-shared --enable-public-interface
 
 %build
+#CFLAGS='-march=i386' ./configure --prefix=/usr/local --enable-static --enable-shared \
+#	--mandir=/usr/share/man --infodir=/usr/share/info --libdir=/usr/local/lib \
+#	--sysconfdir=/usr/local/etc --enable-public-interface
+#%{__make}
 
-CFLAGS='-march=i386' ./configure --prefix=/usr/local --enable-static --enable-shared \
-	--mandir=/usr/share/man --infodir=/usr/share/info --libdir=/usr/local/lib \
-	--sysconfdir=/usr/local/etc --enable-public-interface
-%{__make}
+%make
 
 %install
-%{__rm} -rf $RPM_BUILD_ROOT
-DESTDIR="$RPM_BUILD_ROOT" %{__make} install
+#%{__rm} -rf $RPM_BUILD_ROOT
+#DESTDIR="$RPM_BUILD_ROOT" %{__make} install
+
+%makeinstall_std
 
 %preun
 #sed -i 's/^.*libhideip.so//g' /etc/ld.so.preload
 
 %post
-#ldconfig
+ldconfig
 #install-info
 
-%postun
-#ldconfig
+%postun -p /sbin/ldconfig
 
 %clean
-%{__rm} -rf $RPM_BUILD_ROOT
+#%{__rm} -rf $RPM_BUILD_ROOT
 
 #%define _unpackaged_files_terminate_build 0
 %files
 
 %defattr(-,root,root)
-/usr/local/lib/libhideip.so
-/usr/local/lib/libhideip.so.1
-/usr/local/lib/libhideip.so.1.4.1
-/usr/local/lib/libhideip.la
-%doc /usr/share/info/libhideip.info.gz
-%doc /usr/share/man/man3/libhideip.3.gz
+%{_libdir}/libhideip.so
+%{_libdir}/libhideip.so.6
+%{_libdir}/libhideip.so.6.0.0
+%{_libdir}/libhideip.la
+%doc %{_infodir}/libhideip.info%_extension
+%doc %{_mandir}/man3/libhideip.3%_extension
 %doc README
 %doc COPYING
 %doc AUTHORS
@@ -77,19 +80,19 @@ Summary:	Library for IP address hiding - development package
 Release:	1
 URL:		http://libhideip.sf.net
 License:	GPLv3+
-Group:		Development/Libraries
+Group:		Development/C
 #Packager:	Bogdan Drozdowski <bogdandr@op.pl>
 #Prefix:		/usr/local
 #Source:		%{name}-%{version}.tar.gz
 Requires:	%{name} = %{version}
-BuildRequires:	gcc, glibc, glibc-devel, glibc-headers, make
+BuildRequires:	gcc, glibc, glibc-devel, make
 
 %files devel
 
 %defattr(-,root,root)
-/usr/local/lib/libhideip.a
-/usr/local/include/libhideip.h
-/usr/local/lib/pkgconfig/libhideip.pc
+%{_includedir}/libhideip.h
+%{_libdir}/libhideip.a
+%{_libdir}/pkgconfig/libhideip.pc
 
 %description devel
 

@@ -1,7 +1,7 @@
 /*
  * A library for hiding local IP address.
  *
- * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -51,9 +51,26 @@
 # include <string.h>
 #endif
 
+#ifdef HAVE_NETDB_H
+# include <netdb.h>
+#endif
+
+#ifdef HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif
+
+#ifdef HAVE_ARPA_NAMESER_H
+# include <arpa/nameser.h>
+#endif
+
+#ifdef HAVE_RESOLV_H
+# include <resolv.h>
+#endif
+
 #include "lhip_priv.h"
 
 static int	__lhip_is_initialized		= LHIP_INIT_STAGE_NOT_INITIALIZED;
+static void *	__lhip_handle_resolv		= NULL;
 
 /* --- Pointers to original functions. */
 /* network-related functions: */
@@ -71,6 +88,8 @@ static i_sipp				__lhip_real_getifaddrs		= NULL;
 static i_ssp_sl_cp_s_cp_s_i		__lhip_real_getnameinfo		= NULL;
 static i_cp_cp_sap_sapp			__lhip_real_getaddrinfo		= NULL;
 static i_cp_cpp_cpp			__lhip_real_execve		= NULL;
+static i_i_cpp_cpp			__lhip_real_fexecve		= NULL;
+static i_i_cp_cpp_cpp_i			__lhip_real_execveat		= NULL;
 static i_cp				__lhip_real_system		= NULL;
 static i_i_i_va				__lhip_real_ioctl		= NULL;
 static i_i_i_i				__lhip_real_socket		= NULL;
@@ -96,20 +115,28 @@ static i_i_cp_i_			__lhip_real_openat		= NULL;
 
 /* name resolving functions: */
 static ccp_i_ucp_i			__lhip_real_res_query		= NULL;
+static r_ccp_i_ucp_i			__lhip_real_res_nquery		= NULL;
 static ccp_i_ucp_i			__lhip_real_res_search		= NULL;
+static r_ccp_i_ucp_i			__lhip_real_res_nsearch		= NULL;
 static ccp_cpp_i_ucp_i			__lhip_real_res_querydomain	= NULL;
+static r_ccp_cpp_i_ucp_i		__lhip_real_res_nquerydomain	= NULL;
 static i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery		= NULL;
+static r_i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_nmkquery	= NULL;
 
 /* libpcap functions: */
-static cp_cp				__lhip_real_pcap_lookupdev	= NULL;
-static i_ccp_uip_uip_cp			__lhip_real_pcap_lookupnet	= NULL;
-static pp_ccp_cp			__lhip_real_pcap_create		= NULL;
-static pp_i_i				__lhip_real_pcap_open_dead	= NULL;
-static pp_ccp_i_i_i_cp			__lhip_real_pcap_open_live	= NULL;
-static pp_ccp_cp			__lhip_real_pcap_open_offline	= NULL;
-static pp_Fp_cp				__lhip_real_pcap_fopen_offline	= NULL;
-static pp_ipt_cp			__lhip_real_pcap_hopen_offline	= NULL;
-static i_ifpp_cp			__lhip_real_pcap_findalldevs	= NULL;
+static cp_cp				__lhip_real_pcap_lookupdev		= NULL;
+static i_ccp_uip_uip_cp			__lhip_real_pcap_lookupnet		= NULL;
+static pp_ccp_cp			__lhip_real_pcap_create			= NULL;
+static pp_i_i				__lhip_real_pcap_open_dead		= NULL;
+static pp_i_i_ui			__lhip_real_pcap_open_dead_ts		= NULL;
+static pp_ccp_i_i_i_cp			__lhip_real_pcap_open_live		= NULL;
+static pp_ccp_cp			__lhip_real_pcap_open_offline		= NULL;
+static pp_ccp_ui_cp			__lhip_real_pcap_open_offline_ts	= NULL;
+static pp_Fp_cp				__lhip_real_pcap_fopen_offline		= NULL;
+static pp_Fp_ui_cp			__lhip_real_pcap_fopen_offline_ts	= NULL;
+static pp_ipt_cp			__lhip_real_pcap_hopen_offline		= NULL;
+static pp_ipt_ui_cp			__lhip_real_pcap_hopen_offline_ts	= NULL;
+static i_ifpp_cp			__lhip_real_pcap_findalldevs		= NULL;
 
 #if ((defined HAVE_DLSYM) || (defined HAVE_LIBDL_DLSYM))		\
 	&& (!defined HAVE_DLVSYM) && (!defined HAVE_LIBDL_DLVSYM)	\
@@ -122,13 +149,14 @@ static i_ifpp_cp			__lhip_real_pcap_findalldevs	= NULL;
 
 /* =============================================================== */
 
+#ifndef HAVE_STRDUP
 char * __lhip_duplicate_string (
-#ifdef LSR_ANSIC
+# ifdef LHIP_ANSIC
 	const char src[])
-#else
+# else
 	src)
 	const char src[];
-#endif
+# endif
 {
 	size_t len;
 	char * dest;
@@ -147,14 +175,15 @@ char * __lhip_duplicate_string (
 	{
 		return NULL;
 	}
-#ifdef HAVE_STRING_H
+# ifdef HAVE_STRING_H
 	strncpy (dest, src, len);
-#else
+# else
 	LHIP_MEMCOPY (dest, src, len);
-#endif
+# endif
 	dest[len] = '\0';
 	return dest;
 }
+#endif /* ! HAVE_STRDUP */
 
 /* =============================================================== */
 
@@ -203,12 +232,42 @@ void __lhip_mem_set (
 
 /* =============================================================== */
 
-int LHIP_ATTR ((constructor))
-__lhip_main (
-#ifdef LHIP_ANSIC
-	void
+#ifndef LHIP_ANSIC
+static void * __lhip_resolve_func LHIP_PARAMS ((void * const lib_handle,
+	const char func_name1[], const char func_name2[]));
 #endif
-)
+
+static void * __lhip_resolve_func (
+#ifdef LHIP_ANSIC
+	void * const lib_handle, const char func_name1[], const char func_name2[])
+#else
+	lib_handle, func_name1, func_name2)
+	void * const lib_handle;
+	const char func_name1[];
+	const char func_name2[];
+#endif
+{
+	void * ret = NULL;
+	ret = dlsym (RTLD_NEXT, func_name1);
+	if ( ret == NULL )
+	{
+		ret = dlsym (RTLD_NEXT, func_name2);
+	}
+	if ( (ret == NULL) && (lib_handle != NULL) )
+	{
+		ret = dlsym (lib_handle, func_name1);
+		if ( ret == NULL )
+		{
+			ret = dlsym (lib_handle, func_name2);
+		}
+	}
+	return ret;
+}
+
+/* =============================================================== */
+
+int LHIP_ATTR ((constructor))
+__lhip_main (LHIP_VOID)
 {
 	if ( __lhip_is_initialized == LHIP_INIT_STAGE_NOT_INITIALIZED )
 	{
@@ -228,6 +287,8 @@ __lhip_main (
 		*(void **) (&__lhip_real_getnameinfo)      = dlsym (RTLD_NEXT, "getnameinfo");
 		*(void **) (&__lhip_real_getaddrinfo)      = dlsym (RTLD_NEXT, "getaddrinfo");
 		*(void **) (&__lhip_real_execve)           = dlsym (RTLD_NEXT, "execve");
+		*(void **) (&__lhip_real_fexecve)          = dlsym (RTLD_NEXT, "fexecve");
+		*(void **) (&__lhip_real_execveat)         = dlsym (RTLD_NEXT, "execveat");
 		*(void **) (&__lhip_real_system)           = dlsym (RTLD_NEXT, "system");
 		*(void **) (&__lhip_real_ioctl)            = dlsym (RTLD_NEXT, "ioctl");
 		*(void **) (&__lhip_real_socket)           = dlsym (RTLD_NEXT, "socket");
@@ -245,6 +306,10 @@ __lhip_main (
 		*(void **) (&__lhip_real_fopen64)          = dlsym  (RTLD_NEXT, "fopen64");
 #else
 		*(void **) (&__lhip_real_fopen64)          = dlvsym (RTLD_NEXT, "fopen64", "GLIBC_2.1");
+		if ( __lhip_real_fopen64 == NULL )
+		{
+			*(void **) (&__lhip_real_fopen64)  = dlsym (RTLD_NEXT, "fopen64");
+		}
 #endif
 		*(void **) (&__lhip_real_freopen64)        = dlsym  (RTLD_NEXT, "freopen64");
 		*(void **) (&__lhip_real_open64)           = dlsym  (RTLD_NEXT, "open64");
@@ -254,26 +319,54 @@ __lhip_main (
 		*(void **) (&__lhip_real_fopen)            = dlsym  (RTLD_NEXT, "fopen");
 #else
 		*(void **) (&__lhip_real_fopen)            = dlvsym (RTLD_NEXT, "fopen", "GLIBC_2.1");
+		if ( __lhip_real_fopen == NULL )
+		{
+			*(void **) (&__lhip_real_fopen)    = dlsym  (RTLD_NEXT, "fopen");
+		}
 #endif
 		*(void **) (&__lhip_real_freopen)          = dlsym  (RTLD_NEXT, "freopen");
 		*(void **) (&__lhip_real_open)             = dlsym  (RTLD_NEXT, "open");
 		*(void **) (&__lhip_real_openat)           = dlsym  (RTLD_NEXT, "openat");
+
 		/* name resolving functions: */
-		*(void **) (&__lhip_real_res_query)        = dlsym  (RTLD_NEXT, "res_query");
-		*(void **) (&__lhip_real_res_search)       = dlsym  (RTLD_NEXT, "res_search");
-		*(void **) (&__lhip_real_res_querydomain)  = dlsym  (RTLD_NEXT, "res_querydomain");
-		*(void **) (&__lhip_real_res_mkquery)      = dlsym  (RTLD_NEXT, "res_mkquery");
+		__lhip_handle_resolv = dlopen("libresolv.so", RTLD_NOW);
+		/* CAUTION: some glibc version actually define the name resolver
+		 * as macros, so a standard symbol search will always fail.
+		 */
+#define LHIP_RES_FUNC(x) #x /* doesn't substitute the parameter, so level 2 needed */
+#define LHIP_RES_FUNC2(x) LHIP_RES_FUNC(x) /* substitute the real function's symbol and pass it to LHIP_RES_FUNC() */
+
+		*(void **) (&__lhip_real_res_query)        = __lhip_resolve_func (
+						__lhip_handle_resolv, "res_query", LHIP_RES_FUNC2(res_query));
+		*(void **) (&__lhip_real_res_nquery)       = __lhip_resolve_func (
+						__lhip_handle_resolv, "res_nquery", LHIP_RES_FUNC2(res_nquery));
+		*(void **) (&__lhip_real_res_search)       = __lhip_resolve_func (
+						__lhip_handle_resolv, "res_search", LHIP_RES_FUNC2(res_search));
+		*(void **) (&__lhip_real_res_nsearch)      = __lhip_resolve_func (
+						__lhip_handle_resolv, "res_nsearch", LHIP_RES_FUNC2(res_nsearch));
+		*(void **) (&__lhip_real_res_querydomain)  = __lhip_resolve_func (
+						__lhip_handle_resolv, "res_querydomain", LHIP_RES_FUNC2(res_querydomain));
+		*(void **) (&__lhip_real_res_nquerydomain) = __lhip_resolve_func (
+						__lhip_handle_resolv, "res_nquerydomain", LHIP_RES_FUNC2(res_nquerydomain));
+		*(void **) (&__lhip_real_res_mkquery)      = __lhip_resolve_func (
+						__lhip_handle_resolv, "res_mkquery", LHIP_RES_FUNC2(res_mkquery));
+		*(void **) (&__lhip_real_res_nmkquery)     = __lhip_resolve_func (
+						__lhip_handle_resolv, "res_nmkquery", LHIP_RES_FUNC2(res_nmkquery));
 
 		/* libpcap functions: */
-		*(void **) (&__lhip_real_pcap_lookupdev)     = dlsym  (RTLD_NEXT, "pcap_lookupdev");
-		*(void **) (&__lhip_real_pcap_lookupnet)     = dlsym  (RTLD_NEXT, "pcap_lookupnet");
-		*(void **) (&__lhip_real_pcap_create)        = dlsym  (RTLD_NEXT, "pcap_create");
-		*(void **) (&__lhip_real_pcap_open_dead)     = dlsym  (RTLD_NEXT, "pcap_open_dead");
-		*(void **) (&__lhip_real_pcap_open_live)     = dlsym  (RTLD_NEXT, "pcap_open_live");
-		*(void **) (&__lhip_real_pcap_open_offline)  = dlsym  (RTLD_NEXT, "pcap_open_offline");
-		*(void **) (&__lhip_real_pcap_fopen_offline) = dlsym  (RTLD_NEXT, "pcap_fopen_offline");
-		*(void **) (&__lhip_real_pcap_hopen_offline) = dlsym  (RTLD_NEXT, "pcap_hopen_offline");
-		*(void **) (&__lhip_real_pcap_findalldevs)   = dlsym  (RTLD_NEXT, "pcap_findalldevs");
+		*(void **) (&__lhip_real_pcap_lookupdev)        = dlsym  (RTLD_NEXT, "pcap_lookupdev");
+		*(void **) (&__lhip_real_pcap_lookupnet)        = dlsym  (RTLD_NEXT, "pcap_lookupnet");
+		*(void **) (&__lhip_real_pcap_create)           = dlsym  (RTLD_NEXT, "pcap_create");
+		*(void **) (&__lhip_real_pcap_open_dead)        = dlsym  (RTLD_NEXT, "pcap_open_dead");
+		*(void **) (&__lhip_real_pcap_open_dead_ts)     = dlsym  (RTLD_NEXT, "pcap_open_dead_with_tstamp_precision");
+		*(void **) (&__lhip_real_pcap_open_live)        = dlsym  (RTLD_NEXT, "pcap_open_live");
+		*(void **) (&__lhip_real_pcap_open_offline)     = dlsym  (RTLD_NEXT, "pcap_open_offline");
+		*(void **) (&__lhip_real_pcap_open_offline_ts)  = dlsym  (RTLD_NEXT, "pcap_open_offline_with_tstamp_precision");
+		*(void **) (&__lhip_real_pcap_fopen_offline)    = dlsym  (RTLD_NEXT, "pcap_fopen_offline");
+		*(void **) (&__lhip_real_pcap_fopen_offline_ts) = dlsym  (RTLD_NEXT, "pcap_fopen_offline_with_tstamp_precision");
+		*(void **) (&__lhip_real_pcap_hopen_offline)    = dlsym  (RTLD_NEXT, "pcap_hopen_offline");
+		*(void **) (&__lhip_real_pcap_hopen_offline_ts) = dlsym  (RTLD_NEXT, "pcap_hopen_offline_with_tstamp_precision");
+		*(void **) (&__lhip_real_pcap_findalldevs)      = dlsym  (RTLD_NEXT, "pcap_findalldevs");
 
 		__lhip_is_initialized = LHIP_INIT_STAGE_AFTER_DLSYM;
 
@@ -288,543 +381,418 @@ __lhip_main (
 /* =============================================================== */
 
 void LHIP_ATTR ((destructor))
-__lhip_end (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+__lhip_end (LHIP_VOID)
 {
+	if ( __lhip_handle_resolv != NULL )
+	{
+		dlclose (__lhip_handle_resolv);
+	}
 	__lhip_free_local_addresses ();
+	endhostent();
 }
 
 /* =============================================================== */
 
-int
-__lhip_get_init_stage (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+int __lhip_get_init_stage (LHIP_VOID)
 {
 	return __lhip_is_initialized;
 }
 
 /* =============================================================== */
 
-shp_vp_sl_i __lhip_real_gethostbyaddr_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+shp_vp_sl_i __lhip_real_gethostbyaddr_location (LHIP_VOID)
 {
 	return __lhip_real_gethostbyaddr;
 }
 
 /* =============================================================== */
 
-i_vp_sl_i_shp_cp_s_shpp_ip __lhip_real_gethostbyaddr_r_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_vp_sl_i_shp_cp_s_shpp_ip __lhip_real_gethostbyaddr_r_location (LHIP_VOID)
 {
 	return __lhip_real_gethostbyaddr_r;
 }
 
 /* =============================================================== */
 
-shp_cp __lhip_real_gethostbyname_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+shp_cp __lhip_real_gethostbyname_location (LHIP_VOID)
 {
 	return __lhip_real_gethostbyname;
 }
 
 /* =============================================================== */
 
-i_cp_shp_cp_s_shpp_ip __lhip_real_gethostbyname_r_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_cp_shp_cp_s_shpp_ip __lhip_real_gethostbyname_r_location (LHIP_VOID)
 {
 	return __lhip_real_gethostbyname_r;
 }
 
 /* =============================================================== */
 
-shp_cp_i __lhip_real_gethostbyname2_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+shp_cp_i __lhip_real_gethostbyname2_location (LHIP_VOID)
 {
 	return __lhip_real_gethostbyname2;
 }
 
 /* =============================================================== */
 
-i_cp_i_shp_cp_s_shpp_i __lhip_real_gethostbyname2_r_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_cp_i_shp_cp_s_shpp_i __lhip_real_gethostbyname2_r_location (LHIP_VOID)
 {
 	return __lhip_real_gethostbyname2_r;
 }
 
 /* =============================================================== */
 
-shp_v __lhip_real_gethostent_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+shp_v __lhip_real_gethostent_location (LHIP_VOID)
 {
 	return __lhip_real_gethostent;
 }
 
 /* =============================================================== */
 
-i_shp_cp_s_shpp_ip __lhip_real_gethostent_r_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_shp_cp_s_shpp_ip __lhip_real_gethostent_r_location (LHIP_VOID)
 {
 	return __lhip_real_gethostent_r;
 }
 
 /* =============================================================== */
 
-shp_cp_s_i_ip __lhip_real_getipnodebyaddr_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+shp_cp_s_i_ip __lhip_real_getipnodebyaddr_location (LHIP_VOID)
 {
 	return __lhip_real_getipnodebyaddr;
 }
 
 /* =============================================================== */
 
-shp_cp_i_i_ip __lhip_real_getipnodebyname_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+shp_cp_i_i_ip __lhip_real_getipnodebyname_location (LHIP_VOID)
 {
 	return __lhip_real_getipnodebyname;
 }
 
 /* =============================================================== */
 
-i_sipp __lhip_real_getifaddrs_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_sipp __lhip_real_getifaddrs_location (LHIP_VOID)
 {
 	return __lhip_real_getifaddrs;
 }
 
 /* =============================================================== */
 
-i_ssp_sl_cp_s_cp_s_i __lhip_real_getnameinfo_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_ssp_sl_cp_s_cp_s_i __lhip_real_getnameinfo_location (LHIP_VOID)
 {
 	return __lhip_real_getnameinfo;
 }
 
 /* =============================================================== */
 
-i_cp_cp_sap_sapp __lhip_real_getaddrinfo_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_cp_cp_sap_sapp __lhip_real_getaddrinfo_location (LHIP_VOID)
 {
 	return __lhip_real_getaddrinfo;
 }
 
 /* =============================================================== */
 
-i_cp_cpp_cpp __lhip_real_execve_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_cp_cpp_cpp __lhip_real_execve_location (LHIP_VOID)
 {
 	return __lhip_real_execve;
 }
 
 /* =============================================================== */
 
-i_cp __lhip_real_system_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_i_cpp_cpp __lhip_real_fexecve_location (LHIP_VOID)
+{
+	return __lhip_real_fexecve;
+}
+
+/* =============================================================== */
+
+i_i_cp_cpp_cpp_i __lhip_real_execveat_location (LHIP_VOID)
+{
+	return __lhip_real_execveat;
+}
+
+/* =============================================================== */
+
+i_cp __lhip_real_system_location (LHIP_VOID)
 {
 	return __lhip_real_system;
 }
 
 /* =============================================================== */
 
-i_i_i_va __lhip_real_ioctl_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_i_i_va __lhip_real_ioctl_location (LHIP_VOID)
 {
 	return __lhip_real_ioctl;
 }
 
 /* =============================================================== */
 
-i_i_i_i __lhip_real_socket_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_i_i_i __lhip_real_socket_location (LHIP_VOID)
 {
 	return __lhip_real_socket;
 }
 
 /* =============================================================== */
 
-ss_i_smp_i __lhip_real_recvmsg_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+ss_i_smp_i __lhip_real_recvmsg_location (LHIP_VOID)
 {
 	return __lhip_real_recvmsg;
 }
 
 /* =============================================================== */
 
-ss_i_csmp_i __lhip_real_sendmsg_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+ss_i_csmp_i __lhip_real_sendmsg_location (LHIP_VOID)
 {
 	return __lhip_real_sendmsg;
 }
 
 /* =============================================================== */
 
-i_cp_s __lhip_real_gethostname_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_cp_s __lhip_real_gethostname_location (LHIP_VOID)
 {
 	return __lhip_real_gethostname;
 }
 
 /* =============================================================== */
 
-i_sup __lhip_real_uname_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_sup __lhip_real_uname_location (LHIP_VOID)
 {
 	return __lhip_real_uname;
 }
 
 /* =============================================================== */
 
-fp_cp_cp __lhip_real_fopen64_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+fp_cp_cp __lhip_real_fopen64_location (LHIP_VOID)
 {
 	return __lhip_real_fopen64;
 }
 
 /* =============================================================== */
 
-fp_cp_cp_fp __lhip_real_freopen64_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+fp_cp_cp_fp __lhip_real_freopen64_location (LHIP_VOID)
 {
 	return __lhip_real_freopen64;
 }
 
 /* =============================================================== */
 
-i_cp_i_ __lhip_real_open64_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_cp_i_ __lhip_real_open64_location (LHIP_VOID)
 {
 	return __lhip_real_open64;
 }
 
 /* =============================================================== */
 
-i_i_cp_i_ __lhip_real_openat64_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_i_cp_i_ __lhip_real_openat64_location (LHIP_VOID)
 {
 	return __lhip_real_openat64;
 }
 
 /* =============================================================== */
 
-fp_cp_cp __lhip_real_fopen_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+fp_cp_cp __lhip_real_fopen_location (LHIP_VOID)
 {
 	return __lhip_real_fopen;
 }
 
 /* =============================================================== */
 
-fp_cp_cp_fp __lhip_real_freopen_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+fp_cp_cp_fp __lhip_real_freopen_location (LHIP_VOID)
 {
 	return __lhip_real_freopen;
 }
 
 /* =============================================================== */
 
-i_cp_i_ __lhip_real_open_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_cp_i_ __lhip_real_open_location (LHIP_VOID)
 {
 	return __lhip_real_open;
 }
 
 /* =============================================================== */
 
-i_i_cp_i_ __lhip_real_openat_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_i_cp_i_ __lhip_real_openat_location (LHIP_VOID)
 {
 	return __lhip_real_openat;
 }
 
 /* =============================================================== */
 
-i_i_i_vp_slp __lhip_real_getsockopt_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_i_i_vp_slp __lhip_real_getsockopt_location (LHIP_VOID)
 {
 	return __lhip_real_getsockopt;
 }
 
 /* =============================================================== */
 
-i_i_i_cvp_sl __lhip_real_setsockopt_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_i_i_cvp_sl __lhip_real_setsockopt_location (LHIP_VOID)
 {
 	return __lhip_real_setsockopt;
 }
 
 /* =============================================================== */
 
-i_ssp_slp __lhip_real_getsockname_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_ssp_slp __lhip_real_getsockname_location (LHIP_VOID)
 {
 	return __lhip_real_getsockname;
 }
 
 /* =============================================================== */
 
-i_cssp_sl __lhip_real_bind_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_cssp_sl __lhip_real_bind_location (LHIP_VOID)
 {
 	return __lhip_real_bind;
 }
 
 /* =============================================================== */
 
-i_i_ia2 __lhip_real_socketpair_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_i_ia2 __lhip_real_socketpair_location (LHIP_VOID)
 {
 	return __lhip_real_socketpair;
 }
 
 /* =============================================================== */
 
-ccp_i_ucp_i __lhip_real_res_query_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+ccp_i_ucp_i __lhip_real_res_query_location (LHIP_VOID)
 {
 	return __lhip_real_res_query;
 }
 
+/* =============================================================== */
+
+r_ccp_i_ucp_i __lhip_real_res_nquery_location (LHIP_VOID)
+{
+	return __lhip_real_res_nquery;
+}
 
 /* =============================================================== */
 
-ccp_i_ucp_i __lhip_real_res_search_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+ccp_i_ucp_i __lhip_real_res_search_location (LHIP_VOID)
 {
 	return __lhip_real_res_search;
 }
 
+/* =============================================================== */
+
+r_ccp_i_ucp_i __lhip_real_res_nsearch_location (LHIP_VOID)
+{
+	return __lhip_real_res_nsearch;
+}
 
 /* =============================================================== */
 
-ccp_cpp_i_ucp_i __lhip_real_res_querydomain_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+ccp_cpp_i_ucp_i __lhip_real_res_querydomain_location (LHIP_VOID)
 {
 	return __lhip_real_res_querydomain;
 }
 
+/* =============================================================== */
+
+r_ccp_cpp_i_ucp_i __lhip_real_res_nquerydomain_location (LHIP_VOID)
+{
+	return __lhip_real_res_nquerydomain;
+}
 
 /* =============================================================== */
 
-i_ccp_i_i_cucp_i_cucp_ucp_i __lhip_real_res_mkquery_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_ccp_i_i_cucp_i_cucp_ucp_i __lhip_real_res_mkquery_location (LHIP_VOID)
 {
 	return __lhip_real_res_mkquery;
 }
 
 /* =============================================================== */
 
-cp_cp __lhip_real_pcap_lookupdev_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+r_i_ccp_i_i_cucp_i_cucp_ucp_i __lhip_real_res_nmkquery_location (LHIP_VOID)
+{
+	return __lhip_real_res_nmkquery;
+}
+
+/* =============================================================== */
+
+cp_cp __lhip_real_pcap_lookupdev_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_lookupdev;
 }
 
 /* =============================================================== */
 
-i_ccp_uip_uip_cp __lhip_real_pcap_lookupnet_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+i_ccp_uip_uip_cp __lhip_real_pcap_lookupnet_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_lookupnet;
 }
 
 /* =============================================================== */
 
-pp_ccp_cp __lhip_real_pcap_create_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+pp_ccp_cp __lhip_real_pcap_create_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_create;
 }
 
 /* =============================================================== */
 
-pp_i_i __lhip_real_pcap_open_dead_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+pp_i_i __lhip_real_pcap_open_dead_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_open_dead;
 }
 
 /* =============================================================== */
 
-pp_ccp_i_i_i_cp __lhip_real_pcap_open_live_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+pp_i_i_ui __lhip_real_pcap_o_d_tstamp_location (LHIP_VOID)
+{
+	return __lhip_real_pcap_open_dead_ts;
+}
+
+/* =============================================================== */
+
+pp_ccp_i_i_i_cp __lhip_real_pcap_open_live_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_open_live;
 }
 
 /* =============================================================== */
 
-pp_ccp_cp __lhip_real_pcap_open_offline_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+pp_ccp_cp __lhip_real_pcap_open_offline_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_open_offline;
 }
 
 /* =============================================================== */
 
-pp_Fp_cp __lhip_real_pcap_fopen_offline_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+pp_ccp_ui_cp __lhip_real_pcap_open_offline_ts_location (LHIP_VOID)
+{
+	return __lhip_real_pcap_open_offline_ts;
+}
+
+/* =============================================================== */
+
+pp_Fp_cp __lhip_real_pcap_fopen_offline_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_fopen_offline;
 }
 
 /* =============================================================== */
 
-pp_ipt_cp __lhip_real_pcap_hopen_offline_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+pp_Fp_ui_cp __lhip_real_pcap_fopen_offline_ts_location (LHIP_VOID)
+{
+	return __lhip_real_pcap_fopen_offline_ts;
+}
+
+/* =============================================================== */
+
+pp_ipt_cp __lhip_real_pcap_hopen_offline_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_hopen_offline;
 }
 
 /* =============================================================== */
 
-i_ifpp_cp __lhip_real_pcap_findalldevs_location (
-#ifdef LHIP_ANSIC
-	void
-#endif
-)
+pp_ipt_ui_cp __lhip_real_pcap_hopen_offline_ts_location (LHIP_VOID)
+{
+	return __lhip_real_pcap_hopen_offline_ts;
+}
+
+/* =============================================================== */
+
+i_ifpp_cp __lhip_real_pcap_findalldevs_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_findalldevs;
 }

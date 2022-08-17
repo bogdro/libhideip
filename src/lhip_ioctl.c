@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- ioctl function replacement.
  *
- * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -266,7 +266,7 @@ ioctl (
 #if (defined SIOCGIFADDR) || (defined SIOCGIFCONF) || (defined SIOCGIFHWADDR)
 	struct ifreq * addrs;
 	struct ifconf * cfg;
-	unsigned int buf_index;
+	size_t buf_index;
 	int req_index;
 #endif
 #if (defined __solaris__) && (defined AF_INET6)
@@ -275,10 +275,6 @@ ioctl (
 #endif
 
 	__lhip_main ();
-#ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: ioctl(%d, %lu, ...)\n", d, request);
-	fflush (stderr);
-#endif
 
 	if ( __lhip_real_ioctl_location () == NULL )
 	{
@@ -296,6 +292,10 @@ ioctl (
 # endif
 	data1 = va_arg (args, void *);
 	data2 = va_arg (args, void *);
+#endif
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: ioctl(%d, %lu, ...)\n", d, request);
+	fflush (stderr);
 #endif
 
 	if ( (__lhip_check_prog_ban () != 0)
