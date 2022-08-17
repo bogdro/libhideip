@@ -104,8 +104,6 @@ static pp_Fp_cp				__lhip_real_pcap_fopen_offline	= NULL;
 static pp_ipt_cp			__lhip_real_pcap_hopen_offline	= NULL;
 static i_ifpp_cp			__lhip_real_pcap_findalldevs	= NULL;
 
-void __lhip_end PARAMS ((void));
-
 /* =============================================================== */
 
 int LHIP_ATTR ((constructor))

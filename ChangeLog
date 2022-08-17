@@ -1,3 +1,27 @@
+2011-10-05	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* libhideip version 0.5
+	  Providing a public interface to use by programmers to secure their
+	  programs. Added a file for pkg-config with library information.
+	  Verified that no symbol whose name can't be randomized can be
+	  reached from the outside.
+	* src/{lhip_public.c.in,libhideip.h.in}: new files with the public
+	  interface to libhideip.
+	* configure.ac: added the --enable-public-interface option to enable
+	  the library's public interface, added new C compiler flags to
+	  check for: -Wwrite-strings and -Waggregate-return. Added generating
+	  a file for pkg-config.
+	* README: changed "program" to "library" when talking about libhideip,
+	  added the --enable-public-interface configure option.
+	* INSTALL: added the --enable-public-interface configure option.
+	* doc/libhideip.texi.in: added the --enable-public-interface configure
+	  option
+	* libhideip.pc.in: a data file for pkg-config.
+	* src/lhip_priv.h: added __lhip_end to the list of public functions,
+	  so the name randomizing scripts get pick it up.
+	* libhideip.spec.in: added the -devel package
+	* Makefile.am: added the file for pkg-config.
+
 2011-03-17	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* libhideip version 0.4

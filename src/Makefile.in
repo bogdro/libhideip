@@ -15,6 +15,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -34,9 +35,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@PUBLIC_INTERFACE_TRUE@am__append_1 = lhip_public.c libhideip.h
+@PUBLIC_INTERFACE_TRUE@am__append_2 = lhip_public.c libhideip.h
 subdir = src
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/lhip_cfg.h.in
+DIST_COMMON = $(am__nobase_include_HEADERS_DIST) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(srcdir)/lhip_cfg.h.in \
+	$(srcdir)/lhip_public.c.in $(srcdir)/libhideip.h.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_define_path_style.m4 \
 	$(top_srcdir)/m4/ac_prototype.m4 \
@@ -49,7 +53,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = lhip_cfg.h
+CONFIG_CLEAN_FILES = lhip_cfg.h libhideip.h lhip_public.c
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -72,13 +76,14 @@ am__nobase_list = $(am__nobase_strip_setup); \
 am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__installdirs = "$(DESTDIR)$(libdir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libhideip_la_LIBADD =
 am_libhideip_la_OBJECTS = lhip_exec.lo lhip_main.lo lhip_net.lo \
 	lhip_banning.lo lhip_ioctl.lo lhip_opens.lo lhip_uname.lo \
 	lhip_resolve.lo lhip_pcap.lo lhip_addr.lo
-nodist_libhideip_la_OBJECTS =
+@PUBLIC_INTERFACE_TRUE@am__objects_1 = lhip_public.lo
+nodist_libhideip_la_OBJECTS = $(am__objects_1)
 libhideip_la_OBJECTS = $(am_libhideip_la_OBJECTS) \
 	$(nodist_libhideip_la_OBJECTS)
 libhideip_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -99,6 +104,8 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libhideip_la_SOURCES) $(nodist_libhideip_la_SOURCES)
 DIST_SOURCES = $(libhideip_la_SOURCES)
+am__nobase_include_HEADERS_DIST = libhideip.h
+HEADERS = $(nobase_include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -221,19 +228,22 @@ libhideip_la_SOURCES = lhip_exec.c lhip_main.c lhip_net.c lhip_banning.c \
 	lhip_ioctl.c lhip_opens.c lhip_uname.c lhip_resolve.c lhip_priv.h \
 	lhip_pcap.c lhip_addr.c
 
-EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh
+EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh \
+	libhideip.h.in lhip_public.c.in
+
 
 # VERSION = C:R:A     (current, revision, age)
 # only code changed => R++
 # interface changed => C++, R:=0
 # - interface add => A++
 # - interface removed => A:=0
-libhideip_la_LDFLAGS = -version-info 3:0:2
+libhideip_la_LDFLAGS = -version-info 4:0:3
 
 #nobase_include_HEADERS = lhip_priv.h
 BUILT_SOURCES = lhip_paths.h
-nodist_libhideip_la_SOURCES = lhip_paths.h
-libhideip_la_DISTCLEANFILES = lhip_paths.h
+nodist_libhideip_la_SOURCES = lhip_paths.h $(am__append_1)
+libhideip_la_DISTCLEANFILES = lhip_paths.h $(am__append_2)
+@PUBLIC_INTERFACE_TRUE@nobase_include_HEADERS = libhideip.h
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -270,6 +280,10 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 lhip_cfg.h: $(top_builddir)/config.status $(srcdir)/lhip_cfg.h.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+libhideip.h: $(top_builddir)/config.status $(srcdir)/libhideip.h.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+lhip_public.c: $(top_builddir)/config.status $(srcdir)/lhip_public.c.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -319,6 +333,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_net.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_opens.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_pcap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_public.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_resolve.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_uname.Plo@am__quote@
 
@@ -348,6 +363,29 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-nobase_includeHEADERS: $(nobase_include_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(includedir)" || $(MKDIR_P) "$(DESTDIR)$(includedir)"
+	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	$(am__nobase_list) | while read dir files; do \
+	  xfiles=; for file in $$files; do \
+	    if test -f "$$file"; then xfiles="$$xfiles $$file"; \
+	    else xfiles="$$xfiles $(srcdir)/$$file"; fi; done; \
+	  test -z "$$xfiles" || { \
+	    test "x$$dir" = x. || { \
+	      echo "$(MKDIR_P) '$(DESTDIR)$(includedir)/$$dir'"; \
+	      $(MKDIR_P) "$(DESTDIR)$(includedir)/$$dir"; }; \
+	    echo " $(INSTALL_HEADER) $$xfiles '$(DESTDIR)$(includedir)/$$dir'"; \
+	    $(INSTALL_HEADER) $$xfiles "$(DESTDIR)$(includedir)/$$dir" || exit $$?; }; \
+	done
+
+uninstall-nobase_includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	$(am__nobase_strip_setup); files=`$(am__nobase_strip)`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(includedir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(includedir)" && rm -f $$files
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -434,9 +472,9 @@ distdir: $(DISTFILES)
 check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: $(BUILT_SOURCES)
@@ -489,7 +527,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-nobase_includeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -535,7 +573,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-libLTLIBRARIES
+uninstall-am: uninstall-libLTLIBRARIES uninstall-nobase_includeHEADERS
 
 .MAKE: all check install install-am install-strip
 
@@ -546,12 +584,14 @@ uninstall-am: uninstall-libLTLIBRARIES
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am \
-	install-libLTLIBRARIES install-man install-pdf install-pdf-am \
+	install-libLTLIBRARIES install-man \
+	install-nobase_includeHEADERS install-pdf install-pdf-am \
 	install-ps install-ps-am install-strip installcheck \
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-libLTLIBRARIES
+	tags uninstall uninstall-am uninstall-libLTLIBRARIES \
+	uninstall-nobase_includeHEADERS
 
 lhip_paths.h: Makefile
 	echo '#define SYSCONFDIR "$(sysconfdir)"' > lhip_paths.h

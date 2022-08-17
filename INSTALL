@@ -10,6 +10,9 @@ Requirements for compiling the full version:
 - the 'make' program
 
 Type './configure' to configure the library for your system.
+If you want to enable the public interface of LibHideIP, configure the
+ library with
+	./configure --enable-public-interface
 
 Type 'make' to compile the library. LibHideIP assumes that your host has
  maximum 100 aliases and addresses. If you think this number is not enough,
@@ -24,7 +27,7 @@ Type 'make install' to install the library.
 
 =======================================================
 
-Building an RPM package:
+Building an RPM package (the old way):
 
 1) copy the libhideip.spec file to /usr/src/redhat/SPECS
 2) copy the source package libhideip-XX.tar.gz to /usr/src/redhat/SOURCES
@@ -32,3 +35,10 @@ Building an RPM package:
 	rpmbuild -ba /usr/src/redhat/SPECS/libhideip.spec
 4) get the rpms from /usr/src/redhat/RPMS/i386 and /usr/src/redhat/SRPMS
 
+Building an RPM package (the new way):
+
+1) copy the libhideip.spec file to $HOME/rpmbuild/SPECS
+2) copy the source package libhideip-XX.tar.gz to $HOME/rpmbuild/SOURCES
+3) type
+	rpmbuild -ba $HOME/rpmbuild/SPECS/libhideip.spec
+4) get the rpms from $HOME/rpmbuild/RPMS/i386 and $HOME/rpmbuild/SRPMS

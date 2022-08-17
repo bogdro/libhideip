@@ -30,8 +30,9 @@ neutral data.
 
 %build
 
-CFLAGS='-march=i386' ./configure --prefix=/usr/local --disable-static --enable-shared \
-	--mandir=/usr/share/man --infodir=/usr/share/info --libdir=/usr/local/lib --sysconfdir=/usr/local/etc
+CFLAGS='-march=i386' ./configure --prefix=/usr/local --enable-static --enable-shared \
+	--mandir=/usr/share/man --infodir=/usr/share/info --libdir=/usr/local/lib \
+	--sysconfdir=/usr/local/etc --enable-public-interface
 %{__make}
 
 %install
@@ -57,7 +58,7 @@ DESTDIR="$RPM_BUILD_ROOT" %{__make} install
 %defattr(-,root,root)
 /usr/local/lib/libhideip.so
 /usr/local/lib/libhideip.so.1
-/usr/local/lib/libhideip.so.1.2.0
+/usr/local/lib/libhideip.so.1.3.0
 /usr/local/lib/libhideip.la
 %doc /usr/share/info/libhideip.info.gz
 %doc /usr/share/man/man3/libhideip.3.gz
@@ -67,3 +68,34 @@ DESTDIR="$RPM_BUILD_ROOT" %{__make} install
 %doc ChangeLog
 
 %changelog
+
+############################################################################
+
+%package devel
+
+Summary:	Library for IP address hiding
+Release:	1
+URL:		http://rudy.mif.pg.gda.pl/~bogdro/soft/
+License:	GPLv3+
+Group:		Development/Libraries
+#Packager:	Bogdan Drozdowski <bogdandr@op.pl>
+#Prefix:		/usr/local
+#Source:		%{name}-%{version}.tar.gz
+Requires:	%{name} = %{version}
+BuildRequires:	gcc, glibc, glibc-devel, glibc-headers, make
+
+%files devel
+
+%defattr(-,root,root)
+/usr/local/lib/libhideip.a
+/usr/local/include/libhideip.h
+/usr/local/lib/pkgconfig/libhideip.pc
+
+%description devel
+
+This is the development package for libhideip.
+Libhideip is a library which intercepts system calls that may lead to
+getting your local IP address by programs, which is bad for your privacy.
+The potentially-dangerous functions are replaced by safe ones, which return
+neutral data.
+

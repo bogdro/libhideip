@@ -48,9 +48,12 @@ Requirements for compiling:
 
 - the 'make' program
 
-Type './configure' to configure the program for your system.
+Type './configure' to configure the library for your system.
+If you want to enable the public interface of LibHideIP, configure the
+ library with
+	./configure --enable-public-interface
 
-Type 'make' to compile the program. LibHideIP assumes that your host has
+Type 'make' to compile the library. LibHideIP assumes that your host has
  maximum 100 aliases and addresses. If you think this number is not enough,
  compile LibHideIP with:
 	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'

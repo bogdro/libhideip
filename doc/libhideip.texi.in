@@ -120,6 +120,9 @@ opening functions.
 
 Type @command{./configure} to configure LibHideIP for your system.
 
+If you want to enable the public interface of LibHideIP, configure the
+library with @command{./configure --enable-public-interface}.
+
 Type @command{make} to compile the library.
 LibHideIP assumes that your host has
 maximum 100 aliases and addresses. If you think this number is not enough,

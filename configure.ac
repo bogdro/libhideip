@@ -2,15 +2,28 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 0.4, bogdandr@op.pl)
+AC_INIT(libhideip, 0.5, bogdandr@op.pl)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
-	libhideip.spec src/lhip_cfg.h])
+	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
+	libhideip.pc])
 AC_CONFIG_SRCDIR([src/lhip_net.c])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
+
 # ==================== configure arguments
+
+AC_ARG_ENABLE([public-interface],[[  --enable-public-interface  Enable the library's public interface.]],
+        [if (test "x$enableval" = "xyes"); then
+                public_if=yes
+         else
+                public_if=no
+         fi
+        ]
+        ,[public_if=no])
+
+AM_CONDITIONAL(PUBLIC_INTERFACE, test "x$public_if" = "xyes")
 
 # ==================== Checks for programs.
 AC_PROG_CC
@@ -227,6 +240,9 @@ if (test "x$GCC" = "xyes" ); then
 	AX_C_CHECK_FLAG([-Wlogical-op], [CFLAGS="$CFLAGS -Wlogical-op"], [CFLAGS="$CFLAGS"])
 	AX_C_CHECK_FLAG([-fstack-protector-all], [CFLAGS="$CFLAGS -fstack-protector-all"], [CFLAGS="$CFLAGS"])
 	AX_C_CHECK_FLAG([-O2], [CFLAGS="$CFLAGS -O2"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-Waggregate-return], [CFLAGS="$CFLAGS -Waggregate-return"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-Wwrite-strings], [CFLAGS="$CFLAGS -Wwrite-strings"], [CFLAGS="$CFLAGS"])
+
 fi
 
 # this doubles the CFLAGS on compile:

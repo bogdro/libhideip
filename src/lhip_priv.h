@@ -225,65 +225,65 @@ typedef unsigned int bpf_u_int32;
 
 /* --- Function typedefs. */
 /* network-related functions: */
-typedef struct hostent * (*shp_vp_sl_i)		PARAMS((const void * addr, socklen_t len, int type));
-typedef int (*i_vp_sl_i_shp_cp_s_shpp_ip)	PARAMS((const void *addr, socklen_t len, int type,
+typedef struct hostent * (*shp_vp_sl_i)		PARAMS ((const void * addr, socklen_t len, int type));
+typedef int (*i_vp_sl_i_shp_cp_s_shpp_ip)	PARAMS ((const void *addr, socklen_t len, int type,
 							struct hostent *ret, char *buf, size_t buflen,
 							struct hostent **result, int *h_errnop));
-typedef struct hostent * (*shp_cp)		PARAMS((const char *name));
-typedef int (*i_cp_shp_cp_s_shpp_ip)		PARAMS((const char *name,
+typedef struct hostent * (*shp_cp)		PARAMS ((const char *name));
+typedef int (*i_cp_shp_cp_s_shpp_ip)		PARAMS ((const char *name,
 							struct hostent *ret, char *buf, size_t buflen,
 							struct hostent **result, int *h_errnop));
-typedef struct hostent * (*shp_cp_i)		PARAMS((const char *name, int af));
-typedef int (*i_cp_i_shp_cp_s_shpp_i)		PARAMS((const char *name, int af,
+typedef struct hostent * (*shp_cp_i)		PARAMS ((const char *name, int af));
+typedef int (*i_cp_i_shp_cp_s_shpp_i)		PARAMS ((const char *name, int af,
 							struct hostent *ret, char *buf, size_t buflen,
 							struct hostent **result, int *h_errnop));
-typedef struct hostent * (*shp_v)		PARAMS((void));
-typedef int (*i_shp_cp_s_shpp_ip)		PARAMS((struct hostent *ret, char *buf, size_t buflen,
+typedef struct hostent * (*shp_v)		PARAMS ((void));
+typedef int (*i_shp_cp_s_shpp_ip)		PARAMS ((struct hostent *ret, char *buf, size_t buflen,
 							struct hostent **result, int *h_errnop));
-typedef struct hostent * (*shp_cp_s_i_ip)	PARAMS((const void *addr,
+typedef struct hostent * (*shp_cp_s_i_ip)	PARAMS ((const void *addr,
 							size_t len, int af, int *error_num));
-typedef struct hostent * (*shp_cp_i_i_ip)	PARAMS((const char *name,
+typedef struct hostent * (*shp_cp_i_i_ip)	PARAMS ((const char *name,
 							int af, int flags, int *error_num));
-typedef int (*i_sipp)				PARAMS((struct ifaddrs **__ifap));
-typedef int (*i_ssp_sl_cp_s_cp_s_i)		PARAMS((const struct sockaddr *sa, socklen_t salen,
+typedef int (*i_sipp)				PARAMS ((struct ifaddrs **__ifap));
+typedef int (*i_ssp_sl_cp_s_cp_s_i)		PARAMS ((const struct sockaddr *sa, socklen_t salen,
 							char *host, GETNAMEINFO_ARG4TYPE hostlen,
 							char *serv, GETNAMEINFO_ARG6TYPE servlen,
 							GETNAMEINFO_ARG7TYPE flags));
-typedef int (*i_cp_cp_sap_sapp)			PARAMS((const char *node, const char *service,
+typedef int (*i_cp_cp_sap_sapp)			PARAMS ((const char *node, const char *service,
 							const struct addrinfo *hints,
 							struct addrinfo **res));
-typedef int (*i_cp_cpp_cpp)			PARAMS((const char *filename, char *const argv[],
+typedef int (*i_cp_cpp_cpp)			PARAMS ((const char *filename, char *const argv[],
 							char *const envp[]));
-typedef int (*i_cp)				PARAMS((const char *command));
-typedef int (*i_i_i_va)				PARAMS((int d, unsigned long int request, ...));
-typedef int (*i_i_i_i)				PARAMS((int domain, int type, int protocol));
-typedef ssize_t (*ss_i_smp_i)			PARAMS((int s, struct msghdr *msg, int flags));
-typedef ssize_t (*ss_i_csmp_i)			PARAMS((int s, const struct msghdr *msg, int flags));
-typedef int (*i_cp_s)				PARAMS((char *name, size_t len));
-typedef int (*i_sup)				PARAMS((struct utsname *buf));
-typedef int (*i_i_i_vp_slp)			PARAMS((int s, int level, int optname,
+typedef int (*i_cp)				PARAMS ((const char *command));
+typedef int (*i_i_i_va)				PARAMS ((int d, unsigned long int request, ...));
+typedef int (*i_i_i_i)				PARAMS ((int domain, int type, int protocol));
+typedef ssize_t (*ss_i_smp_i)			PARAMS ((int s, struct msghdr *msg, int flags));
+typedef ssize_t (*ss_i_csmp_i)			PARAMS ((int s, const struct msghdr *msg, int flags));
+typedef int (*i_cp_s)				PARAMS ((char *name, size_t len));
+typedef int (*i_sup)				PARAMS ((struct utsname *buf));
+typedef int (*i_i_i_vp_slp)			PARAMS ((int s, int level, int optname,
 							void * optval, socklen_t * optlen));
-typedef int (*i_i_i_cvp_sl)			PARAMS((int s, int level, int optname,
+typedef int (*i_i_i_cvp_sl)			PARAMS ((int s, int level, int optname,
 							const void * optval, socklen_t optlen));
-typedef int (*i_ssp_slp)			PARAMS((int s, struct sockaddr *name, socklen_t *namelen));
-typedef int (*i_cssp_sl)			PARAMS((int sockfd, const struct sockaddr *my_addr,
+typedef int (*i_ssp_slp)			PARAMS ((int s, struct sockaddr *name, socklen_t *namelen));
+typedef int (*i_cssp_sl)			PARAMS ((int sockfd, const struct sockaddr *my_addr,
 							socklen_t addrlen));
-typedef int (*i_i_ia2)				PARAMS((int d, int type, int protocol, int sv[2]));
+typedef int (*i_i_ia2)				PARAMS ((int d, int type, int protocol, int sv[2]));
 
 /* file-related functions: */
-typedef FILE*	(*fp_cp_cp)			PARAMS((const char * const name, const char * const mode));
-typedef FILE*	(*fp_cp_cp_fp)			PARAMS((const char * const name, const char * const mode,
+typedef FILE*	(*fp_cp_cp)			PARAMS ((const char * const name, const char * const mode));
+typedef FILE*	(*fp_cp_cp_fp)			PARAMS ((const char * const name, const char * const mode,
 							FILE* stream));
-typedef int	(*i_cp_i_)			PARAMS((const char * const name, const int flags, ...));
-typedef int	(*i_i_cp_i_)			PARAMS((const int dir_fd, const char * const pathname,
+typedef int	(*i_cp_i_)			PARAMS ((const char * const name, const int flags, ...));
+typedef int	(*i_i_cp_i_)			PARAMS ((const int dir_fd, const char * const pathname,
 							const int flags, ...));
 
 /* name resolving functions: */
-typedef int (*ccp_i_ucp_i)			PARAMS((const char *dname, int class, int type,
+typedef int (*ccp_i_ucp_i)			PARAMS ((const char *dname, int class, int type,
 							unsigned char *answer, int anslen));
-typedef int (*ccp_cpp_i_ucp_i)			PARAMS((const char *name, const char *domain, int class,
+typedef int (*ccp_cpp_i_ucp_i)			PARAMS ((const char *name, const char *domain, int class,
 							int type, unsigned char *answer, int anslen));
-typedef int (*i_ccp_i_i_cucp_i_cucp_ucp_i)	PARAMS((int op, const char *dname, int class, int type,
+typedef int (*i_ccp_i_i_cucp_i_cucp_ucp_i)	PARAMS ((int op, const char *dname, int class, int type,
 							const unsigned char *data, int datalen,
 							const unsigned char *newrr, unsigned char *buf,
 							int buflen));
@@ -305,73 +305,75 @@ extern "C" {
 # endif
 
 /* network-related functions: */
-extern GCC_WARN_UNUSED_RESULT shp_vp_sl_i			__lhip_real_gethostbyaddr_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_vp_sl_i_shp_cp_s_shpp_ip	__lhip_real_gethostbyaddr_r_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT shp_cp				__lhip_real_gethostbyname_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_shp_cp_s_shpp_ip		__lhip_real_gethostbyname_r_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT shp_cp_i				__lhip_real_gethostbyname2_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_i_shp_cp_s_shpp_i		__lhip_real_gethostbyname2_r_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT shp_v				__lhip_real_gethostent_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_shp_cp_s_shpp_ip		__lhip_real_gethostent_r_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT shp_cp_s_i_ip			__lhip_real_getipnodebyaddr_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT shp_cp_i_i_ip			__lhip_real_getipnodebyname_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_sipp				__lhip_real_getifaddrs_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_ssp_sl_cp_s_cp_s_i		__lhip_real_getnameinfo_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_cp_sap_sapp			__lhip_real_getaddrinfo_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_cpp_cpp			__lhip_real_execve_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_cp				__lhip_real_system_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_i_i_va				__lhip_real_ioctl_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_i_i_i				__lhip_real_socket_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT ss_i_smp_i			__lhip_real_recvmsg_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT ss_i_csmp_i			__lhip_real_sendmsg_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_s				__lhip_real_gethostname_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_sup				__lhip_real_uname_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_i_i_vp_slp			__lhip_real_getsockopt_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_i_i_cvp_sl			__lhip_real_setsockopt_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_ssp_slp				__lhip_real_getsockname_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_cssp_sl				__lhip_real_bind_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_i_ia2				__lhip_real_socketpair_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT shp_vp_sl_i			__lhip_real_gethostbyaddr_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_vp_sl_i_shp_cp_s_shpp_ip	__lhip_real_gethostbyaddr_r_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_cp				__lhip_real_gethostbyname_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_shp_cp_s_shpp_ip		__lhip_real_gethostbyname_r_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_cp_i				__lhip_real_gethostbyname2_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_i_shp_cp_s_shpp_i		__lhip_real_gethostbyname2_r_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_v				__lhip_real_gethostent_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_shp_cp_s_shpp_ip		__lhip_real_gethostent_r_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_cp_s_i_ip			__lhip_real_getipnodebyaddr_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_cp_i_i_ip			__lhip_real_getipnodebyname_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_sipp				__lhip_real_getifaddrs_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ssp_sl_cp_s_cp_s_i		__lhip_real_getnameinfo_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_cp_sap_sapp			__lhip_real_getaddrinfo_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_cpp_cpp			__lhip_real_execve_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp				__lhip_real_system_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_i_va				__lhip_real_ioctl_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_i_i				__lhip_real_socket_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT ss_i_smp_i			__lhip_real_recvmsg_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT ss_i_csmp_i			__lhip_real_sendmsg_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_s				__lhip_real_gethostname_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_sup				__lhip_real_uname_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_i_vp_slp			__lhip_real_getsockopt_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_i_cvp_sl			__lhip_real_setsockopt_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ssp_slp				__lhip_real_getsockname_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cssp_sl				__lhip_real_bind_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_ia2				__lhip_real_socketpair_location PARAMS ((void));
 
 /* file-related functions: */
-extern GCC_WARN_UNUSED_RESULT fp_cp_cp				__lhip_real_fopen64_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT fp_cp_cp_fp			__lhip_real_freopen64_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_i_				__lhip_real_open64_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_i_cp_i_				__lhip_real_openat64_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT fp_cp_cp				__lhip_real_fopen64_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT fp_cp_cp_fp			__lhip_real_freopen64_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_i_				__lhip_real_open64_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_cp_i_				__lhip_real_openat64_location PARAMS ((void));
 
-extern GCC_WARN_UNUSED_RESULT fp_cp_cp				__lhip_real_fopen_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT fp_cp_cp_fp			__lhip_real_freopen_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_i_				__lhip_real_open_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_i_cp_i_				__lhip_real_openat_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT fp_cp_cp				__lhip_real_fopen_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT fp_cp_cp_fp			__lhip_real_freopen_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_i_				__lhip_real_open_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_cp_i_				__lhip_real_openat_location PARAMS ((void));
 
 /* name resolving functions: */
-extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_query_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_search_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT ccp_cpp_i_ucp_i			__lhip_real_res_querydomain_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_query_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_search_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT ccp_cpp_i_ucp_i			__lhip_real_res_querydomain_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery_location PARAMS ((void));
 
 /* libpcap functions: */
-extern GCC_WARN_UNUSED_RESULT cp_cp				__lhip_real_pcap_lookupdev_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_ccp_uip_uip_cp			__lhip_real_pcap_lookupnet_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_create_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT pp_i_i				__lhip_real_pcap_open_dead_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT pp_ccp_i_i_i_cp			__lhip_real_pcap_open_live_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_open_offline_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT pp_Fp_cp				__lhip_real_pcap_fopen_offline_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT pp_ipt_cp				__lhip_real_pcap_hopen_offline_location PARAMS((void));
-extern GCC_WARN_UNUSED_RESULT i_ifpp_cp				__lhip_real_pcap_findalldevs_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT cp_cp				__lhip_real_pcap_lookupdev_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ccp_uip_uip_cp			__lhip_real_pcap_lookupnet_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_create_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_i_i				__lhip_real_pcap_open_dead_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_i_i_i_cp			__lhip_real_pcap_open_live_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_open_offline_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_Fp_cp				__lhip_real_pcap_fopen_offline_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ipt_cp				__lhip_real_pcap_hopen_offline_location PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ifpp_cp				__lhip_real_pcap_findalldevs_location PARAMS ((void));
 
 /* The library functions: */
-extern int							__lhip_main PARAMS((void));
-extern int GCC_WARN_UNUSED_RESULT				__lhip_check_prog_ban PARAMS((void));
-extern int GCC_WARN_UNUSED_RESULT				__lhip_is_local_addr PARAMS((
+extern int							__lhip_main PARAMS ((void));
+extern int GCC_WARN_UNUSED_RESULT				__lhip_check_prog_ban PARAMS ((void));
+extern int GCC_WARN_UNUSED_RESULT				__lhip_is_local_addr PARAMS ((
 									const struct hostent * const h));
-extern void							__lhip_change_data PARAMS((
+extern void							__lhip_change_data PARAMS ((
 									struct hostent * const ret));
-extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv4 PARAMS((void));
-extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv6 PARAMS((void));
-extern int GCC_WARN_UNUSED_RESULT				__lhip_get_init_stage PARAMS((void));
-extern void 							__lhip_read_local_addresses PARAMS((void));
-extern void							__lhip_free_local_addresses PARAMS((void));
+extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv4 PARAMS ((void));
+extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv6 PARAMS ((void));
+extern int GCC_WARN_UNUSED_RESULT				__lhip_get_init_stage PARAMS ((void));
+extern void 							__lhip_read_local_addresses PARAMS ((void));
+extern void							__lhip_free_local_addresses PARAMS ((void));
+extern void							__lhip_end PARAMS ((void));
+
 
 # ifdef __cplusplus
 }
