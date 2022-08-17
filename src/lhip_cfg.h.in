@@ -79,6 +79,7 @@
 #  define HAVE_OPENAT64		1
 #  undef  HAVE_PCAP_H
 #  undef  HAVE_PCAP_PCAP_H
+#  undef  HAVE_PCAP_FINDALLDEVS_EX
 #  define HAVE_READLINK		1
 #  define HAVE_REALLOC		1
 #  define HAVE_RESOLV_H		1

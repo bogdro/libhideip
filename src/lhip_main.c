@@ -154,6 +154,9 @@ static i_cp_rmtp_ifpp_cp		__lhip_real_pcap_findalldevs_ex		= NULL;
 
 #ifdef TEST_COMPILE
 # undef LHIP_ANSIC
+# if TEST_COMPILE > 1
+#  undef HAVE_MALLOC
+# endif
 #endif
 
 /* =============================================================== */

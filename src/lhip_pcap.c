@@ -70,8 +70,8 @@ extern pcap_t * pcap_open_offline_with_tstamp_precision LHIP_PARAMS ((const char
 extern pcap_t * pcap_fopen_offline LHIP_PARAMS ((FILE * fp, char * errbuf));
 extern pcap_t * pcap_fopen_offline_with_tstamp_precision LHIP_PARAMS ((FILE *, u_int, char *));
 extern int pcap_findalldevs LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
-extern int pcap_findalldevs_ex LHIP_PARAMS ((char *source, struct pcap_rmtauth *auth,
-            pcap_if_t **alldevs, char *errbuf));
+extern int pcap_findalldevs_ex LHIP_PARAMS ((PCAP_FINDALLDEVS_EX_ARG1TYPE source,
+	struct pcap_rmtauth *auth, pcap_if_t **alldevs, char *errbuf));
 
 #  ifdef __cplusplus
 }
@@ -96,6 +96,9 @@ extern pcap_t * pcap_hopen_offline_with_tstamp_precision LHIP_PARAMS ((intptr_t,
 
 #ifdef TEST_COMPILE
 # undef LHIP_ANSIC
+# if TEST_COMPILE > 1
+#  undef HAVE_MALLOC
+# endif
 #endif
 
 /* =============================================================== */
@@ -387,7 +390,7 @@ pcap_fopen_offline (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_fopen_offline(0x%x)\n", (unsigned int)fp);
+	fprintf (stderr, "libhideip: pcap_fopen_offline(0x%lx)\n", (unsigned long int)fp);
 	fflush (stderr);
 #endif
 
@@ -421,8 +424,8 @@ pcap_fopen_offline_with_tstamp_precision (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_fopen_offline_with_tstamp_precision(0x%x, %d)\n",
-		(unsigned int)fp, t);
+	fprintf (stderr, "libhideip: pcap_fopen_offline_with_tstamp_precision(0x%lx, %d)\n",
+		(unsigned long int)fp, t);
 	fflush (stderr);
 #endif
 
@@ -523,7 +526,7 @@ pcap_findalldevs (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_findalldevs(0x%x)\n", (unsigned int)devs);
+	fprintf (stderr, "libhideip: pcap_findalldevs(0x%lx)\n", (unsigned long int)devs);
 	fflush (stderr);
 #endif
 
@@ -543,27 +546,28 @@ pcap_findalldevs (
 
 /* =============================================================== */
 
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
 int
 pcap_findalldevs_ex (
-#ifdef LHIP_ANSIC
-	char *source, struct pcap_rmtauth *auth,
+# ifdef LHIP_ANSIC
+	PCAP_FINDALLDEVS_EX_ARG1TYPE source, struct pcap_rmtauth *auth,
 		pcap_if_t **alldevs, char *errbuf)
-#else
+# else
 	source, auth, alldevs, errbuf)
-	char *source;
+	PCAP_FINDALLDEVS_EX_ARG1TYPE source;
 	struct pcap_rmtauth *auth;
 	pcap_if_t **alldevs;
 	char *errbuf;
-#endif
+# endif
 {
 	__lhip_main ();
 
-#ifdef LHIP_DEBUG
+# ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: pcap_findalldevs_ex(0x%x, 0x%x, 0x%x, 0x%x)\n",
 		(unsigned int)devs, (unsigned int)auth, (unsigned int)alldevs,
 		(unsigned int)errbuf);
 	fflush (stderr);
-#endif
+# endif
 
 	if ( __lhip_real_pcap_findalldevs_ex_location () == NULL )
 	{
@@ -578,3 +582,4 @@ pcap_findalldevs_ex (
 
 	return -1;
 }
+#endif /* HAVE_PCAP_FINDALLDEVS_EX */

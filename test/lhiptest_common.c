@@ -137,18 +137,19 @@ void lhiptest_prepare_banned_file (void)
 }
 
 /* ======================================================= */
-
 /*
 __attribute__ ((constructor))
 static void setup_global(void) / * unchecked fixture * /
 {
+/ *
 	*(void **) (&orig_write) = dlsym (RTLD_NEXT, "write");
 	*(void **) (&orig_rename) = dlsym (RTLD_NEXT, "rename");
+* /
 }
-*/
-/*
 static void teardown_global(void)
 {
+	/ *__lhip_free_local_addresses (); * /
+	/ * __lhip_end(); * /
 }
 */
 
@@ -167,6 +168,7 @@ static void teardown_test(void)
 {
 	unlink(LHIP_TEST_FILENAME);
 	unlink(LHIP_TEST_BANNED_FILENAME);
+	/*__lhip_end();*/
 }
 
 TCase * lhiptest_add_fixtures(TCase * tests)

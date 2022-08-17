@@ -189,12 +189,6 @@ static const char * __lhip_valuable_files[] =
 	"/proc/net/fib_trie"
 };
 
-#ifndef HAVE_MALLOC
-static char __lhip_linkpath[LHIP_MAXPATHLEN + 1];
-static char __lhip_newlinkpath[LHIP_MAXPATHLEN + 1];
-static char __lhip_newlinkdir[LHIP_MAXPATHLEN + 1];
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -213,6 +207,15 @@ extern int fexecve LHIP_PARAMS ((int fd, char *const argv[], char *const envp[])
 
 #ifdef TEST_COMPILE
 # undef LHIP_ANSIC
+# if TEST_COMPILE > 1
+#  undef HAVE_MALLOC
+# endif
+#endif
+
+#ifndef HAVE_MALLOC
+static char __lhip_linkpath[LHIP_MAXPATHLEN + 1];
+static char __lhip_newlinkpath[LHIP_MAXPATHLEN + 1];
+static char __lhip_newlinkdir[LHIP_MAXPATHLEN + 1];
 #endif
 
 /* ======================================================= */
@@ -315,6 +318,7 @@ static char * __lhip_get_target_link_path (
 			lnk_res = readlink (current_name, __lhip_newlinkpath, (size_t)lsize);
 			if ( (lnk_res < 0) || (lnk_res > lsize) )
 			{
+				free (__lhip_newlinkpath);
 				break;
 			}
 			__lhip_newlinkpath[lnk_res] = '\0';
@@ -348,11 +352,17 @@ static char * __lhip_get_target_link_path (
 				free (__lhip_newlinkdir);
 # endif /* HAVE_MALLOC */
 			}
+			res = strcmp (current_name, __lhip_newlinkpath);
 # ifdef HAVE_MALLOC
 			free (current_name);
 # endif /* HAVE_MALLOC */
 			current_name = __lhip_newlinkpath;
 
+			if ( res == 0 )
+			{
+				/* the old and new names are the same - a link pointing to itself */
+				break;
+			}
 # ifdef HAVE_LSTAT64
 			res = lstat64 (current_name, &st);
 # else
@@ -362,7 +372,7 @@ static char * __lhip_get_target_link_path (
 			res = -1;
 #  endif
 # endif
-		}
+		} /* while ( res >= 0 ) */
 		return current_name;
 	}
 	else
@@ -681,8 +691,7 @@ static int __lhip_is_forbidden_program (
 					{
 						strncpy (__lhip_newlinkpath, path,
 							sizeof (__lhip_newlinkpath) - 1);
-						__lhip_newlinkpath[sizeof (__lhip_newlinkpath) - 1]
-						= '\0';
+						__lhip_newlinkpath[sizeof (__lhip_newlinkpath) - 1] = '\0';
 					}
 					__lhip_append_path (__lhip_newlinkpath,
 						__lhip_linkpath, sizeof (__lhip_newlinkpath));
@@ -844,11 +853,11 @@ fexecve (
 	if ( real_name != NULL )
 	{
 		res = __lhip_is_forbidden_program (real_name, argv, 0);
+#ifdef HAVE_MALLOC
+		free ((void *)real_name);
+#endif
 		if ( res != 0 )
 		{
-#ifdef HAVE_MALLOC
-			free ((void *)real_name);
-#endif
 			LHIP_SET_ERRNO_PERM();
 			return -1;
 		}

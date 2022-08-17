@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 1.9, bogdro@users.sourceforge.net)
+AC_INIT(libhideip, 1.9.1, bogdro@users.sourceforge.net)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
@@ -126,7 +126,8 @@ fi
 # This adds a runtime dependency, but otherwise it could make the program
 # bypass LibHideIP or make normally-working functions not available anymore.
 
-AC_CHECK_LIB([pcap],[pcap_lookupdev])
+libpcap=yes
+AC_CHECK_LIB([pcap],[pcap_lookupdev],,[libpcap=no])
 
 AC_CHECK_LIB([resolv],[res_query], [],
 	[AC_CHECK_LIB([resolv],[__res_query], [],
@@ -302,6 +303,28 @@ AC_CHECK_FUNC([getnameinfo], [AC_DEFINE(HAVE_GETNAMEINFO, [1], [Whether you have
 	ARG7TYPE, [unsigned int, int])
 	])
 
+if (test "x$libpcap" = "xyes"); then
+
+	AH_TEMPLATE([PCAP_FINDALLDEVS_EX_ARG1TYPE])
+	AC_CHECK_FUNC([pcap_findalldevs_ex], [AC_DEFINE(HAVE_PCAP_FINDALLDEVS_EX, [1], [Whether you have the pcap_findalldevs_ex function])
+		AC_PROTOTYPE(pcap_findalldevs_ex,
+		[
+		#ifdef HAVE_PCAP_H
+		#include <pcap.h>
+		#else
+		#ifdef HAVE_PCAP_PCAP_H
+		#include <pcap/pcap.h>
+		#endif
+		#endif
+		],
+		[
+			int (*test) (ARG1TYPE source, struct pcap_rmtauth *auth,
+				pcap_if_t **alldevs, char *errbuf) = &pcap_findalldevs_ex;
+		],
+		ARG1TYPE, [char *, const char *])
+		])
+fi
+
 have_check=no
 #ACTION-IF-NOT-FOUND is required, otherwise 'configure' fails
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.8], [have_check=yes], [have_check=no])
@@ -356,6 +379,7 @@ if (test "x$GCC" = "xyes" ); then
         AX_C_CHECK_FLAG([-Wno-nonnull-compare], [CFLAGS="$CFLAGS -Wno-nonnull-compare"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wstringop-truncation], [CFLAGS="$CFLAGS -Wstringop-truncation"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wduplicated-branches], [CFLAGS="$CFLAGS -Wduplicated-branches"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-fstack-check], [CFLAGS="$CFLAGS -fstack-check"], [CFLAGS="$CFLAGS"])
 
 	# required for the compiler, which is used by libtool instead of the linker
 	AX_C_CHECK_FLAG([-Wl,-z -Wl,noexecstack], [CFLAGS="$CFLAGS -Wl,-z -Wl,noexecstack"], [CFLAGS="$CFLAGS"])

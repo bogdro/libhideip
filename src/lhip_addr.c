@@ -170,6 +170,9 @@ __lhip_check_hostent_match LHIP_PARAMS ((
 
 #ifdef TEST_COMPILE
 # undef LHIP_ANSIC
+# if TEST_COMPILE > 1
+#  undef HAVE_MALLOC
+# endif
 #endif
 
 /* =============================================================== */
@@ -403,10 +406,10 @@ void __lhip_read_local_addresses (LHIP_VOID)
 	fflush (stderr);
 	if ( __lhip_our_real_name_ipv4 != NULL )
 	{
-		fprintf (stderr, "LibHideIP: 1: name=%s, h_addr_list=0x%x\n",
+		fprintf (stderr, "LibHideIP: 1: name=%s, h_addr_list=0x%lx\n",
 			(__lhip_our_real_name_ipv4->h_name == NULL)? "null" :
 				__lhip_our_real_name_ipv4->h_name,
-			(unsigned int)__lhip_our_real_name_ipv4->h_addr_list);
+			(unsigned long int)__lhip_our_real_name_ipv4->h_addr_list);
 		if ( __lhip_our_real_name_ipv4->h_addr_list != NULL )
 		{
 			int debug_j = 0;
@@ -424,10 +427,10 @@ void __lhip_read_local_addresses (LHIP_VOID)
 	}
 	if ( __lhip_our_real_name_ipv6 != NULL )
 	{
-		fprintf (stderr, "LibHideIP: 2: name=%s, h_addr_list=0x%x\n",
+		fprintf (stderr, "LibHideIP: 2: name=%s, h_addr_list=0x%lx\n",
 			(__lhip_our_real_name_ipv6->h_name == NULL)? "null" :
 				__lhip_our_real_name_ipv6->h_name,
-			(unsigned int)__lhip_our_real_name_ipv6->h_addr_list);
+			(unsigned long int)__lhip_our_real_name_ipv6->h_addr_list);
 		if ( __lhip_our_real_name_ipv6->h_addr_list != NULL )
 		{
 			int debug_j = 0;
@@ -464,11 +467,11 @@ void __lhip_read_local_addresses (LHIP_VOID)
 	fflush (stderr);
 	for ( i = 0; i < __lhip_number_of_hostnames; i++ )
 	{
-		fprintf (stderr, "LibHideIP: 6+%lu: name=%s, h_addr_list=0x%x, h_addrtype=%d, " \
+		fprintf (stderr, "LibHideIP: 6+%lu: name=%s, h_addr_list=0x%lx, h_addrtype=%d, " \
 			 "AF_INET=%d, AF_INET6=%d, h_length=%d\n", i,
 			(__lhip_our_names_addr[i].h_name == NULL)? "null" :
 				__lhip_our_names_addr[i].h_name,
-			(unsigned int)__lhip_our_names_addr[i].h_addr_list,
+			(unsigned long int)__lhip_our_names_addr[i].h_addr_list,
 			__lhip_our_names_addr[i].h_addrtype,
 			AF_INET, AF_INET6, __lhip_our_names_addr[i].h_length);
 		if ( __lhip_our_names_addr[i].h_addr_list != NULL )

@@ -59,6 +59,9 @@
 
 #ifdef TEST_COMPILE
 # undef LHIP_ANSIC
+# if TEST_COMPILE > 1
+#  undef HAVE_MALLOC
+# endif
 #endif
 
 #ifdef LHIP_ANSIC

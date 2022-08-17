@@ -115,6 +115,9 @@ extern int open64 LHIP_PARAMS ((const char * const path, const int flags, ... ))
 #  define WAS_LHIP_ANSIC
 # endif
 # undef LHIP_ANSIC
+# if TEST_COMPILE > 1
+#  undef HAVE_MALLOC
+# endif
 #endif
 
 /* ======================================================= */

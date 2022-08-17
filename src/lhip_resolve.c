@@ -108,6 +108,9 @@ static char __lhip_name_copy[LHIP_MAXPATHLEN];
 
 #ifdef TEST_COMPILE
 # undef LHIP_ANSIC
+# if TEST_COMPILE > 1
+#  undef HAVE_MALLOC
+# endif
 #endif
 
 /* =============================================================== */
@@ -170,16 +173,12 @@ static int __lhip_is_forbidden_name (
 		h.h_name = new_name;
 	}
 	else
+#endif
 	{
 		strncpy (__lhip_name_copy, name, LHIP_MIN (j, LHIP_MAXPATHLEN-1));
 		__lhip_name_copy[LHIP_MAXPATHLEN-1] = '\0';
 		h.h_name = __lhip_name_copy;
 	}
-#else
-	strncpy (__lhip_name_copy, name, LHIP_MIN (j, LHIP_MAXPATHLEN-1));
-	__lhip_name_copy[LHIP_MAXPATHLEN-1] = '\0';
-	h.h_name = __lhip_name_copy;
-#endif
 	h.h_aliases = NULL;
 	h.h_addrtype = 0;
 	h.h_length = 0;
@@ -558,7 +557,7 @@ getaddrinfo_a(
 
 	__lhip_main ();
 # ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: getaddrinfo_a(%d, 0x%x, %d, 0x%x)\n", mode, list, nitems, sevp);
+	fprintf (stderr, "libhideip: getaddrinfo_a(%d, 0x%lx, %d, 0x%lx)\n", mode, list, nitems, sevp);
 	fflush (stderr);
 # endif
 	if ( __lhip_real_getaddrinfo_a_location () == NULL )

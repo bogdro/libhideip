@@ -1,3 +1,36 @@
+2021-08-25	Bogdan Drozdowski <bogdro@users.sourceforge.net>
+
+	* LibHideIP version 1.9.1
+	  This is a bugfix- and compatibility-improvement-only release. No new
+	  features are added. Fixed compile errors on newer systems. Fixed
+	  memory leaks and one endless loop. Other minor fixes.
+	* configure.ac: Added checking for the -fstack-check compiler option.
+	  Added a check for the parameter type for pcap_findalldevs_ex(),
+	  because it was changed in an incompatible way in libpcap 1.9.1.
+	* src/lhip_cfg.h.in: added HAVE_PCAP_FINDALLDEVS_EX
+	* src/lhip_exec.c (__lhip_get_target_link_path): leave when the link
+	  target is the same as the link itself to avoid endless loops
+	* src/lhip_pcap.c (pcap_findalldevs_ex): use a variable parameter type
+	  provided by 'configure'. Define the function conditionally, otherwise
+	  if the function is not present, the correct parameter type cannot be
+	  established and compilation may fail.
+	* src/lhip_pcap.c (pcap_fopen_offline,
+	  pcap_fopen_offline_with_tstamp_precision, pcap_findalldevs): fixed
+	  the debug loggers for long pointers
+	* src/lhip_addr.c (__lhip_read_local_addresses): fixed the debug
+	  loggers for long pointers
+	* src/lhip_resolv.c (getaddrinfo_a): fixed the debug loggers for long
+	  pointers
+	* src/lhip_net.c (gethostname): declare variables only when needed
+	* src/lhip_resolv.c (__lhip_is_forbidden_name): simplify a bit
+	* src/lhip_exec.c (fexecve): always free() the obtained name
+	* src/lhip_exec.c (__lhip_get_target_link_path): fixed one memory leak
+	  on an error path
+	* src/*.c: added a flag to disable malloc() for compile checking
+	* test/lhiptest_exec.c (test_fexecve_banned): use 'wget', because
+	  'ifconfig' changes location on various systems
+	* test/Makefile.am: move common elements to variables
+
 2021-01-10	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* LibHideIP version 1.9

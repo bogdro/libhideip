@@ -215,8 +215,8 @@ END_TEST
 START_TEST(test_fexecve_banned)
 {
 	int a;
-	char progname[] = "/sbin/ifconfig";
-	char * args[] = { NULL, NULL };
+	char progname[] = "/usr/bin/wget";
+	char * args[] = { NULL, "https://libhideip.sourceforge.io", NULL };
 	char * envp[] = { NULL };
 	int prog_fd;
 

@@ -227,7 +227,13 @@ static const char local_name[] = "localhost";
 #endif
 
 #ifdef TEST_COMPILE
+# ifdef LHIP_ANSIC
+#  define WAS_LHIP_ANSIC
+# endif
 # undef LHIP_ANSIC
+# if TEST_COMPILE > 1
+#  undef HAVE_MALLOC
+# endif
 #endif
 
 /* =============================================================== */
@@ -1277,7 +1283,9 @@ gethostname (
 	size_t len;
 #endif
 {
+#ifndef LHIP_ENABLE_GUI_APPS
 	LHIP_MAKE_ERRNO_VAR(err);
+#endif
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -1418,6 +1426,11 @@ setsockopt (
 
 /* =============================================================== */
 
+/* problem with type portability - skip checking these 2 functions */
+#if (defined TEST_COMPILE) && (defined WAS_LHIP_ANSIC)
+# define LHIP_ANSIC 1
+#endif
+
 int
 getsockname (
 #ifdef LHIP_ANSIC
@@ -1544,6 +1557,10 @@ bind (
 }
 
 /* =============================================================== */
+
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
+#endif
 
 int
 socketpair (

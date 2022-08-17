@@ -11,42 +11,45 @@ check_PROGRAMS = lhiptest_banning lhiptest_exec lhiptest_ioctl lhiptest_net \
 #nobase_include_HEADERS = lhiptest_common.h
 #nodist_include_HEADERS = lhiptest_common.h
 EXTRA_DIST = lhiptest_common.h
+LHIPTEST_COMMON_SRC = lhiptest_common.c lhiptest_common.h
+LHIPTEST_COMMON_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
+LHIPTEST_COMMON_LIB = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
 
-lhiptest_banning_SOURCES = lhiptest_banning.c lhiptest_common.c lhiptest_common.h
-lhiptest_banning_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
-lhiptest_banning_LDADD = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+lhiptest_banning_SOURCES = lhiptest_banning.c $(LHIPTEST_COMMON_SRC)
+lhiptest_banning_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
+lhiptest_banning_LDADD = $(LHIPTEST_COMMON_LIB)
 
-lhiptest_exec_SOURCES = lhiptest_exec.c lhiptest_common.c lhiptest_common.h
-lhiptest_exec_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
-lhiptest_exec_LDADD = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+lhiptest_exec_SOURCES = lhiptest_exec.c $(LHIPTEST_COMMON_SRC)
+lhiptest_exec_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
+lhiptest_exec_LDADD = $(LHIPTEST_COMMON_LIB)
 
-lhiptest_ioctl_SOURCES = lhiptest_ioctl.c lhiptest_common.c lhiptest_common.h
-lhiptest_ioctl_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
-lhiptest_ioctl_LDADD = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+lhiptest_ioctl_SOURCES = lhiptest_ioctl.c $(LHIPTEST_COMMON_SRC)
+lhiptest_ioctl_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
+lhiptest_ioctl_LDADD = $(LHIPTEST_COMMON_LIB)
 
-lhiptest_net_SOURCES = lhiptest_net.c lhiptest_common.c lhiptest_common.h
-lhiptest_net_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
-lhiptest_net_LDADD = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+lhiptest_net_SOURCES = lhiptest_net.c $(LHIPTEST_COMMON_SRC)
+lhiptest_net_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
+lhiptest_net_LDADD = $(LHIPTEST_COMMON_LIB)
 
-lhiptest_opens_SOURCES = lhiptest_opens.c lhiptest_common.c lhiptest_common.h
-lhiptest_opens_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
-lhiptest_opens_LDADD = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+lhiptest_opens_SOURCES = lhiptest_opens.c $(LHIPTEST_COMMON_SRC)
+lhiptest_opens_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
+lhiptest_opens_LDADD = $(LHIPTEST_COMMON_LIB)
 
-lhiptest_pcap_SOURCES = lhiptest_pcap.c lhiptest_common.c lhiptest_common.h
-lhiptest_pcap_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
-lhiptest_pcap_LDADD = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+lhiptest_pcap_SOURCES = lhiptest_pcap.c $(LHIPTEST_COMMON_SRC)
+lhiptest_pcap_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
+lhiptest_pcap_LDADD = $(LHIPTEST_COMMON_LIB)
 
-lhiptest_resolve_SOURCES = lhiptest_resolve.c lhiptest_common.c lhiptest_common.h
-lhiptest_resolve_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
-lhiptest_resolve_LDADD = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+lhiptest_resolve_SOURCES = lhiptest_resolve.c $(LHIPTEST_COMMON_SRC)
+lhiptest_resolve_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
+lhiptest_resolve_LDADD = $(LHIPTEST_COMMON_LIB)
 
-lhiptest_uname_SOURCES = lhiptest_uname.c lhiptest_common.c lhiptest_common.h
-lhiptest_uname_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
-lhiptest_uname_LDADD = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+lhiptest_uname_SOURCES = lhiptest_uname.c $(LHIPTEST_COMMON_SRC)
+lhiptest_uname_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
+lhiptest_uname_LDADD = $(LHIPTEST_COMMON_LIB)
 
-lhiptest_other_SOURCES = lhiptest_other.c lhiptest_common.c lhiptest_common.h
-lhiptest_other_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
-lhiptest_other_LDADD = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+lhiptest_other_SOURCES = lhiptest_other.c $(LHIPTEST_COMMON_SRC)
+lhiptest_other_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
+lhiptest_other_LDADD = $(LHIPTEST_COMMON_LIB)
 
 zcompile: $(TESTS)
 .PHONY: zcompile
