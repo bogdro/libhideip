@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- libpcap functions' replacements.
  *
- * Copyright (C) 2011 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2011-2012 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -90,7 +90,7 @@ pcap_lookupdev (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_lookupdev_location ()) (errbuf);
 	}
@@ -116,7 +116,7 @@ pcap_lookupnet (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_lookupnet(%s)\n", (device==NULL)? "null" : device);
+	fprintf (stderr, "libhideip: pcap_lookupnet(%s)\n", (device == NULL)? "null" : device);
 	fflush (stderr);
 #endif
 
@@ -125,7 +125,7 @@ pcap_lookupnet (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_lookupnet_location ()) (device, netp, maskp, errbuf);
 	}
@@ -148,7 +148,7 @@ pcap_create (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_create(%s)\n", (source==NULL)? "null" : source);
+	fprintf (stderr, "libhideip: pcap_create(%s)\n", (source == NULL)? "null" : source);
 	fflush (stderr);
 #endif
 
@@ -157,7 +157,7 @@ pcap_create (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_create_location ()) (source, errbuf);
 	}
@@ -189,7 +189,7 @@ pcap_open_dead (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_open_dead_location ()) (linktype, snaplen);
 	}
@@ -216,7 +216,7 @@ pcap_open_live (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_open_live(%s)\n", (device==NULL)? "null" : device);
+	fprintf (stderr, "libhideip: pcap_open_live(%s)\n", (device == NULL)? "null" : device);
 	fflush (stderr);
 #endif
 
@@ -225,7 +225,7 @@ pcap_open_live (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_open_live_location ()) (device, snaplen, promisc, to_ms, errbuf);
 	}
@@ -248,7 +248,7 @@ pcap_open_offline (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_open_offline(%s)\n", (fname==NULL)? "null" : fname);
+	fprintf (stderr, "libhideip: pcap_open_offline(%s)\n", (fname == NULL)? "null" : fname);
 	fflush (stderr);
 #endif
 
@@ -257,7 +257,7 @@ pcap_open_offline (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_open_offline_location ()) (fname, errbuf);
 	}
@@ -289,7 +289,7 @@ pcap_fopen_offline (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_fopen_offline_location ()) (fp, errbuf);
 	}
@@ -321,7 +321,7 @@ pcap_hopen_offline (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_hopen_offline_location ()) (a, errbuf);
 	}
@@ -353,7 +353,7 @@ pcap_findalldevs (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_findalldevs_location ()) (devs, errbuf);
 	}

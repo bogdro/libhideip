@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- address resolving functions' replacements.
  *
- * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -81,7 +81,7 @@ static char __lhip_name_copy[LHIP_MAXPATHLEN];
 /* =============================================================== */
 
 #ifndef LHIP_ANSIC
-static int __lhip_is_forbidden_name PARAMS((const char * const name));
+static int __lhip_is_forbidden_name PARAMS ((const char * const name));
 #endif
 
 /**
@@ -170,7 +170,7 @@ res_query (
 {
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: res_query(%s)\n", (dname!=NULL)? dname : "null");
+	fprintf (stderr, "libhideip: res_query(%s)\n", (dname != NULL)? dname : "null");
 	fflush (stderr);
 #endif
 
@@ -182,7 +182,7 @@ res_query (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		/*errno = 0;*/
@@ -217,7 +217,7 @@ res_search (
 {
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: res_search(%s)\n", (dname!=NULL)? dname : "null");
+	fprintf (stderr, "libhideip: res_search(%s)\n", (dname != NULL)? dname : "null");
 	fflush (stderr);
 #endif
 
@@ -229,7 +229,7 @@ res_search (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		/*errno = 0;*/
@@ -266,7 +266,7 @@ res_querydomain (
 {
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: res_querydomain(%s, %s)\n", (name!=NULL)? name : "null",
+	fprintf (stderr, "libhideip: res_querydomain(%s, %s)\n", (name != NULL)? name : "null",
 		(domain!=NULL)? domain : "null");
 	fflush (stderr);
 #endif
@@ -279,7 +279,7 @@ res_querydomain (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		/*errno = 0;*/
@@ -319,7 +319,7 @@ res_mkquery (
 {
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: res_mkquery(%s)\n", (dname!=NULL)? dname : "null");
+	fprintf (stderr, "libhideip: res_mkquery(%s)\n", (dname != NULL)? dname : "null");
 	fflush (stderr);
 #endif
 
@@ -331,7 +331,7 @@ res_mkquery (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		/*errno = 0;*/

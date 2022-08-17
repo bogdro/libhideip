@@ -58,7 +58,7 @@ DESTDIR="$RPM_BUILD_ROOT" %{__make} install
 %defattr(-,root,root)
 /usr/local/lib/libhideip.so
 /usr/local/lib/libhideip.so.1
-/usr/local/lib/libhideip.so.1.3.0
+/usr/local/lib/libhideip.so.1.3.1
 /usr/local/lib/libhideip.la
 %doc /usr/share/info/libhideip.info.gz
 %doc /usr/share/man/man3/libhideip.3.gz
@@ -73,7 +73,7 @@ DESTDIR="$RPM_BUILD_ROOT" %{__make} install
 
 %package devel
 
-Summary:	Library for IP address hiding
+Summary:	Library for IP address hiding - development package
 Release:	1
 URL:		http://rudy.mif.pg.gda.pl/~bogdro/soft/
 License:	GPLv3+

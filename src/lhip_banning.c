@@ -2,7 +2,7 @@
  * A library for secure removing files.
  *	-- private file and program banning functions.
  *
- * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -78,7 +78,10 @@ __lhip_get_exename (
 #ifdef HAVE_ERRNO_H
 	int err = 0;
 #endif
-	for ( i=0; i < size; i++ ) exename[i] = '\0';
+	for ( i = 0; i < size; i++ )
+	{
+		exename[i] = '\0';
+	}
 	/* get the name of the current executable */
 #ifdef HAVE_ERRNO_H
 	err = errno;
@@ -113,6 +116,9 @@ __lhip_check_prog_ban (
 {
 	FILE    *fp;
 	int	ret = 0;	/* DEFAULT: NO, this program is not banned */
+#ifdef HAVE_ERRNO_H
+	int err = 0;
+#endif
 
 	/* Is this process on the list of applications to ignore? */
 	__lhip_get_exename (__lhip_exename, LHIP_MAXPATHLEN);
@@ -125,14 +131,17 @@ __lhip_check_prog_ban (
 
 	if ( __lhip_real_fopen_location () != NULL )
 	{
+#ifdef HAVE_ERRNO_H
+		err = errno;
+#endif
 		fp = (*__lhip_real_fopen_location ()) (SYSCONFDIR LHIP_PATH_SEP "libhideip.progban", "r");
-		if (fp != NULL)
+		if ( fp != NULL )
 		{
 			while ( fgets (__lhip_omitfile, sizeof (__lhip_omitfile), fp) != NULL )
 			{
 				__lhip_omitfile[LHIP_MAXPATHLEN - 1] = '\0';
 
-				if ( __lhip_omitfile[0] != '\0' /*(strlen (__lhip_omitfile) > 0)*/
+				if ( (__lhip_omitfile[0] != '\0') /*(strlen (__lhip_omitfile) > 0)*/
 					&& (__lhip_omitfile[0] != '\n')
 					&& (__lhip_omitfile[0] != '\r') )
 				{
@@ -142,13 +151,16 @@ __lhip_check_prog_ban (
 					if (strstr (__lhip_exename, __lhip_omitfile) != NULL)
 					{
 						/* needle found in haystack */
-						fclose (fp);
 						ret = 1;	/* YES, this program is banned */
+						break;
 					}
 				}
 			}
 			fclose (fp);
 		}
+#ifdef HAVE_ERRNO_H
+		errno = err;
+#endif
 	}
 	return ret;
 }

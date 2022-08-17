@@ -13,6 +13,8 @@ Type './configure' to configure the library for your system.
 If you want to enable the public interface of LibHideIP, configure the
  library with
 	./configure --enable-public-interface
+ The public interface is compatible with SWIG (http://www.swig.org), so
+ you can make native bindings to LibHideIP for any supported language.
 
 Type 'make' to compile the library. LibHideIP assumes that your host has
  maximum 100 aliases and addresses. If you think this number is not enough,

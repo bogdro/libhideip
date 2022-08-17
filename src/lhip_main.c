@@ -1,7 +1,7 @@
 /*
  * A library for hiding local IP address.
  *
- * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -46,7 +46,7 @@
 
 #include "lhip_priv.h"
 
-static int	__lhip_is_initialized		= 0;
+static int	__lhip_is_initialized		= LHIP_INIT_STAGE_NOT_INITIALIZED;
 
 /* --- Pointers to original functions. */
 /* network-related functions: */
@@ -113,7 +113,7 @@ __lhip_main (
 #endif
 )
 {
-	if ( __lhip_is_initialized == 0 )
+	if ( __lhip_is_initialized == LHIP_INIT_STAGE_NOT_INITIALIZED )
 	{
 		/* Get pointers to the original functions: */
 
@@ -182,11 +182,11 @@ __lhip_main (
 		*(void **) (&__lhip_real_pcap_hopen_offline) = dlsym  (RTLD_NEXT, "pcap_hopen_offline");
 		*(void **) (&__lhip_real_pcap_findalldevs)   = dlsym  (RTLD_NEXT, "pcap_findalldevs");
 
-		__lhip_is_initialized = 1;
+		__lhip_is_initialized = LHIP_INIT_STAGE_AFTER_DLSYM;
 
 		__lhip_read_local_addresses ();
 
-		__lhip_is_initialized = 2;
+		__lhip_is_initialized = LHIP_INIT_STAGE_FULLY_INITIALIZED;
 
 	}	/* is_initialized == 0 */
 	return 0;

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 0.5, bogdandr@op.pl)
+AC_INIT(libhideip, 0.6, bogdandr@op.pl)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c

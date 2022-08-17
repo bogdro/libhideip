@@ -33,7 +33,7 @@ This manual is for libhideip, version @VERSION@
 
 @c ==================================================================
 
-    Copyright (c)  2008-2011 Bogdan Drozdowski
+    Copyright (c)  2008-2012 Bogdan Drozdowski
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -47,6 +47,7 @@ Free Documentation License" in the "Copying" chapter.
 * What is libhideip?::		About the library.
 * How to compile?::		How to compile the library.
 * Installing::			Installation of the library.
+* Developing::			Programming with the library.
 * Manual configuration::	Configuration.
 * Author::			How to contact me.
 * Copying::			License - your rights and freedoms.
@@ -121,7 +122,8 @@ opening functions.
 Type @command{./configure} to configure LibHideIP for your system.
 
 If you want to enable the public interface of LibHideIP, configure the
-library with @command{./configure --enable-public-interface}.
+library with @command{./configure --enable-public-interface}. See the
+chapter on developing to learn how to use LibHideIP (@ref{Developing}).
 
 Type @command{make} to compile the library.
 LibHideIP assumes that your host has
@@ -162,7 +164,7 @@ To create an RPM package (the new way):
 
 
 
-@node Installing, Manual configuration, How to compile?, Top
+@node Installing, Developing, How to compile?, Top
 @chapter Making the library work
 
 Libhideip has no magic in it, it won't intercept calls to the mentioned functions
@@ -223,7 +225,68 @@ Then recompile and reinstall the library.
 
 @c ==================================================================
 
-@node Manual configuration, Author, Installing, Top
+
+
+@node Developing, Manual configuration, Installing, Top
+@chapter Programming with the library
+
+LibHideIP comes with a development package. You can use the following
+public functions and constants:
+
+@itemize
+@item void libhideip_enable(void) - enables LibHideIP for the program
+that calls this function
+@item const char * libhideip_version(void) - returns the runtime version
+of the library the program is using
+@item LHIP_VERSION is the compile-time preprocessor string constant containing
+the version of the library the program is compiled against
+@end itemize
+
+If you're using C or C++ (or any language that can parse C header files),
+you can use the header file directly. Simply type:
+
+	#include <libhideip.h>
+
+and compile the program with the library, e.g.:
+
+	gcc -o your_prog your_prog.c -lhideip -ldl
+
+If you want to use LibHideIP with some other programming language,
+you can generate bindings to LibHideIP for that language. You can use
+SWIG (@url{http://www.swig.org}) for this purpose. The header file is compatible
+with SWIG, so you can simply run:
+
+	swig -<your_lang> [<other options>] /path/to/libhideip.h
+
+e.g.
+
+	swig -php -o lhip_wrap_php.c /usr/include/libhideip.h
+
+You can then compile the generated wrapper files:
+
+	gcc -fpic -c lhip_wrap_*.c
+
+and link them into one or separate shared libraries:
+
+	gcc -shared lhip_wrap_*.o -lhideip -o lhip_wrapper.so
+
+After this, you can link your program with the wrapper library and LibHideIP:
+
+	gcc -o your_prog your_prog.c lhip_wrapper.so -lhideip -ldl
+
+or use the library in other languages, as shown in the SWIG examples.
+
+LibHideIP will not contain the interfaces compiled-in, because there may
+be incompatibilities between languages or even between different versions
+of the same language, causing compile-time or other conflicts and
+unnecessary dependencies.
+
+By using SWIG yourself, you can be sure that such problems will not occur.
+
+
+@c ==================================================================
+
+@node Manual configuration, Author, Developing, Top
 @chapter Manual configuration
 
 You can use the configuration file $@{sysconfdir@}/libhideip.progban to
@@ -249,9 +312,11 @@ bogdro (at) rudy . mif . pg . gda . pl
 
 
 or look at my website:@*
-[EN] http://rudy.mif.pg.gda.pl/~bogdro/soft/@*
-[EN] http://rudy.mif.pg.gda.pl/~bogdro/inne/@*
-[PL] http://rudy.mif.pg.gda.pl/~bogdro/@*
+[EN] @url{http://libhideip.sf.net}@*
+[PL] @url{http://libhideip.sf.net/index-pl.php}@*
+[EN] @url{http://rudy.mif.pg.gda.pl/~bogdro/soft/}@*
+[EN] @url{http://rudy.mif.pg.gda.pl/~bogdro/inne/}@*
+[PL] @url{http://rudy.mif.pg.gda.pl/~bogdro/}@*
 
 @c ==================================================================
 

@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- private header file.
  *
- * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -58,7 +58,7 @@
 # undef PARAMS
 # if defined (__STDC__) || defined (_AIX) \
 	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+	|| defined (WIN32) || defined (__cplusplus)
 #  define PARAMS(protos) protos
 #  define LHIP_ANSIC
 # else
@@ -372,23 +372,14 @@ extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv6 PARAMS
 extern int GCC_WARN_UNUSED_RESULT				__lhip_get_init_stage PARAMS ((void));
 extern void 							__lhip_read_local_addresses PARAMS ((void));
 extern void							__lhip_free_local_addresses PARAMS ((void));
+extern int GCC_WARN_UNUSED_RESULT				__lhip_is_forbidden_file
+									PARAMS ((const char * const name));
 extern void							__lhip_end PARAMS ((void));
 
 
 # ifdef __cplusplus
 }
 # endif
-
-# define VALUABLE_FILES	\
-	"if_inet6",	\
-	"ipv6_route",	\
-	"hosts",	\
-	"ifcfg-",	\
-	"hostname",	\
-	"mactab",	\
-	"/dev/net",	\
-	"/dev/udp",	\
-	"/dev/tcp"
 
 # define LOCAL_IPV4_ADDR 127, 0, 0, 1
 # define LOCAL_IPV4_MASK 255, 255, 255, 255
@@ -397,13 +388,18 @@ extern void							__lhip_end PARAMS ((void));
 
 # if (PATH_STYLE==32) || (PATH_STYLE==128)	/* unix or mac */
 #  define LHIP_PATH_SEP "/"
+#  define LHIP_FILE_SEP ':'
 # else
 #  define LHIP_PATH_SEP "\\"
+#  define LHIP_FILE_SEP ';'
 # endif
 
 # define LHIP_MAX(a, b) ( ((a) > (b)) ? (a) : (b) )
 # define LHIP_MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
 # define LHIP_MAXPATHLEN 4097
+# define LHIP_INIT_STAGE_NOT_INITIALIZED 0
+# define LHIP_INIT_STAGE_AFTER_DLSYM 1
+# define LHIP_INIT_STAGE_FULLY_INITIALIZED 2
 
 #endif /* _LHIP_HEADER */
 

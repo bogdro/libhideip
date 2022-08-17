@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- network functions' replacements.
  *
- * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -172,11 +172,11 @@ typedef unsigned short int __u16;
 #include "lhip_priv.h"
 
 #ifndef HAVE_GETIPNODEBYNAME
-extern struct hostent *getipnodebyname PARAMS((const char *name,
+extern struct hostent *getipnodebyname PARAMS ((const char *name,
 	int af, int flags, int *error_num));
 #endif
 #ifndef HAVE_GETIPNODEBYADDR
-extern struct hostent *getipnodebyaddr PARAMS((const void *addr,
+extern struct hostent *getipnodebyaddr PARAMS ((const void *addr,
 	size_t len, int af, int *error_num));
 #endif
 
@@ -187,26 +187,27 @@ static const unsigned char __lhip_netmask_ipv6[16] = {LOCAL_IPV6_MASK};
 
 static const unsigned char __lhip_zeroaddr_ipv4[4] = {0, 0, 0, 0};
 static const unsigned char __lhip_zeroaddr_ipv6[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static const char local_name[] = "localhost";
 
 #ifndef HAVE_GETHOSTBYADDR_R
-extern int gethostbyaddr_r (const void *addr, socklen_t len, int type,
+extern int gethostbyaddr_r PARAMS ((const void *addr, socklen_t len, int type,
                struct hostent *ret, char *buf, size_t buflen,
-               struct hostent **result, int *h_errnop);
+               struct hostent **result, int *h_errnop));
 #endif
 #ifndef HAVE_GETHOSTBYNAME_R
-extern int gethostbyname_r (const char *name,
+extern int gethostbyname_r PARAMS ((const char *name,
                struct hostent *ret, char *buf, size_t buflen,
-               struct hostent **result, int *h_errnop);
+               struct hostent **result, int *h_errnop));
 #endif
 #ifndef HAVE_GETHOSTBYNAME2_R
-extern int gethostbyname2_r (const char *name, int af,
+extern int gethostbyname2_r PARAMS ((const char *name, int af,
                struct hostent *ret, char *buf, size_t buflen,
-               struct hostent **result, int *h_errnop);
+               struct hostent **result, int *h_errnop));
 #endif
 #ifndef HAVE_GETHOSTENT_R
-extern int gethostent_r (
+extern int gethostent_r PARAMS ((
                struct hostent *ret, char *buf, size_t buflen,
-               struct hostent **result, int *h_errnop);
+               struct hostent **result, int *h_errnop));
 #endif
 
 #ifndef AF_NETLINK
@@ -261,7 +262,7 @@ gethostbyaddr (
 		return (*__lhip_real_gethostbyaddr_location ()) (addr, len, type);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -325,7 +326,7 @@ gethostbyaddr_r (
 			(addr, len, type, ret, buf, buflen, result, h_errnop);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -360,7 +361,7 @@ gethostbyname (
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: gethostbyname(%s)\n", (name==NULL)? "null" : name);
+	fprintf (stderr, "libhideip: gethostbyname(%s)\n", (name == NULL)? "null" : name);
 	fflush (stderr);
 #endif
 
@@ -380,7 +381,7 @@ gethostbyname (
 		return (*__lhip_real_gethostbyname_location ()) (name);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -421,7 +422,7 @@ gethostbyname_r (
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: gethostbyname_r(%s)\n", (name==NULL)? "null" : name);
+	fprintf (stderr, "libhideip: gethostbyname_r(%s)\n", (name == NULL)? "null" : name);
 	fflush (stderr);
 #endif
 
@@ -442,7 +443,7 @@ gethostbyname_r (
 			(name, ret, buf, buflen, result, h_errnop);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -478,7 +479,7 @@ gethostbyname2 (
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: gethostbyname2(%s)\n", (name==NULL)? "null" : name);
+	fprintf (stderr, "libhideip: gethostbyname2(%s)\n", (name == NULL)? "null" : name);
 	fflush (stderr);
 #endif
 
@@ -498,7 +499,7 @@ gethostbyname2 (
 		return (*__lhip_real_gethostbyname2_location ()) (name, af);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -540,7 +541,7 @@ gethostbyname2_r (
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: gethostbyname2_r(%s)\n", (name==NULL)? "null" : name);
+	fprintf (stderr, "libhideip: gethostbyname2_r(%s)\n", (name == NULL)? "null" : name);
 	fflush (stderr);
 #endif
 
@@ -561,7 +562,7 @@ gethostbyname2_r (
 			(name, af, ret, buf, buflen, result, h_errnop);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -608,7 +609,7 @@ gethostent (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -667,7 +668,7 @@ gethostent_r (
 		return (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen,result, h_errnop);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -724,7 +725,7 @@ getipnodebyaddr (
 		return (*__lhip_real_getipnodebyaddr_location ()) (addr, len, af, error_num);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -761,7 +762,7 @@ getipnodebyname (
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: getipnodebyname(%s)\n", (name==NULL)? "null" : name);
+	fprintf (stderr, "libhideip: getipnodebyname(%s)\n", (name == NULL)? "null" : name);
 	fflush (stderr);
 #endif
 
@@ -781,7 +782,7 @@ getipnodebyname (
 		return (*__lhip_real_getipnodebyname_location ()) (name, af, flags, error_num);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -839,7 +840,7 @@ getifaddrs (
 		return (*__lhip_real_getifaddrs_location ()) (__ifap);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1059,7 +1060,7 @@ getnameinfo (
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: getnameinfo(%s)\n", (host==NULL)? "null" : host);
+	fprintf (stderr, "libhideip: getnameinfo(%s)\n", (host == NULL)? "null" : host);
 	fflush (stderr);
 #endif
 
@@ -1080,7 +1081,7 @@ getnameinfo (
 			(sa, salen, host, hostlen, serv, servlen, flags);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1113,17 +1114,17 @@ getnameinfo (
 			}
 #endif
 			h.h_addr_list[1] = NULL;
-			if ( memcmp ( &(((const struct sockaddr_in *)sa)->sin_addr),
+			if ( (memcmp ( &(((const struct sockaddr_in *)sa)->sin_addr),
 				__lhip_localhost_ipv4,
-				sizeof (__lhip_localhost_ipv4) ) == 0
+				sizeof (__lhip_localhost_ipv4) ) == 0)
 				||
-				memcmp ( &(((const struct sockaddr_in *)sa)->sin_addr),
+				(memcmp ( &(((const struct sockaddr_in *)sa)->sin_addr),
 				__lhip_zeroaddr_ipv4,
-				sizeof (__lhip_localhost_ipv4) ) == 0
+				sizeof (__lhip_localhost_ipv4) ) == 0)
 				||
-				__lhip_is_local_addr (&h) != 0 )
+				(__lhip_is_local_addr (&h) != 0) )
 			{
-				strncpy (host, "localhost", hostlen);
+				strncpy (host, local_name, hostlen);
 			}
 		}
 		else if ( salen == sizeof (struct sockaddr_in6) )
@@ -1147,17 +1148,17 @@ getnameinfo (
 			}
 #endif
 			h.h_addr_list[1] = NULL;
-			if ( memcmp ( &(((const struct sockaddr_in6 *)sa)->sin6_addr),
+			if ( (memcmp ( &(((const struct sockaddr_in6 *)sa)->sin6_addr),
 				__lhip_localhost_ipv6,
-				sizeof (__lhip_localhost_ipv6) ) == 0
+				sizeof (__lhip_localhost_ipv6) ) == 0)
 				||
-				memcmp ( &(((const struct sockaddr_in6 *)sa)->sin6_addr),
+				(memcmp ( &(((const struct sockaddr_in6 *)sa)->sin6_addr),
 				__lhip_zeroaddr_ipv6,
-				sizeof (__lhip_localhost_ipv6) ) == 0
+				sizeof (__lhip_localhost_ipv6) ) == 0)
 				||
-				__lhip_is_local_addr (&h) != 0 )
+				(__lhip_is_local_addr (&h) != 0) )
 			{
-				strncpy (host, "localhost", hostlen);
+				strncpy (host, local_name, hostlen);
 			}
 		}
 	}
@@ -1194,7 +1195,7 @@ getaddrinfo (
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: getaddrinfo(%s)\n", (node==NULL)? "null" : node);
+	fprintf (stderr, "libhideip: getaddrinfo(%s)\n", (node == NULL)? "null" : node);
 	fflush (stderr);
 #endif
 
@@ -1214,7 +1215,7 @@ getaddrinfo (
 		return (*__lhip_real_getaddrinfo_location ()) (node, service, hints, res);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1234,7 +1235,7 @@ getaddrinfo (
 				tmp = *res;
 				while ( tmp != NULL )
 				{
-					if ( tmp->ai_family == AF_INET && tmp->ai_addr != NULL )
+					if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
 					{
 #ifdef HAVE_MEMCPY
 						memcpy (
@@ -1249,7 +1250,7 @@ getaddrinfo (
 						}
 #endif
 					}
-					else if ( tmp->ai_family == AF_INET6 && tmp->ai_addr != NULL )
+					else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
 					{
 #ifdef HAVE_MEMCPY
 						memcpy (
@@ -1264,9 +1265,9 @@ getaddrinfo (
 						}
 #endif
 					}
-					if (tmp->ai_canonname != NULL )
+					if ( tmp->ai_canonname != NULL )
 					{
-						strncpy (tmp->ai_canonname, "localhost",
+						strncpy (tmp->ai_canonname, local_name,
 							strlen (tmp->ai_canonname) );
 					}
 
@@ -1275,7 +1276,7 @@ getaddrinfo (
 			}
 			else if ( our_name_ipv4->h_aliases != NULL )
 			{
-				j=0;
+				j = 0;
 				while ( our_name_ipv4->h_aliases[j] != NULL )
 				{
 					if ( strcmp (node, our_name_ipv4->h_aliases[j]) == 0 )
@@ -1283,7 +1284,7 @@ getaddrinfo (
 						tmp = *res;
 						do
 						{
-							if ( tmp->ai_family == AF_INET && tmp->ai_addr != NULL )
+							if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
 							{
 #ifdef HAVE_MEMCPY
 								memcpy (
@@ -1298,7 +1299,7 @@ getaddrinfo (
 								}
 #endif
 							}
-							else if ( tmp->ai_family == AF_INET6 && tmp->ai_addr != NULL )
+							else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
 							{
 #ifdef HAVE_MEMCPY
 								memcpy (
@@ -1313,9 +1314,9 @@ getaddrinfo (
 								}
 #endif
 							}
-							if (tmp->ai_canonname != NULL )
+							if ( tmp->ai_canonname != NULL )
 							{
-								strncpy (tmp->ai_canonname, "localhost",
+								strncpy (tmp->ai_canonname, local_name,
 									strlen (tmp->ai_canonname) );
 							}
 
@@ -1333,7 +1334,7 @@ getaddrinfo (
 				tmp = *res;
 				do
 				{
-					if ( tmp->ai_family == AF_INET && tmp->ai_addr != NULL )
+					if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
 					{
 #ifdef HAVE_MEMCPY
 						memcpy (
@@ -1348,7 +1349,7 @@ getaddrinfo (
 						}
 #endif
 					}
-					else if ( tmp->ai_family == AF_INET6 && tmp->ai_addr != NULL )
+					else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
 					{
 #ifdef HAVE_MEMCPY
 						memcpy (
@@ -1363,9 +1364,9 @@ getaddrinfo (
 						}
 #endif
 					}
-					if (tmp->ai_canonname != NULL )
+					if ( tmp->ai_canonname != NULL )
 					{
-						strncpy (tmp->ai_canonname, "localhost",
+						strncpy (tmp->ai_canonname, local_name,
 							strlen (tmp->ai_canonname) );
 					}
 
@@ -1374,7 +1375,7 @@ getaddrinfo (
 			}
 			else if ( our_name_ipv6->h_aliases != NULL )
 			{
-				j=0;
+				j = 0;
 				while ( our_name_ipv6->h_aliases[j] != NULL )
 				{
 					if ( strcmp (node, our_name_ipv6->h_aliases[j]) == 0 )
@@ -1382,7 +1383,7 @@ getaddrinfo (
 						tmp = *res;
 						do
 						{
-							if ( tmp->ai_family == AF_INET && tmp->ai_addr != NULL )
+							if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
 							{
 #ifdef HAVE_MEMCPY
 								memcpy (
@@ -1397,7 +1398,7 @@ getaddrinfo (
 								}
 #endif
 							}
-							else if ( tmp->ai_family == AF_INET6 && tmp->ai_addr != NULL )
+							else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
 							{
 #ifdef HAVE_MEMCPY
 								memcpy (
@@ -1412,9 +1413,9 @@ getaddrinfo (
 								}
 #endif
 							}
-							if (tmp->ai_canonname != NULL )
+							if ( tmp->ai_canonname != NULL )
 							{
-								strncpy (tmp->ai_canonname, "localhost",
+								strncpy (tmp->ai_canonname, local_name,
 									strlen (tmp->ai_canonname) );
 							}
 
@@ -1456,7 +1457,7 @@ socket (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = 0;
@@ -1511,7 +1512,7 @@ recvmsg (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = 0;
@@ -1552,7 +1553,7 @@ sendmsg (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = 0;
@@ -1607,7 +1608,7 @@ gethostname (
 		return (*__lhip_real_gethostname_location ()) (name, len);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1623,7 +1624,7 @@ gethostname (
 		name[i] = '\0';
 	}
 #endif
-	strncpy (name, "localhost", LHIP_MIN (len-1, 9)+1);
+	strncpy (name, local_name, LHIP_MIN (len-1, 9)+1);
 	return 0;
 }
 
@@ -1660,7 +1661,7 @@ getsockopt (
 		return -1;
 	}
 
-	if ( optval == NULL || optlen == NULL )
+	if ( (optval == NULL) || (optlen == NULL) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1668,7 +1669,7 @@ getsockopt (
 		return (*__lhip_real_getsockopt_location ()) (s, level, optname, optval, optlen);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1676,7 +1677,7 @@ getsockopt (
 		return (*__lhip_real_getsockopt_location ()) (s, level, optname, optval, optlen);
 	}
 #if (defined SOL_IP) && (defined IP_PKTINFO)
-	if ( level == SOL_IP && optname == IP_PKTINFO )
+	if ( (level == SOL_IP) && (optname == IP_PKTINFO) )
 	{
 # ifdef HAVE_ERRNO_H
 		errno = -EPERM;
@@ -1728,7 +1729,7 @@ setsockopt (
 		return (*__lhip_real_setsockopt_location ()) (s, level, optname, optval, optlen);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1737,7 +1738,7 @@ setsockopt (
 	}
 
 #if (defined SOL_IP) && (defined IP_PKTINFO)
-	if ( level == SOL_IP && optname == IP_PKTINFO )
+	if ( (level == SOL_IP) && (optname == IP_PKTINFO) )
 	{
 # ifdef HAVE_ERRNO_H
 		errno = -EPERM;
@@ -1783,7 +1784,7 @@ getsockname (
 		return -1;
 	}
 
-	if ( name == NULL || namelen == NULL )
+	if ( (name == NULL) || (namelen == NULL) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1791,7 +1792,7 @@ getsockname (
 		return (*__lhip_real_getsockname_location ()) (s, name, namelen);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1873,7 +1874,7 @@ bind (
 		return (*__lhip_real_bind_location ()) (sockfd, my_addr, addrlen);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1883,13 +1884,13 @@ bind (
 
 	if ( my_addr->sa_family == AF_INET )
 	{
-		if ( memcmp ( &(((const struct sockaddr_in *)my_addr)->sin_addr),
+		if ( (memcmp ( &(((const struct sockaddr_in *)my_addr)->sin_addr),
 			__lhip_localhost_ipv4,
-			sizeof (__lhip_localhost_ipv4) ) != 0
+			sizeof (__lhip_localhost_ipv4) ) != 0)
 			&&
-			memcmp ( &(((const struct sockaddr_in *)my_addr)->sin_addr),
+			(memcmp ( &(((const struct sockaddr_in *)my_addr)->sin_addr),
 			__lhip_zeroaddr_ipv4,
-			sizeof (__lhip_localhost_ipv4) ) != 0 )
+			sizeof (__lhip_localhost_ipv4) ) != 0) )
 		{
 			/* not 127.0.0.1 and not 0.0.0.0 address - forbid, to avoid guessing */
 #ifdef HAVE_ERRNO_H
@@ -1900,13 +1901,13 @@ bind (
 	}
 	else if ( my_addr->sa_family == AF_INET6 )
 	{
-		if ( memcmp ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr),
+		if ( (memcmp ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr),
 			__lhip_localhost_ipv6,
-			sizeof (__lhip_localhost_ipv6) ) != 0
+			sizeof (__lhip_localhost_ipv6) ) != 0)
 			&&
-			memcmp ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr),
+			(memcmp ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr),
 			__lhip_zeroaddr_ipv6,
-			sizeof (__lhip_localhost_ipv6) ) != 0 )
+			sizeof (__lhip_localhost_ipv6) ) != 0) )
 		{
 			/* not ::1 and not ::0 address - forbid, to avoid guessing */
 #ifdef HAVE_ERRNO_H
@@ -1945,7 +1946,7 @@ socketpair (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = 0;

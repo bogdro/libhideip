@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- file opening functions' replacements.
  *
- * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -76,14 +76,14 @@
 #ifdef HAVE_FCNTL_H
 # include <fcntl.h>	/* open*() */
 #else
-extern int open PARAMS((const char * const path, const int flags, ... ));
-extern int open64 PARAMS((const char * const path, const int flags, ... ));
+extern int open PARAMS ((const char * const path, const int flags, ... ));
+extern int open64 PARAMS ((const char * const path, const int flags, ... ));
 #endif
 #ifndef HAVE_OPENAT
-extern int openat PARAMS((const int dirfd, const char * const pathname, const int flags, ...));
+extern int openat PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
 #endif
 #ifndef HAVE_OPENAT64
-extern int openat64 PARAMS((const int dirfd, const char * const pathname, const int flags, ...));
+extern int openat64 PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
 #endif
 
 /*
@@ -97,124 +97,6 @@ extern FILE* freopen64 PARAMS((const char * const path, const char * const mode,
 extern int open64 PARAMS((const char * const path, const int flags, ... ));
 #endif
 */
-
-static const char * __lhip_valuable_files[] =
-{
-	VALUABLE_FILES
-};
-
-#ifndef HAVE_MALLOC
-static char __lhip_linkpath[LHIP_MAXPATHLEN];
-static char __lhip_newlinkpath[LHIP_MAXPATHLEN];
-#endif
-
-/* ======================================================= */
-
-#ifndef LHIP_ANSIC
-static int __lhip_is_forbidden_file PARAMS((const char * const name));
-#endif
-
-/**
- * Tells if the file with the given name is forbidden to be opened.
- * \param name The name of the file to check.
- * \return 1 if forbidden, 0 otherwise.
- */
-static int __lhip_is_forbidden_file (
-#ifdef LHIP_ANSIC
-	const char * const name)
-#else
-	name)
-	const char * const name;
-#endif
-{
-#ifdef HAVE_MALLOC
-	char * __lhip_linkpath;
-#endif
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	int res;
-	struct stat st;
-# ifdef HAVE_MALLOC
-	char * __lhip_newlinkpath;
-# endif
-#endif
-#ifndef HAVE_MEMSET
-	size_t i;
-#endif
-	unsigned int j;
-	int ret = 0;
-
-	if ( name == NULL ) return 0;
-	j = strlen (name) + 1;
-#ifdef HAVE_MALLOC
-	__lhip_linkpath = (char *) malloc ( j );
-	__lhip_newlinkpath = (char *) malloc ( j );
-	if ( __lhip_linkpath != NULL && __lhip_newlinkpath != NULL )
-#endif
-	{
-#ifdef HAVE_MALLOC
-# ifdef HAVE_MEMSET
-		memset (__lhip_linkpath, 0, j);
-		memset (__lhip_newlinkpath, 0, j);
-# else
-		for ( i = 0; i < j; i++ )
-		{
-			__lhip_linkpath[i] = '\0';
-			__lhip_newlinkpath[i] = '\0';
-		}
-# endif
-		strncpy (__lhip_linkpath, name, strlen (name));
-#else
-# ifdef HAVE_MEMSET
-		memset (__lhip_linkpath, 0, sizeof (__lhip_linkpath));
-		memset (__lhip_newlinkpath, 0, sizeof (__lhip_newlinkpath));
-# else
-		for ( i = 0; i < sizeof (__lhip_linkpath); i++ )
-		{
-			__lhip_linkpath[i] = '\0';
-		}
-		for ( i = 0; i < sizeof (__lhip_newlinkpath); i++ )
-		{
-			__lhip_newlinkpath[i] = '\0';
-		}
-# endif
-		strncpy (__lhip_linkpath, name, sizeof (__lhip_linkpath) - 1);
-#endif
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-# ifdef HAVE_MALLOC
-		j = strlen (name) + 1;
-# else
-		j = sizeof (__lhip_newlinkpath);
-# endif
-		res = stat (name, &st);
-		while ( res >= 0 )
-		{
-			if ( S_ISLNK (st.st_mode) )
-			{
-				res = readlink (__lhip_linkpath, __lhip_newlinkpath, j - 1 );
-				if ( res < 0 ) break;
-				__lhip_newlinkpath[res] = '\0';
-				strncpy (__lhip_linkpath, __lhip_newlinkpath, (size_t)res);
-				__lhip_linkpath[res] = '\0';
-			}
-			else break;
-			res = stat (__lhip_linkpath, &st);
-		}
-#endif
-		for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
-		{
-			if ( strstr (__lhip_linkpath, __lhip_valuable_files[j]) != NULL )
-			{
-				ret = 1;
-				break;
-			}
-		}
-	}
-#ifdef HAVE_MALLOC
-	if ( __lhip_newlinkpath != NULL ) free (__lhip_newlinkpath);
-	if ( __lhip_linkpath != NULL ) free (__lhip_linkpath);
-#endif
-	return ret;
-}
 
 /* ======================================================= */
 
@@ -243,8 +125,8 @@ fopen64 (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: fopen64(%s, %s)\n", (name==NULL)? "null" : name,
-		(mode==NULL)? "null" : mode);
+	fprintf (stderr, "libhideip: fopen64(%s, %s)\n", (name == NULL)? "null" : name,
+		(mode == NULL)? "null" : mode);
 	fflush (stderr);
 #endif
 
@@ -272,7 +154,7 @@ fopen64 (
 		return (*__lhip_real_fopen64_location ()) (name, mode);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -320,8 +202,8 @@ fopen (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: fopen(%s, %s)\n", (name==NULL)? "null" : name,
-		(mode==NULL)? "null" : mode);
+	fprintf (stderr, "libhideip: fopen(%s, %s)\n", (name == NULL)? "null" : name,
+		(mode == NULL)? "null" : mode);
 	fflush (stderr);
 #endif
 
@@ -349,7 +231,7 @@ fopen (
 		return (*__lhip_real_fopen_location ()) (name, mode);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -399,7 +281,7 @@ freopen64 (
 
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: freopen64(%s, %s, %ld)\n",
-		(path==NULL)? "null" : path, (mode==NULL)? "null" : mode, (long int)stream);
+		(path == NULL)? "null" : path, (mode == NULL)? "null" : mode, (long int)stream);
 	fflush (stderr);
 #endif
 
@@ -429,7 +311,7 @@ freopen64 (
 		return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -480,7 +362,7 @@ freopen (
 
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: freopen(%s, %s, %ld)\n",
-		(name==NULL)? "null" : name, (mode==NULL)? "null" : mode, (long int)stream);
+		(name == NULL)? "null" : name, (mode == NULL)? "null" : mode, (long int)stream);
 	fflush (stderr);
 #endif
 
@@ -510,7 +392,7 @@ freopen (
 		return (*__lhip_real_freopen_location ()) ( name, mode, stream );
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -578,7 +460,7 @@ open64 (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: open64(%s, 0%o, ...)\n", (path==NULL)? "null" : path, flags);
+	fprintf (stderr, "libhideip: open64(%s, 0%o, ...)\n", (path == NULL)? "null" : path, flags);
 	fflush (stderr);
 #endif
 
@@ -598,7 +480,10 @@ open64 (
 	path = va_arg (args, char * const);
 	flags = va_arg (args, int);
 # endif
-	if ( (flags & O_CREAT) != 0 ) mode = va_arg (args, mode_t);
+	if ( (flags & O_CREAT) != 0 )
+	{
+		mode = va_arg (args, mode_t);
+	}
 #endif
 
 	if ( path == NULL )
@@ -637,7 +522,7 @@ open64 (
 		return ret_fd;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -722,7 +607,7 @@ open (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: open(%s, 0%o, ...)\n", (name==NULL)? "null" : name, flags);
+	fprintf (stderr, "libhideip: open(%s, 0%o, ...)\n", (name == NULL)? "null" : name, flags);
 	fflush (stderr);
 #endif
 
@@ -742,7 +627,10 @@ open (
 	name = va_arg (args, char * const);
 	flags = va_arg (args, int);
 # endif
-	if ( (flags & O_CREAT) != 0 ) mode = va_arg (args, mode_t);
+	if ( (flags & O_CREAT) != 0 )
+	{
+		mode = va_arg (args, mode_t);
+	}
 #endif
 
 	if ( name == NULL )
@@ -781,7 +669,7 @@ open (
 		return ret_fd;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -870,7 +758,7 @@ openat64 (
 
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: openat64(%d, %s, 0%o, ...)\n",
-		dirfd, (pathname==NULL)? "null" : pathname, flags);
+		dirfd, (pathname == NULL)? "null" : pathname, flags);
 	fflush (stderr);
 #endif
 
@@ -891,7 +779,10 @@ openat64 (
 	pathname = va_arg (args, char * const);
 	flags = va_arg (args, int);
 # endif
-	if ( (flags & O_CREAT) != 0 ) mode = va_arg (args, mode_t);
+	if ( (flags & O_CREAT) != 0 )
+	{
+		mode = va_arg (args, mode_t);
+	}
 #endif
 
 	if ( pathname == NULL )
@@ -930,7 +821,7 @@ openat64 (
 		return ret_fd;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;
@@ -1024,7 +915,7 @@ openat (
 
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: openat(%d, %s, 0%o, ...)\n", dirfd,
-		(pathname==NULL)? "null" : pathname, flags);
+		(pathname == NULL)? "null" : pathname, flags);
 	fflush (stderr);
 #endif
 
@@ -1045,7 +936,10 @@ openat (
 	pathname = va_arg (args, char * const);
 	flags = va_arg (args, int);
 # endif
-	if ( (flags & O_CREAT) != 0 ) mode = va_arg (args, mode_t);
+	if ( (flags & O_CREAT) != 0 )
+	{
+		mode = va_arg (args, mode_t);
+	}
 #endif
 
 	if ( pathname == NULL )
@@ -1084,7 +978,7 @@ openat (
 		return ret_fd;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
+	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 #ifdef HAVE_ERRNO_H
 		errno = err;

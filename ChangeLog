@@ -1,3 +1,21 @@
+2012-02-12	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* libhideip version 0.6
+	  Made the header file SWIG-enabled, updated copyright, code cleanup,
+	  efficiency corrected, more forbidden programs, documentation update,
+	  improved compatibility with non-ANSI-C compilers.
+	* libhideip.spec.in: corrected the description of the devel package.
+	* src/libhideip.h.in: SWIG compatibility.
+	* src/lhip_banning.c (__lhip_check_prog_ban): stopping the checking as
+	  soon as a match if found, preserving errno.
+	* src/lhip_exec.c: moved __lhip_is_forbidden_file() from lhip_opens.c
+	  and made it public. Using a constant for the separator char between
+	  different paths. Added more forbidden programs.
+	* src/{lhip_addr.c,lhip_net.c}: moved identical strings to variables
+	* doc/libhideip.texi.in: a new chapter about the development library
+	  and using libhideip with SWIG, added links to SourceForge pages,
+	  marked the URLs.
+
 2011-10-05	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* libhideip version 0.5
