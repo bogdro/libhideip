@@ -39,9 +39,9 @@ host_triplet = @host@
 @PUBLIC_INTERFACE_TRUE@am__append_2 = lhip_public.c
 @PUBLIC_INTERFACE_TRUE@am__append_3 = lhip_public.c
 subdir = src
-DIST_COMMON = $(nobase_include_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/lhip_cfg.h.in \
-	$(srcdir)/lhip_public.c.in $(srcdir)/libhideip.h.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/lhip_cfg.h.in $(srcdir)/lhip_public.c.in \
+	$(srcdir)/libhideip.h.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_define_path_style.m4 \
 	$(top_srcdir)/m4/ac_prototype.m4 \
@@ -105,7 +105,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libhideip_la_SOURCES) $(nodist_libhideip_la_SOURCES)
 DIST_SOURCES = $(libhideip_la_SOURCES)
-HEADERS = $(nobase_include_HEADERS)
+HEADERS = $(nobase_nodist_include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -237,10 +237,10 @@ EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh \
 # interface changed => C++, R:=0
 # - interface add => A++
 # - interface removed => A:=0
-libhideip_la_LDFLAGS = -version-info 4:2:3
+libhideip_la_LDFLAGS = -version-info 4:3:3
 
 #nobase_include_HEADERS = lhip_priv.h
-nobase_include_HEADERS = libhideip.h
+nobase_nodist_include_HEADERS = libhideip.h
 BUILT_SOURCES = lhip_paths.h libhideip.h $(am__append_1)
 nodist_libhideip_la_SOURCES = lhip_paths.h libhideip.h $(am__append_2)
 libhideip_la_DISTCLEANFILES = lhip_paths.h libhideip.h $(am__append_3)
@@ -363,10 +363,10 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-nobase_includeHEADERS: $(nobase_include_HEADERS)
+install-nobase_nodist_includeHEADERS: $(nobase_nodist_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(includedir)" || $(MKDIR_P) "$(DESTDIR)$(includedir)"
-	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(nobase_nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
 	$(am__nobase_list) | while read dir files; do \
 	  xfiles=; for file in $$files; do \
 	    if test -f "$$file"; then xfiles="$$xfiles $$file"; \
@@ -379,9 +379,9 @@ install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	    $(INSTALL_HEADER) $$xfiles "$(DESTDIR)$(includedir)/$$dir" || exit $$?; }; \
 	done
 
-uninstall-nobase_includeHEADERS:
+uninstall-nobase_nodist_includeHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(nobase_nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
 	$(am__nobase_strip_setup); files=`$(am__nobase_strip)`; \
 	test -n "$$files" || exit 0; \
 	echo " ( cd '$(DESTDIR)$(includedir)' && rm -f" $$files ")"; \
@@ -527,7 +527,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-nobase_includeHEADERS
+install-data-am: install-nobase_nodist_includeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -573,7 +573,8 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-libLTLIBRARIES uninstall-nobase_includeHEADERS
+uninstall-am: uninstall-libLTLIBRARIES \
+	uninstall-nobase_nodist_includeHEADERS
 
 .MAKE: all check install install-am install-strip
 
@@ -585,13 +586,13 @@ uninstall-am: uninstall-libLTLIBRARIES uninstall-nobase_includeHEADERS
 	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am \
 	install-libLTLIBRARIES install-man \
-	install-nobase_includeHEADERS install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-nobase_nodist_includeHEADERS install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-libLTLIBRARIES \
-	uninstall-nobase_includeHEADERS
+	uninstall-nobase_nodist_includeHEADERS
 
 lhip_paths.h: Makefile
 	echo '#define SYSCONFDIR "$(sysconfdir)"' > lhip_paths.h

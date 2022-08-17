@@ -1,7 +1,7 @@
 /*
  * A library for hiding local IP address.
  *
- * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *

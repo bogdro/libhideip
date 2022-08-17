@@ -10,11 +10,11 @@ EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh \
 # interface changed => C++, R:=0
 # - interface add => A++
 # - interface removed => A:=0
-libhideip_la_LDFLAGS = -version-info 4:2:3
+libhideip_la_LDFLAGS = -version-info 4:3:3
 
 #nobase_include_HEADERS = lhip_priv.h
 
-nobase_include_HEADERS = libhideip.h
+nobase_nodist_include_HEADERS = libhideip.h
 BUILT_SOURCES = lhip_paths.h libhideip.h
 nodist_libhideip_la_SOURCES = lhip_paths.h libhideip.h
 libhideip_la_DISTCLEANFILES = lhip_paths.h libhideip.h

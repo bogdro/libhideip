@@ -38,7 +38,7 @@ This manual is for LibHideIP, version @VERSION@
 
 @c ==================================================================
 
-    Copyright (c)  2008-2012 Bogdan Drozdowski
+    Copyright (c)  2008-2013 Bogdan Drozdowski
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -124,11 +124,17 @@ opening functions.
 @item the @command{make} program
 @end itemize
 
-Type @command{./configure} to configure LibHideIP for your system.
+Type
+
+	@command{./configure}
+
+to configure LibHideIP for your system.
 
 If you want to enable the public interface of LibHideIP, configure the
-library with@*
-	@command{./configure --enable-public-interface}@*
+library with
+
+	@command{./configure --enable-public-interface}
+
 See the chapter on developing to learn how to use LibHideIP (@ref{Developing}).
 
 LibHideIP allows some programs to be banned (not allowed to run under
@@ -137,29 +143,44 @@ file is always supported - $@{sysconfdir@}/libhideip.progban ($@{sysconfdir@} is
 /usr/local/etc unless set otherwise during configure).
 
 If you want to disable additional banning files pointed to by environment
-variables, configure the library with@*
-	@command{./configure --enable-environment=no}@*
+variables, configure the library with
+
+	@command{./configure --enable-environment=no}
 
 If you want to disable additional banning files in users' home directories,
-configure the library with@*
-	@command{./configure --enable-user-files=no}@*
+configure the library with
 
-Type @command{make} to compile the library.
-LibHideIP assumes that your host has
-maximum 100 aliases and addresses. If you think this number is not enough,
-configure LibHideIP with@*
-	@command{./configure --with-max-host-names=n}@*
-or compile LibHideIP with:@*
-	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'@*
+	@command{./configure --enable-user-files=no}
+
+Type
+
+	@command{make}
+
+to compile the library.
+
+LibHideIP assumes that your host has maximum 100 aliases and addresses,
+unless you have the malloc() function. If you think this number is not
+enough and you don't have the malloc() function, configure LibHideIP with
+
+	@command{./configure --with-max-host-names=n}
+
+or compile LibHideIP with:
+
+	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'
+
 where 'n' is your desired number (10 is minimum).
 
 Documentation comes compiled (and can be copied right away), but can be changed
 and recompiled, if you have the @command{makeinfo} program (@command{texinfo} package).
 
-Type @command{make install} to install the library.
+Type
+
+	@command{make install}
+
+to install the library.
 
 @strong{NOTE}: @command{make install} is @strong{NOT} recommended. Create and install
-an rpm package instead, if possible.
+an RPM package instead, if possible.
 
 To create an RPM package (the old way):
 
@@ -167,7 +188,7 @@ To create an RPM package (the old way):
 @item copy the libhideip.spec file to /usr/src/redhat/SPECS
 @item copy the source package libhideip-@VERSION@.tar.gz to /usr/src/redhat/SOURCES
 @item type @command{rpmbuild -bb /usr/src/redhat/SPECS/libhideip.spec}
-@item get the rpms from /usr/src/redhat/RPMS/i386
+@item get the RPMs from /usr/src/redhat/RPMS/i386
 @end enumerate
 
 To create an RPM package (the new way):
@@ -176,7 +197,7 @@ To create an RPM package (the new way):
 @item copy the libhideip.spec file to $HOME/rpmbuild/SPECS
 @item copy the source package libhideip-@VERSION@.tar.gz to $HOME/rpmbuild/SOURCES
 @item type @command{rpmbuild -bb $HOME/rpmbuild/SPECS/libhideip.spec}
-@item get the rpms from $HOME/rpmbuild/RPMS/i386
+@item get the RPMs from $HOME/rpmbuild/RPMS/i386
 @end enumerate
 
 @c ==================================================================
@@ -195,7 +216,7 @@ Just add the following line:
 
 export LD_PRELOAD=/usr/local/lib/libhideip.so
 
-to your startup scripts (like ~/.bashrc, ~/.bash_profile). You should change
+to your startup scripts (like $HOME/.bashrc, $HOME/.bash_profile). You should change
 the path to the correct one. If you aren't using BASH, consult your shell
 manual for details on how to export an environment variable.
 
@@ -323,6 +344,7 @@ If additional banning files haven't been disabled (@ref{How to compile?}), they 
 be located in users' home directories (e.g. /home/user1/.libhideip.progban).
 You can also put the file in any location and set the environment variable
 LIBHIDEIP_BANFILE to point at that file, e.g.@*
+
 	@command{export LIBHIDEIP_BANFILE=/opt/config/libhideip.progban}
 
 The /proc filesystem must be mounted in order for program banning to work right now.

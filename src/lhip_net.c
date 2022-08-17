@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- network functions' replacements.
  *
- * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -1470,10 +1470,19 @@ socket (
 #ifdef SOCK_PACKET
 		|| (type == SOCK_PACKET)
 #endif
-		|| (protocol == PF_NETLINK) || (protocol == NETLINK_ROUTE) || (protocol == IPPROTO_RAW)
+		/* can catch too many calls, because some socket types
+		   allow any value for the protovcol and still work.
+		|| (protocol == PF_NETLINK)*/
+		/* will catch too many sockets, because NETLINK_ROUTE = 0,
+		   which is an often-used value for inet sockets.
+		|| (protocol == NETLINK_ROUTE)*/
+		/* will be caucght by "type == SOCK_RAW" anyway.
+		|| (protocol == IPPROTO_RAW)*/
+		/* can cause all the problems mentioned above.
 #ifdef NETLINK_ROUTE6
 		|| (protocol == NETLINK_ROUTE6)
 #endif
+		*/
 		)
 	{
 #ifdef HAVE_ERRNO_H
@@ -1959,10 +1968,19 @@ socketpair (
 #ifdef SOCK_PACKET
 		|| (type == SOCK_PACKET)
 #endif
-		|| (protocol == PF_NETLINK) || (protocol == NETLINK_ROUTE) || (protocol == IPPROTO_RAW)
+		/* can catch too many calls, because some socket types
+		   allow any value for the protovcol and still work.
+		|| (protocol == PF_NETLINK)*/
+		/* will catch too many sockets, because NETLINK_ROUTE = 0,
+		   which is an often-used value for inet sockets.
+		|| (protocol == NETLINK_ROUTE)*/
+		/* will be caucght by "type == SOCK_RAW" anyway.
+		|| (protocol == IPPROTO_RAW)*/
+		/* can cause all the problems mentioned above.
 #ifdef NETLINK_ROUTE6
 		|| (protocol == NETLINK_ROUTE6)
 #endif
+		*/
 		)
 	{
 #ifdef HAVE_ERRNO_H

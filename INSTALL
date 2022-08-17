@@ -9,10 +9,17 @@ Requirements for compiling the full version:
   (unless the required functions are in the C library)
 - the 'make' program
 
-Type './configure' to configure the library for your system.
+Type
+
+	./configure
+
+to configure the library for your system.
+
 If you want to enable the public interface of LibHideIP, configure the
  library with
+
 	./configure --enable-public-interface
+
  The public interface is compatible with SWIG (http://www.swig.org), so
  you can make native bindings to LibHideIP for any supported language.
 
@@ -23,24 +30,43 @@ LibHideIP allows some programs to be banned (not allowed to run under
 
 If you want to disable additional banning files pointed to by environment
  variables, configure the library with
+
 	./configure --enable-environment=no
 
 If you want to disable additional banning files in users' home directories,
  configure the library with
+
 	./configure --enable-user-files=no
 
-Type 'make' to compile the library. LibHideIP assumes that your host has
- maximum 100 aliases and addresses. If you think this number is not enough,
- configure LibHideIP with
+Type
+
+	make
+
+to compile the library.
+
+LibHideIP assumes that your host has maximum 100 aliases and addresses,
+ unless you have the malloc() function. If you think this number is not
+ enough and you don't have the malloc() function, configure LibHideIP with
+
 	./configure --with-max-host-names=n
+
  or compile LibHideIP with:
+
 	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'
+
  where 'n' is your desired number (10 is minimum).
 
 Documentation will be compiled (and can be copied right away), if you have
   the 'makeinfo' program ('texinfo' package).
 
-Type 'make install' to install the library.
+Type
+
+	make install
+
+to install the library.
+
+NOTE: 'make install' is NOT recommended. Create and install an RPM package
+ instead, if possible.
 
 =======================================================
 
@@ -50,7 +76,7 @@ Building an RPM package (the old way):
 2) copy the source package libhideip-XX.tar.gz to /usr/src/redhat/SOURCES
 3) type
 	rpmbuild -ba /usr/src/redhat/SPECS/libhideip.spec
-4) get the rpms from /usr/src/redhat/RPMS/i386 and /usr/src/redhat/SRPMS
+4) get the RPMs from /usr/src/redhat/RPMS/i386 and /usr/src/redhat/SRPMS
 
 Building an RPM package (the new way):
 
@@ -58,4 +84,4 @@ Building an RPM package (the new way):
 2) copy the source package libhideip-XX.tar.gz to $HOME/rpmbuild/SOURCES
 3) type
 	rpmbuild -ba $HOME/rpmbuild/SPECS/libhideip.spec
-4) get the rpms from $HOME/rpmbuild/RPMS/i386 and $HOME/rpmbuild/SRPMS
+4) get the RPMs from $HOME/rpmbuild/RPMS/i386 and $HOME/rpmbuild/SRPMS

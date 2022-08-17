@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 0.7.1, bogdandr@op.pl)
+AC_INIT(libhideip, 0.8, bogdandr@op.pl)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
@@ -216,12 +216,11 @@ AC_DEFINE_PATH_STYLE()
 # ==================== Checks for library functions.
 AC_FUNC_MALLOC
 AC_CHECK_FUNC([malloc],
-	AC_DEFINE([HAVE_MALLOC],[1],[Whether you have the malloc function.]),
-	[AC_MSG_ERROR([[I need the malloc() function.]])])
+	AC_DEFINE([HAVE_MALLOC],[1],[Whether you have the malloc function.]))
 
 AC_CHECK_FUNCS([memcpy memset readlink getipnodebyname \
 	getipnodebyaddr getenv gethostbyaddr_r gethostbyname_r gethostbyname2_r\
-	gethostent_r openat openat64])
+	gethostent_r openat openat64 realloc])
 
 AH_TEMPLATE([GETNAMEINFO_ARG4TYPE])
 AH_TEMPLATE([GETNAMEINFO_ARG6TYPE])
@@ -285,6 +284,7 @@ if (test "x$GCC" = "xyes" ); then
 	AX_C_CHECK_FLAG([-Wlogical-op], [CFLAGS="$CFLAGS -Wlogical-op"], [CFLAGS="$CFLAGS"])
 	AX_C_CHECK_FLAG([-fstack-protector-all], [CFLAGS="$CFLAGS -fstack-protector-all"], [CFLAGS="$CFLAGS"])
 	AX_C_CHECK_FLAG([-O2], [CFLAGS="$CFLAGS -O2"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-O3], [CFLAGS="$CFLAGS -O3"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Waggregate-return], [CFLAGS="$CFLAGS -Waggregate-return"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wwrite-strings], [CFLAGS="$CFLAGS -Wwrite-strings"], [CFLAGS="$CFLAGS"])
 

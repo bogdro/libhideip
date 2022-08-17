@@ -2,7 +2,7 @@
  * A library for secure removing files.
  *	-- private file and program banning functions.
  *
- * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -43,6 +43,14 @@
 # include <unistd.h>
 #endif
 
+#ifdef HAVE_STDLIB_H
+# include <stdlib.h> /* getenv, malloc */
+#else
+# ifdef HAVE_MALLOC_H
+#  include <malloc.h>
+# endif
+#endif
+
 #include "lhip_priv.h"
 #include "libhideip.h"
 
@@ -54,7 +62,7 @@ static const char __lhip_banfilename[] = LHIP_BANNING_USERFILE;
 
 #ifndef LHIP_ANSIC
 static char *
-__lhip_get_exename LHIP_PARAMS((char * const exename, const size_t size));
+__lhip_get_exename LHIP_PARAMS ((char * const exename, const size_t size));
 #endif
 
 /**
@@ -111,7 +119,7 @@ __lhip_get_exename (
 
 #ifndef LHIP_ANSIC
 static int
-__lhip_is_banned_in_file LHIP_PARAMS((const char * const exename, const char * const ban_file_name));
+__lhip_is_banned_in_file LHIP_PARAMS ((const char * const exename, const char * const ban_file_name));
 #endif
 
 /**

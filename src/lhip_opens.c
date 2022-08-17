@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- file opening functions' replacements.
  *
- * Copyright (C) 2008-2012 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -61,14 +61,6 @@
 # include <sys/stat.h>
 #endif
 
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#else
-# ifdef HAVE_MALLOC_H
-#  include <malloc.h>
-# endif
-#endif
-
 #include <stdio.h>
 
 #include "lhip_priv.h"
@@ -88,13 +80,13 @@ extern int openat64 LHIP_PARAMS ((const int dirfd, const char * const pathname, 
 
 /*
 #ifndef HAVE_FOPEN64
-extern FILE* fopen64 LHIP_PARAMS((const char * const name, const char * const mode));
+extern FILE* fopen64 LHIP_PARAMS ((const char * const name, const char * const mode));
 #endif
 #ifndef HAVE_FREOPEN64
-extern FILE* freopen64 LHIP_PARAMS((const char * const path, const char * const mode, FILE * stream));
+extern FILE* freopen64 LHIP_PARAMS ((const char * const path, const char * const mode, FILE * stream));
 #endif
 #ifndef HAVE_OPEN64
-extern int open64 LHIP_PARAMS((const char * const path, const int flags, ... ));
+extern int open64 LHIP_PARAMS ((const char * const path, const int flags, ... ));
 #endif
 */
 

@@ -1,3 +1,31 @@
+2013-06-02	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* LibHideIP version 0.8
+	  Corrected getting the local addresses and limitations on
+	  allowed operations. Other small fixes and updates.
+	* configure.ac: checking for the -O3 compiler option, checking for
+	  the realloc() function. No longer requiring malloc().
+	* src/libhideip.h.in: documented constants introduced in 0.7 and
+	  correctly indented them.
+	* doc/libhideip.texi.in, doc/libhideip.3: changed "~" to $HOME
+	* README, INSTALL, doc/libhideip.texi.in: changed "rpm" to "RPM"
+	* doc/libhideip.texi.in: put commands in separate paragraphs
+	* src/lhip_banning.c: added the stdlib.h file, required by getenv()
+	  and the malloc.h file (optional)
+	* src/Makefile.am: made libhideip.h not distributed
+	* src/lhip_addr.c (__lhip_read_local_addresses): fixed reading the
+	  local addresses, moved common code to separate functions, resizing
+	  the array with local addresses when necessary
+	* src/lhip_net.c (socket, socketpair): fixed the socket type check
+	  so that some normal operations work again
+	* src/lhip_exec.c (__lhip_is_forbidden_file,
+	  __lhip_is_forbidden_program): fixed compiling without malloc(),
+	  getenv(), sys/stat.h and readlink().
+	* src/lhip_exec.c (__lhip_is_forbidden_file): small improvements
+	* src/lhip_opens.c: removed including the unnecessary malloc.h file
+	* src/lhip_ioctl.c: removed unnecessary variables
+	* src/lhip_exec.c: added a missing "unused" attribute
+
 2012-09-30	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* LibHideIP version 0.7.1
