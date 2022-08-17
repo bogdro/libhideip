@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- file opening functions' replacements.
  *
- * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -61,6 +61,14 @@
 # include <sys/stat.h>
 #endif
 
+#ifdef HAVE_STDLIB_H
+# include <stdlib.h>
+#else
+# ifdef HAVE_MALLOC_H
+#  include <malloc.h>
+# endif
+#endif
+
 #include <stdio.h>
 
 #include "lhip_priv.h"
@@ -95,7 +103,118 @@ static const char * __lhip_valuable_files[] =
 	VALUABLE_FILES
 };
 
-#define  LHIP_MAXPATHLEN 4097
+#ifndef HAVE_MALLOC
+static char __lhip_linkpath[LHIP_MAXPATHLEN];
+static char __lhip_newlinkpath[LHIP_MAXPATHLEN];
+#endif
+
+/* ======================================================= */
+
+#ifndef LHIP_ANSIC
+static int __lhip_is_forbidden_file PARAMS((const char * const name));
+#endif
+
+/**
+ * Tells if the file with the given name is forbidden to be opened.
+ * \param name The name of the file to check.
+ * \return 1 if forbidden, 0 otherwise.
+ */
+static int __lhip_is_forbidden_file (
+#ifdef LHIP_ANSIC
+	const char * const name)
+#else
+	name)
+	const char * const name;
+#endif
+{
+#ifdef HAVE_MALLOC
+	char * __lhip_linkpath;
+#endif
+#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
+	int res;
+	struct stat st;
+# ifdef HAVE_MALLOC
+	char * __lhip_newlinkpath;
+# endif
+#endif
+#ifndef HAVE_MEMSET
+	size_t i;
+#endif
+	unsigned int j;
+	int ret = 0;
+
+	if ( name == NULL ) return 0;
+	j = strlen (name) + 1;
+#ifdef HAVE_MALLOC
+	__lhip_linkpath = (char *) malloc ( j );
+	__lhip_newlinkpath = (char *) malloc ( j );
+	if ( __lhip_linkpath != NULL && __lhip_newlinkpath != NULL )
+#endif
+	{
+#ifdef HAVE_MALLOC
+# ifdef HAVE_MEMSET
+		memset (__lhip_linkpath, 0, j);
+		memset (__lhip_newlinkpath, 0, j);
+# else
+		for ( i = 0; i < j; i++ )
+		{
+			__lhip_linkpath[i] = '\0';
+			__lhip_newlinkpath[i] = '\0';
+		}
+# endif
+		strncpy (__lhip_linkpath, name, strlen (name));
+#else
+# ifdef HAVE_MEMSET
+		memset (__lhip_linkpath, 0, sizeof (__lhip_linkpath));
+		memset (__lhip_newlinkpath, 0, sizeof (__lhip_newlinkpath));
+# else
+		for ( i = 0; i < sizeof (__lhip_linkpath); i++ )
+		{
+			__lhip_linkpath[i] = '\0';
+		}
+		for ( i = 0; i < sizeof (__lhip_newlinkpath); i++ )
+		{
+			__lhip_newlinkpath[i] = '\0';
+		}
+# endif
+		strncpy (__lhip_linkpath, name, sizeof (__lhip_linkpath) - 1);
+#endif
+#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
+# ifdef HAVE_MALLOC
+		j = strlen (name) + 1;
+# else
+		j = sizeof (__lhip_newlinkpath);
+# endif
+		res = stat (name, &st);
+		while ( res >= 0 )
+		{
+			if ( S_ISLNK (st.st_mode) )
+			{
+				res = readlink (__lhip_linkpath, __lhip_newlinkpath, j - 1 );
+				if ( res < 0 ) break;
+				__lhip_newlinkpath[res] = '\0';
+				strncpy (__lhip_linkpath, __lhip_newlinkpath, (size_t)res);
+				__lhip_linkpath[res] = '\0';
+			}
+			else break;
+			res = stat (__lhip_linkpath, &st);
+		}
+#endif
+		for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
+		{
+			if ( strstr (__lhip_linkpath, __lhip_valuable_files[j]) != NULL )
+			{
+				ret = 1;
+				break;
+			}
+		}
+	}
+#ifdef HAVE_MALLOC
+	if ( __lhip_newlinkpath != NULL ) free (__lhip_newlinkpath);
+	if ( __lhip_linkpath != NULL ) free (__lhip_linkpath);
+#endif
+	return ret;
+}
 
 /* ======================================================= */
 
@@ -105,9 +224,7 @@ static const char * __lhip_valuable_files[] =
 
 FILE*
 fopen64 (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const char * const name, const char * const mode)
 #else
 	name, mode)
@@ -121,13 +238,6 @@ fopen64 (
 
 #ifdef HAVE_ERRNO_H
 	int err = 0;
-#endif
-	unsigned int j;
-	char linkpath[LHIP_MAXPATHLEN];
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	int res;
-	struct stat st;
-	char newlinkpath[LHIP_MAXPATHLEN];
 #endif
 
 	__lhip_main ();
@@ -170,33 +280,13 @@ fopen64 (
 		return (*__lhip_real_fopen64_location ()) (name, mode);
 	}
 
-	strncpy (linkpath, name, strlen (name));
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	res = stat (linkpath, &st);
-	while ( res >= 0 )
+	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-		if ( S_ISLNK (st.st_mode) )
-		{
-			res = readlink (linkpath, newlinkpath, sizeof (newlinkpath) );
-			if ( res < 0 ) break;
-			newlinkpath[res] = '\0';
-			strncpy (linkpath, newlinkpath, (size_t)res);
-		}
-		else break;
-		res = stat (linkpath, &st);
-	}
-#endif
-	for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
-	{
-		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
-		{
 #ifdef HAVE_ERRNO_H
-			errno = -EPERM;
+		errno = -EPERM;
 #endif
-			return NULL;
-		}
+		return NULL;
 	}
-
 #ifdef HAVE_ERRNO_H
 	errno = err;
 #endif
@@ -211,9 +301,7 @@ fopen64 (
 
 FILE*
 fopen (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const char * const name, const char * const mode)
 #else
 	name, mode)
@@ -227,13 +315,6 @@ fopen (
 
 #ifdef HAVE_ERRNO_H
 	int err = 0;
-#endif
-	unsigned int j;
-	char linkpath[LHIP_MAXPATHLEN];
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	int res;
-	struct stat st;
-	char newlinkpath[LHIP_MAXPATHLEN];
 #endif
 
 	__lhip_main ();
@@ -276,31 +357,12 @@ fopen (
 		return (*__lhip_real_fopen_location ()) (name, mode);
 	}
 
-	strncpy (linkpath, name, strlen (name));
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	res = stat (linkpath, &st);
-	while ( res >= 0 )
+	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-		if ( S_ISLNK (st.st_mode) )
-		{
-			res = readlink (linkpath, newlinkpath, sizeof (newlinkpath) );
-			if ( res < 0 ) break;
-			newlinkpath[res] = '\0';
-			strncpy (linkpath, newlinkpath, (size_t)res);
-		}
-		else break;
-		res = stat (linkpath, &st);
-	}
-#endif
-	for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
-	{
-		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
-		{
 #ifdef HAVE_ERRNO_H
-			errno = -EPERM;
+		errno = -EPERM;
 #endif
-			return NULL;
-		}
+		return NULL;
 	}
 
 #ifdef HAVE_ERRNO_H
@@ -316,9 +378,7 @@ fopen (
 
 FILE*
 freopen64 (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const char * const path, const char * const mode, FILE * stream)
 #else
 	path, mode, stream)
@@ -334,19 +394,12 @@ freopen64 (
 #ifdef HAVE_ERRNO_H
 	int err = 0;
 #endif
-	unsigned int j;
-	char linkpath[LHIP_MAXPATHLEN];
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	int res;
-	struct stat st;
-	char newlinkpath[LHIP_MAXPATHLEN];
-#endif
 
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: freopen64(%s, %s, %ld)\n",
-		(path==NULL)? "null" : path, (mode==NULL)? "null" : mode, (long)stream);
+		(path==NULL)? "null" : path, (mode==NULL)? "null" : mode, (long int)stream);
 	fflush (stderr);
 #endif
 
@@ -384,31 +437,12 @@ freopen64 (
 		return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
 	}
 
-	strncpy (linkpath, path, strlen (path));
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	res = stat (linkpath, &st);
-	while ( res >= 0 )
+	if ( __lhip_is_forbidden_file (path) != 0 )
 	{
-		if ( S_ISLNK (st.st_mode) )
-		{
-			res = readlink (linkpath, newlinkpath, sizeof (newlinkpath) );
-			if ( res < 0 ) break;
-			newlinkpath[res] = '\0';
-			strncpy (linkpath, newlinkpath, (size_t)res);
-		}
-		else break;
-		res = stat (linkpath, &st);
-	}
-#endif
-	for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
-	{
-		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
-		{
 #ifdef HAVE_ERRNO_H
-			errno = -EPERM;
+		errno = -EPERM;
 #endif
-			return NULL;
-		}
+		return NULL;
 	}
 
 #ifdef HAVE_ERRNO_H
@@ -425,9 +459,7 @@ freopen64 (
 
 FILE*
 freopen (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const char * const name, const char * const mode, FILE* stream)
 #else
 	name, mode, stream)
@@ -443,19 +475,12 @@ freopen (
 #ifdef HAVE_ERRNO_H
 	int err = 0;
 #endif
-	unsigned int j;
-	char linkpath[LHIP_MAXPATHLEN];
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	int res;
-	struct stat st;
-	char newlinkpath[LHIP_MAXPATHLEN];
-#endif
 
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: freopen(%s, %s, %ld)\n",
-		(name==NULL)? "null" : name, (mode==NULL)? "null" : mode, (long)stream);
+		(name==NULL)? "null" : name, (mode==NULL)? "null" : mode, (long int)stream);
 	fflush (stderr);
 #endif
 
@@ -493,31 +518,12 @@ freopen (
 		return (*__lhip_real_freopen_location ()) ( name, mode, stream );
 	}
 
-	strncpy (linkpath, name, strlen (name));
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	res = stat (linkpath, &st);
-	while ( res >= 0 )
+	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-		if ( S_ISLNK (st.st_mode) )
-		{
-			res = readlink (linkpath, newlinkpath, sizeof (newlinkpath) );
-			if ( res < 0 ) break;
-			newlinkpath[res] = '\0';
-			strncpy (linkpath, newlinkpath, (size_t)res);
-		}
-		else break;
-		res = stat (linkpath, &st);
-	}
-#endif
-	for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
-	{
-		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
-		{
 #ifdef HAVE_ERRNO_H
-			errno = -EPERM;
+		errno = -EPERM;
 #endif
-			return NULL;
-		}
+		return NULL;
 	}
 
 #ifdef HAVE_ERRNO_H
@@ -541,14 +547,15 @@ freopen (
 
 int
 open64 (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const char * const path, const int flags, ... )
 #else
-	path, flags, ... )
+	va_alist )
+	va_dcl /* no semicolons here! */
+	/*
+	path, flags )
 	const char * const path;
-	const int flags;
+	const int flags;*/
 #endif
 {
 #if (defined __GNUC__) && (!defined open64)
@@ -557,18 +564,15 @@ open64 (
 
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
+# ifndef LHIP_ANSIC
+	char * const path;
+	int flags;
+# endif
 #endif
 	int ret_fd;
 	mode_t mode = 0666;
 #ifdef HAVE_ERRNO_H
 	int err = 0;
-#endif
-	unsigned int j;
-	char linkpath[LHIP_MAXPATHLEN];
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	int res;
-	struct stat st;
-	char newlinkpath[LHIP_MAXPATHLEN];
 #endif
 
 	__lhip_main ();
@@ -587,8 +591,14 @@ open64 (
 	}
 
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+# ifdef LHIP_ANSIC
 	va_start (args, flags);
-	mode = va_arg (args, mode_t);
+# else
+	va_start (args);
+	path = va_arg (args, char * const);
+	flags = va_arg (args, int);
+# endif
+	if ( (flags & O_CREAT) != 0 ) mode = va_arg (args, mode_t);
 #endif
 
 	if ( path == NULL )
@@ -645,34 +655,15 @@ open64 (
 		return ret_fd;
 	}
 
-	strncpy (linkpath, path, strlen (path));
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	res = stat (linkpath, &st);
-	while ( res >= 0 )
+	if ( __lhip_is_forbidden_file (path) != 0 )
 	{
-		if ( S_ISLNK (st.st_mode) )
-		{
-			res = readlink (linkpath, newlinkpath, sizeof (newlinkpath) );
-			if ( res < 0 ) break;
-			newlinkpath[res] = '\0';
-			strncpy (linkpath, newlinkpath, (size_t)res);
-		}
-		else break;
-		res = stat (linkpath, &st);
-	}
-#endif
-	for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
-	{
-		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
-		{
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-			va_end (args);
+		va_end (args);
 #endif
 #ifdef HAVE_ERRNO_H
-			errno = -EPERM;
+		errno = -EPERM;
 #endif
-			return -1;
-		}
+		return -1;
 	}
 
 #ifdef HAVE_ERRNO_H
@@ -700,14 +691,15 @@ open64 (
 
 int
 open (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const char * const name, const int flags, ... )
 #else
-	name, flags, ... )
+	va_alist )
+	va_dcl /* no semicolons here! */
+	/*
+	name, flags )
 	const char * const name;
-	const int flags;
+	const int flags;*/
 #endif
 {
 #if (defined __GNUC__) && (!defined open)
@@ -716,18 +708,15 @@ open (
 
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
+# ifndef LHIP_ANSIC
+	char * const name;
+	int flags;
+# endif
 #endif
 	int ret_fd;
 	mode_t mode = 0666;
 #ifdef HAVE_ERRNO_H
 	int err = 0;
-#endif
-	unsigned int j;
-	char linkpath[LHIP_MAXPATHLEN];
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	int res;
-	struct stat st;
-	char newlinkpath[LHIP_MAXPATHLEN];
 #endif
 
 	__lhip_main ();
@@ -746,8 +735,14 @@ open (
 	}
 
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+# ifdef LHIP_ANSIC
 	va_start (args, flags);
-	mode = va_arg (args, mode_t);
+# else
+	va_start (args);
+	name = va_arg (args, char * const);
+	flags = va_arg (args, int);
+# endif
+	if ( (flags & O_CREAT) != 0 ) mode = va_arg (args, mode_t);
 #endif
 
 	if ( name == NULL )
@@ -804,35 +799,17 @@ open (
 		return ret_fd;
 	}
 
-	strncpy (linkpath, name, strlen (name));
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	res = stat (linkpath, &st);
-	while ( res >= 0 )
+	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-		if ( S_ISLNK (st.st_mode) )
-		{
-			res = readlink (linkpath, newlinkpath, sizeof (newlinkpath) );
-			if ( res < 0 ) break;
-			newlinkpath[res] = '\0';
-			strncpy (linkpath, newlinkpath, (size_t)res);
-		}
-		else break;
-		res = stat (linkpath, &st);
-	}
-#endif
-	for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
-	{
-		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
-		{
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-			va_end (args);
+		va_end (args);
 #endif
 #ifdef HAVE_ERRNO_H
-			errno = -EPERM;
+		errno = -EPERM;
 #endif
-			return -1;
-		}
+		return -1;
 	}
+
 
 #ifdef HAVE_ERRNO_H
 	errno = err;
@@ -859,15 +836,16 @@ open (
 
 int
 openat64 (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const int dirfd, const char * const pathname, const int flags, ...)
 #else
-	dirfd, pathname, flags, ...)
+	va_alist )
+	va_dcl /* no semicolons here! */
+	/*
+	dirfd, pathname, flags )
 	const int dirfd;
 	const char * const pathname;
-	const int flags;
+	const int flags;*/
 #endif
 {
 #if (defined __GNUC__) && (!defined openat64)
@@ -878,16 +856,14 @@ openat64 (
 	mode_t mode = 0666;
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
+# ifndef LHIP_ANSIC
+	int dirfd;
+	char * const pathname;
+	int flags;
+# endif
 #endif
 #ifdef HAVE_ERRNO_H
 	int err = 0;
-#endif
-	unsigned int j;
-	char linkpath[LHIP_MAXPATHLEN];
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	int res;
-	struct stat st;
-	char newlinkpath[LHIP_MAXPATHLEN];
 #endif
 
 	__lhip_main ();
@@ -907,8 +883,15 @@ openat64 (
 	}
 
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+# ifdef LHIP_ANSIC
 	va_start (args, flags);
-	mode = va_arg (args, mode_t);
+# else
+	va_start (args);
+	dirfd = va_arg (args, int);
+	pathname = va_arg (args, char * const);
+	flags = va_arg (args, int);
+# endif
+	if ( (flags & O_CREAT) != 0 ) mode = va_arg (args, mode_t);
 #endif
 
 	if ( pathname == NULL )
@@ -965,34 +948,15 @@ openat64 (
 		return ret_fd;
 	}
 
-	strncpy (linkpath, pathname, strlen (pathname));
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	res = stat (linkpath, &st);
-	while ( res >= 0 )
+	if ( __lhip_is_forbidden_file (pathname) != 0 )
 	{
-		if ( S_ISLNK (st.st_mode) )
-		{
-			res = readlink (linkpath, newlinkpath, sizeof (newlinkpath) );
-			if ( res < 0 ) break;
-			newlinkpath[res] = '\0';
-			strncpy (linkpath, newlinkpath, (size_t)res);
-		}
-		else break;
-		res = stat (linkpath, &st);
-	}
-#endif
-	for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
-	{
-		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
-		{
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-			va_end (args);
+		va_end (args);
 #endif
 #ifdef HAVE_ERRNO_H
-			errno = -EPERM;
+		errno = -EPERM;
 #endif
-			return -1;
-		}
+		return -1;
 	}
 
 #ifdef HAVE_ERRNO_H
@@ -1026,15 +990,16 @@ int openat(int dirfd, const char *pathname, int flags, mode_t mode);
 
 int
 openat (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const int dirfd, const char * const pathname, const int flags, ...)
 #else
-	dirfd, pathname, flags, ...)
+	va_alist )
+	va_dcl /* no semicolons here! */
+	/*
+	dirfd, pathname, flags )
 	const int dirfd;
 	const char * const pathname;
-	const int flags;
+	const int flags;*/
 #endif
 {
 #if (defined __GNUC__) && (!defined openat)
@@ -1045,16 +1010,14 @@ openat (
 	mode_t mode = 0666;
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
+# ifndef LHIP_ANSIC
+	int dirfd;
+	char * const pathname;
+	int flags;
+# endif
 #endif
 #ifdef HAVE_ERRNO_H
 	int err = 0;
-#endif
-	unsigned int j;
-	char linkpath[LHIP_MAXPATHLEN];
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	int res;
-	struct stat st;
-	char newlinkpath[LHIP_MAXPATHLEN];
 #endif
 
 	__lhip_main ();
@@ -1074,8 +1037,15 @@ openat (
 	}
 
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+# ifdef LHIP_ANSIC
 	va_start (args, flags);
-	mode = va_arg (args, mode_t);
+# else
+	va_start (args);
+	dirfd = va_arg (args, int);
+	pathname = va_arg (args, char * const);
+	flags = va_arg (args, int);
+# endif
+	if ( (flags & O_CREAT) != 0 ) mode = va_arg (args, mode_t);
 #endif
 
 	if ( pathname == NULL )
@@ -1132,35 +1102,17 @@ openat (
 		return ret_fd;
 	}
 
-	strncpy (linkpath, pathname, strlen (pathname));
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
-	res = stat (linkpath, &st);
-	while ( res >= 0 )
+	if ( __lhip_is_forbidden_file (pathname) != 0 )
 	{
-		if ( S_ISLNK (st.st_mode) )
-		{
-			res = readlink (linkpath, newlinkpath, sizeof (newlinkpath) );
-			if ( res < 0 ) break;
-			newlinkpath[res] = '\0';
-			strncpy (linkpath, newlinkpath, (size_t)res);
-		}
-		else break;
-		res = stat (linkpath, &st);
-	}
-#endif
-	for ( j=0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
-	{
-		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
-		{
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-			va_end (args);
+		va_end (args);
 #endif
 #ifdef HAVE_ERRNO_H
-			errno = -EPERM;
+		errno = -EPERM;
 #endif
-			return -1;
-		}
+		return -1;
 	}
+
 
 #ifdef HAVE_ERRNO_H
 	errno = err;

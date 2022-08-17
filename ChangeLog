@@ -1,3 +1,47 @@
+2010-05-22	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* libhideip version 0.3
+	  Upgrade to newer autotools, gcc and libtool. Added some copyright
+	  notices when using code from the GNU C library. Run flawfinder on
+	  the code and changed some parts according to the result. Fixed
+	  compiling on non-ANSI-C compilers.
+	* configure.ac: added AC_CONFIG_MACRO_DIR, recommended by libtoolize.
+	  Added checks for headers related to network name resolving.
+	* src/lhip_ioctl.c (ioctl): fixed signed/unsigned variable problem.
+	  Added some untested Solaris support.
+	* src/lhip_cfg.h.in: enabled HAVE_OPENAT*.
+	* src/lhip_exec.c: forbid executing more programs: "ntop", anything
+	  with "sniff" or "shark" (like Wireshark) in name. Changed "tcpdump"
+	  to "tcp" in banning, to match more programs.
+	* src/lhip_net.c (socket): forbid creating raw and packet sockets.
+	* src/randomize_names*: added name randomization scripts from LibSecRm,
+	  to allow easier hiding of LibHideIP's functions' names (to prevent
+	  detecting LibHideIP).
+	* src/lhip_net.c (getnameinfo): now checking also for the zero address
+	  and all detected local addresses.
+	* src/lhip_net.c (bind): new function to prevent guessing the local
+	  address by attempting to bind to all posiible addresses in turn.
+	* src/lhip_net.c (getsockname): new function to prevent from getting
+	  the local address from an already-created socket.
+	* src/lhip_net.c (getsockopt, setsockopt): new functions to prevent
+	  from getting the local address from a socket by reading its options.
+	* src/lhip_net.c (socketpair): new function to prevent from creating
+	  raw sockets that could lead to revealing the local address.
+	* src/lhip_main.c (__lhip_is_local_addr): fixed comparing IPv4
+	  addresses with IPv6 addresses.
+	* src/lhip_net.c: fixed problems when memcpy() isn't available.
+	* src/lhip_exec.c (system): fixed too small buffer allocated.
+	* src/lhip_net.c (getifaddrs): checking network mask and broadcast
+	  addresses for NULL and checking their type before changing data.
+	* src/lhip_opens.c, src/lhip_exec.c: zeroing buffers for file names.
+	* src/lhip_priv.h: defined LHIP_MIN, LHIP_MAX, LHIP_MAXPATHLEN
+	  LHIP_ANSIC (for function prototypes) here.
+	* doc/libsecrm.texi.in: added one more limitation of LibHideIP.
+	  Updated information how to hide LibHideIP.
+	* src/lhip_resolve.c: new file that blocks name resolving functions
+	  for localhost/localdomain.
+	* libhideip.spec.in: corrected warnings displayed by rpmlint.
+
 2009-02-16	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* libhideip version 0.2
@@ -32,4 +76,3 @@
 	* README: quick installation guide
 	* AUTHORS: authors list
 	* libhideip.spec: an RPM spec file - can be used to build RPMs.
-

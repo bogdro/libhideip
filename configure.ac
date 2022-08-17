@@ -2,12 +2,13 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 0.2, bogdandr@op.pl)
+AC_INIT(libhideip, 0.3, bogdandr@op.pl)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h])
 AC_CONFIG_SRCDIR([src/lhip_net.c])
 AC_CONFIG_HEADER([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 # ==================== configure arguments
 
@@ -60,7 +61,8 @@ AC_HEADER_STDC
 
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h errno.h malloc.h\
 	sys/types.h netdb.h sys/socket.h ifaddrs.h arpa/inet.h\
-	netinet/in.h sys/ioctl.h fcntl.h sys/utsname.h asm/types.h])
+	netinet/in.h sys/ioctl.h fcntl.h sys/utsname.h asm/types.h\
+	arpa/nameser.h])
 
 AC_CHECK_HEADER([net/if.h],AC_DEFINE([HAVE_NET_IF_H],[1],
 	[Whether you have the net/if.h header.]),[],
@@ -95,6 +97,23 @@ AC_CHECK_HEADER([linux/netlink.h],AC_DEFINE([HAVE_LINUX_NETLINK_H],[1],
 	#else
 	typedef unsigned int __u32;
 	typedef unsigned short __u16;
+	#endif
+	])
+
+AC_CHECK_HEADER([resolv.h],AC_DEFINE([HAVE_RESOLV_H],[1],
+	[Whether you have the resolv.h header.]),[],
+	[
+	#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#ifdef HAVE_NETINET_IN_H
+	#include <netinet/in.h>
+	#endif
+	#ifdef HAVE_ARPA_NAMESER_H
+	#include <arpa/nameser.h>
+	#endif
+	#ifdef HAVE_NETDB_H
+	#include <netdb.h>
 	#endif
 	])
 

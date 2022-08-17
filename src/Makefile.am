@@ -1,14 +1,14 @@
 lib_LTLIBRARIES = libhideip.la
 libhideip_la_SOURCES = lhip_exec.c lhip_main.c lhip_net.c lhip_banning.c \
-	lhip_ioctl.c lhip_opens.c lhip_uname.c lhip_priv.h
-EXTRA_DIST = lhip_cfg.h.in
+	lhip_ioctl.c lhip_opens.c lhip_uname.c lhip_resolve.c lhip_priv.h
+EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh
 
 # VERSION = C:R:A     (current, revision, age)
 # only code changed => R++
 # interface changed => C++, R:=0
 # - interface add => A++
 # - interface removed => A:=0
-libhideip_la_LDFLAGS = -version-info 1:1:0
+libhideip_la_LDFLAGS = -version-info 2:0:1
 
 #nobase_include_HEADERS = lhip_priv.h
 

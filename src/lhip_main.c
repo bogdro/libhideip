@@ -1,7 +1,8 @@
 /*
  * A library for hiding local IP address.
  *
- * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
  * Syntax example: export LD_PRELOAD=/usr/local/lib/libhideip.so
@@ -36,9 +37,7 @@
 #  define RTLD_NEXT ((void *) -1l)
 # endif
 #else
-# if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+# ifdef LHIP_ANSIC
 #  error Dynamic loading functions missing.
 # endif
 #endif
@@ -82,40 +81,40 @@
 
 #if (!defined HAVE_NETINET_IN_H) && (!defined HAVE_SYS_SOCKET_H)
 struct sockaddr
-  {
-    unsigned short int sa_family;
-    char sa_data[14];
-  };
+{
+	unsigned short int sa_family;
+	char sa_data[14];
+};
 
-typedef unsigned short in_port_t;
+typedef unsigned short int in_port_t;
 
 typedef unsigned int in_addr_t;
 struct in_addr
-  {
-    in_addr_t s_addr;
-  };
+{
+	in_addr_t s_addr;
+};
 
 struct in6_addr
-  {
-    union
-      {
-	unsigned char	u6_addr8[16];
-	unsigned short u6_addr16[8];
-	unsigned int u6_addr32[4];
-      } in6_u;
-#define s6_addr			in6_u.u6_addr8
-#define s6_addr16		in6_u.u6_addr16
-#define s6_addr32		in6_u.u6_addr32
-  };
+{
+	union
+	{
+		unsigned char	u6_addr8[16];
+		unsigned short int u6_addr16[8];
+		unsigned int u6_addr32[4];
+	} in6_u;
+# define s6_addr		in6_u.u6_addr8
+# define s6_addr16		in6_u.u6_addr16
+# define s6_addr32		in6_u.u6_addr32
+};
 
 struct sockaddr_in
 {
 	unsigned short int sin_family;
-    in_port_t sin_port;			/* Port number.  */
-    struct in_addr sin_addr;		/* Internet address.  */
+	in_port_t sin_port;			/* Port number.  */
+	struct in_addr sin_addr;		/* Internet address.  */
 
-    /* Pad to size of `struct sockaddr'.  */
-    unsigned char sin_zero[sizeof (struct sockaddr) -
+	/* Pad to size of `struct sockaddr'.  */
+	unsigned char sin_zero[sizeof (struct sockaddr) -
 			   sizeof (sin_family) -
 			   sizeof (in_port_t) -
 			   sizeof (struct in_addr)];
@@ -124,10 +123,10 @@ struct sockaddr_in
 struct sockaddr_in6
 {
 	unsigned short int sin6_family;
-    in_port_t sin6_port;	/* Transport layer port # */
-    unsigned int sin6_flowinfo;	/* IPv6 flow information */
-    struct in6_addr sin6_addr;	/* IPv6 address */
-    unsigned int sin6_scope_id;	/* IPv6 scope-id */
+	in_port_t sin6_port;	/* Transport layer port # */
+	unsigned int sin6_flowinfo;	/* IPv6 flow information */
+	struct in6_addr sin6_addr;	/* IPv6 address */
+	unsigned int sin6_scope_id;	/* IPv6 scope-id */
 };
 #endif
 
@@ -157,6 +156,11 @@ static ss_i_smp_i			__lhip_real_recvmsg		= NULL;
 static ss_i_csmp_i			__lhip_real_sendmsg		= NULL;
 static i_cp_s				__lhip_real_gethostname		= NULL;
 static i_sup				__lhip_real_uname		= NULL;
+static i_i_i_vp_slp			__lhip_real_getsockopt		= NULL;
+static i_i_i_cvp_sl			__lhip_real_setsockopt		= NULL;
+static i_ssp_slp			__lhip_real_getsockname		= NULL;
+static i_cssp_sl			__lhip_real_bind		= NULL;
+static i_i_ia2				__lhip_real_socketpair		= NULL;
 
 /* file-related functions: */
 static fp_cp_cp				__lhip_real_fopen64		= NULL;
@@ -167,6 +171,12 @@ static fp_cp_cp				__lhip_real_fopen		= NULL;
 static fp_cp_cp_fp			__lhip_real_freopen		= NULL;
 static i_cp_i_				__lhip_real_open		= NULL;
 static i_i_cp_i_			__lhip_real_openat		= NULL;
+
+/* name resolving functions: */
+static ccp_i_ucp_i			__lhip_real_res_query		= NULL;
+static ccp_i_ucp_i			__lhip_real_res_search		= NULL;
+static ccp_cpp_i_ucp_i			__lhip_real_res_querydomain	= NULL;
+static i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery		= NULL;
 
 static struct hostent * __lhip_our_real_name_ipv4 = NULL;
 static struct hostent * __lhip_our_real_name_ipv6 = NULL;
@@ -187,8 +197,6 @@ static struct sockaddr * __lhip_our_addresses[LHIP_MAX_HOSTNAMES];
 static unsigned int __lhip_number_of_addresses = 0;
 */
 
-#define LHIP_MIN(a,b) ( ((a)<(b)) ? (a) : (b) )
-
 static int GCC_WARN_UNUSED_RESULT
 __lhip_check_hostname_match PARAMS((const char * const host1, const char * const host2));
 
@@ -196,9 +204,7 @@ __lhip_check_hostname_match PARAMS((const char * const host1, const char * const
 
 int LHIP_ATTR ((constructor))
 __lhip_main (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -253,7 +259,11 @@ __lhip_main (
 		*(void **) (&__lhip_real_sendmsg)          = dlsym (RTLD_NEXT, "sendmsg");
 		*(void **) (&__lhip_real_gethostname)      = dlsym (RTLD_NEXT, "gethostname");
 		*(void **) (&__lhip_real_uname)            = dlsym (RTLD_NEXT, "uname");
-
+		*(void **) (&__lhip_real_getsockopt)       = dlsym (RTLD_NEXT, "getsockopt");
+		*(void **) (&__lhip_real_setsockopt)       = dlsym (RTLD_NEXT, "setsockopt");
+		*(void **) (&__lhip_real_getsockname)      = dlsym (RTLD_NEXT, "getsockname");
+		*(void **) (&__lhip_real_bind)             = dlsym (RTLD_NEXT, "bind");
+		*(void **) (&__lhip_real_socketpair)       = dlsym (RTLD_NEXT, "socketpair");
 		/* file-related functions: */
 #if (defined HAVE_DLSYM || defined HAVE_LIBDL_DLSYM)			\
 	&& (!defined HAVE_DLVSYM) && (!defined HAVE_LIBDL_DLVSYM)	\
@@ -276,6 +286,11 @@ __lhip_main (
 		*(void **) (&__lhip_real_freopen)          = dlsym  (RTLD_NEXT, "freopen");
 		*(void **) (&__lhip_real_open)             = dlsym  (RTLD_NEXT, "open");
 		*(void **) (&__lhip_real_openat)           = dlsym  (RTLD_NEXT, "openat");
+		/* name resolving functions: */
+		*(void **) (&__lhip_real_res_query)        = dlsym  (RTLD_NEXT, "res_query");
+		*(void **) (&__lhip_real_res_search)       = dlsym  (RTLD_NEXT, "res_search");
+		*(void **) (&__lhip_real_res_querydomain)  = dlsym  (RTLD_NEXT, "res_querydomain");
+		*(void **) (&__lhip_real_res_mkquery)      = dlsym  (RTLD_NEXT, "res_mkquery");
 
 		__lhip_is_initialized = 1;
 
@@ -362,7 +377,7 @@ __lhip_main (
 								{
 									strncpy (__lhip_tmp.h_aliases[i],
 										hostent_res->h_aliases[i],
-										strlen (hostent_res->h_aliases[i]));
+										strlen (hostent_res->h_aliases[i])+1);
 								}
 							}
 							/* end-of-list marker */
@@ -535,13 +550,13 @@ __lhip_main (
 					}
 				} /* ai_res == 0 ... */
 			} /* ai_res == 0 */
-			/* TODO: IPv6 */
+			/* IPv6: */
 # ifdef HAVE_MEMCPY
 			memcpy (&lhip_addr6, __lhip_localhost_ipv6, sizeof (__lhip_localhost_ipv6));
 # else
-			for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
+			for ( k = 0; k < sizeof (__lhip_localhost_ipv6); k++ )
 			{
-				((char *)&(lhip_addr6))[i] = __lhip_localhost_ipv6[i];
+				((char *)&(lhip_addr6))[k] = __lhip_localhost_ipv6[k];
 			}
 # endif
 			__lhip_our_names_addr[__lhip_number_of_hostnames].h_name = NULL;
@@ -589,7 +604,7 @@ __lhip_main (
 							{
 								strncpy (__lhip_tmp.h_aliases[i],
 									hostent_res->h_aliases[i],
-									strlen (hostent_res->h_aliases[i]));
+									strlen (hostent_res->h_aliases[i])+1);
 							}
 						}
 						/* end-of-list marker */
@@ -777,13 +792,16 @@ __lhip_main (
 				if ( __lhip_our_real_name_ipv4 != NULL )
 				{
 # ifdef HAVE_MALLOC
-					__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
-						= (char *) malloc (strlen (__lhip_our_real_name_ipv4->h_name) + 1);
-					if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name != NULL )
+					if ( __lhip_our_real_name_ipv4->h_name != NULL )
 					{
-						strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name,
-							__lhip_our_real_name_ipv4->h_name,
-							strlen (__lhip_our_real_name_ipv4->h_name) + 1 );
+						__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
+							= (char *) malloc (strlen (__lhip_our_real_name_ipv4->h_name) + 1);
+						if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name != NULL )
+						{
+							strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name,
+								__lhip_our_real_name_ipv4->h_name,
+								strlen (__lhip_our_real_name_ipv4->h_name) + 1 );
+						}
 					}
 					j = 0;
 					if ( __lhip_our_real_name_ipv4->h_aliases != NULL )
@@ -859,9 +877,9 @@ __lhip_main (
 # ifdef HAVE_MEMCPY
 			memcpy (&lhip_addr6, __lhip_localhost_ipv6, sizeof (__lhip_localhost_ipv6));
 # else
-			for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
+			for ( k = 0; k < sizeof (__lhip_localhost_ipv6); k++ )
 			{
-				((char *)&(lhip_addr6))[i] = __lhip_localhost_ipv6[i];
+				((char *)&(lhip_addr6))[k] = __lhip_localhost_ipv6[k];
 			}
 # endif
 			__lhip_our_names_addr[__lhip_number_of_hostnames].h_name = NULL;
@@ -872,13 +890,16 @@ __lhip_main (
 			if ( __lhip_our_real_name_ipv6 != NULL )
 			{
 # ifdef HAVE_MALLOC
-				__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
-					= (char *) malloc (strlen (__lhip_our_real_name_ipv6->h_name) + 1);
-				if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name != NULL )
+				if ( __lhip_our_real_name_ipv6->h_name != NULL )
 				{
-					strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name,
-						__lhip_our_real_name_ipv6->h_name,
-						strlen (__lhip_our_real_name_ipv6->h_name) + 1 );
+					__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
+						= (char *) malloc (strlen (__lhip_our_real_name_ipv6->h_name) + 1);
+					if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name != NULL )
+					{
+						strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name,
+							__lhip_our_real_name_ipv6->h_name,
+							strlen (__lhip_our_real_name_ipv6->h_name) + 1 );
+					}
 				}
 				j = 0;
 				if ( __lhip_our_real_name_ipv6->h_aliases != NULL )
@@ -1000,7 +1021,7 @@ __lhip_main (
 								{
 									strncpy (__lhip_tmp.h_aliases[i],
 										hostent_res->h_aliases[i],
-										strlen (hostent_res->h_aliases[i]));
+										strlen (hostent_res->h_aliases[i])+1);
 								}
 							}
 							/* end-of-list marker */
@@ -1102,7 +1123,7 @@ __lhip_main (
 								{
 									strncpy (__lhip_tmp.h_aliases[i],
 										hostent_res->h_aliases[i],
-										strlen (hostent_res->h_aliases[i]));
+										strlen (hostent_res->h_aliases[i])+1);
 								}
 							}
 							/* end-of-list marker */
@@ -1203,7 +1224,7 @@ __lhip_main (
 								{
 									strncpy (__lhip_tmp.h_aliases[i],
 										hostent_res->h_aliases[i],
-										strlen (hostent_res->h_aliases[i]));
+										strlen (hostent_res->h_aliases[i])+1);
 								}
 							}
 							/* end-of-list marker */
@@ -1301,7 +1322,7 @@ __lhip_main (
 								{
 									strncpy (__lhip_tmp.h_aliases[i],
 										hostent_res->h_aliases[i],
-										strlen (hostent_res->h_aliases[i]));
+										strlen (hostent_res->h_aliases[i])+1);
 								}
 							}
 							/* end-of-list marker */
@@ -1495,7 +1516,7 @@ __lhip_main (
 								{
 									strncpy (__lhip_tmp.h_aliases[i],
 										hostent_res->h_aliases[i],
-										strlen (hostent_res->h_aliases[i]));
+										strlen (hostent_res->h_aliases[i])+1);
 								}
 							}
 							/* end-of-list marker */
@@ -1720,13 +1741,16 @@ __lhip_main (
 							sizeof (__lhip_localhost_ipv4) ) == 0) )
 					{
 #ifdef HAVE_MALLOC
-						__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
-							= (char *) malloc (strlen (hostent_res->h_name) + 1);
-						if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name != NULL )
+						if ( hostent_res->h_name != NULL )
 						{
-							strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name,
-								hostent_res->h_name,
-								strlen (hostent_res->h_name) + 1 );
+							__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
+								= (char *) malloc (strlen (hostent_res->h_name) + 1);
+							if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name != NULL )
+							{
+								strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name,
+									hostent_res->h_name,
+									strlen (hostent_res->h_name) + 1 );
+							}
 						}
 						j = 0;
 						if ( hostent_res->h_aliases != NULL )
@@ -1735,21 +1759,21 @@ __lhip_main (
 							{
 								j++;
 							}
-						}
-						__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases
-							= (char **) malloc ( j * sizeof (char *) + 1);
-						if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases != NULL )
-						{
-							for ( i=0; i < j; i++ )
+							__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases
+								= (char **) malloc ( j * sizeof (char *) + 1);
+							if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases != NULL )
 							{
-								__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] =
-									(char *) malloc ( strlen
-										(hostent_res->h_aliases[i]) + 1);
-								if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] != NULL )
+								for ( i=0; i < j; i++ )
 								{
-									strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i],
-										hostent_res->h_aliases[i],
-										strlen (hostent_res->h_aliases[i]) + 1 );
+									__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] =
+										(char *) malloc ( strlen
+											(hostent_res->h_aliases[i]) + 1);
+									if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] != NULL )
+									{
+										strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i],
+											hostent_res->h_aliases[i],
+											strlen (hostent_res->h_aliases[i]) + 1 );
+									}
 								}
 							}
 						}
@@ -1811,13 +1835,16 @@ __lhip_main (
 							sizeof (__lhip_localhost_ipv6) ) == 0) )
 					{
 #ifdef HAVE_MALLOC
-						__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
-							= (char *) malloc (strlen (hostent_res->h_name) + 1);
-						if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name != NULL )
+						if ( hostent_res->h_name != NULL )
 						{
-							strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name,
-								hostent_res->h_name,
-								strlen (hostent_res->h_name) + 1 );
+							__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
+								= (char *) malloc (strlen (hostent_res->h_name) + 1);
+							if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name != NULL )
+							{
+								strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name,
+									hostent_res->h_name,
+									strlen (hostent_res->h_name) + 1 );
+							}
 						}
 						j = 0;
 						if ( hostent_res->h_aliases != NULL )
@@ -1826,21 +1853,21 @@ __lhip_main (
 							{
 								j++;
 							}
-						}
-						__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases
-							= (char **) malloc ( j * sizeof (char *) + 1);
-						if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases != NULL )
-						{
-							for ( i=0; i < j; i++ )
+							__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases
+								= (char **) malloc ( j * sizeof (char *) + 1);
+							if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases != NULL )
 							{
-								__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] =
-									(char *) malloc ( strlen
-										(hostent_res->h_aliases[i]) + 1);
-								if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] != NULL )
+								for ( i=0; i < j; i++ )
 								{
-									strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i],
-										hostent_res->h_aliases[i],
-										strlen (hostent_res->h_aliases[i]) + 1 );
+									__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] =
+										(char *) malloc ( strlen
+											(hostent_res->h_aliases[i]) + 1);
+									if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] != NULL )
+									{
+										strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i],
+											hostent_res->h_aliases[i],
+											strlen (hostent_res->h_aliases[i]) + 1 );
+									}
 								}
 							}
 						}
@@ -1912,9 +1939,9 @@ __lhip_main (
 			memcpy (&(addr_ipv4.sin_addr.s_addr), __lhip_localhost_ipv4,
 				sizeof (struct in_addr));
 #else
-			for ( i = 0; i < sizeof (struct in_addr); i++ )
+			for ( k = 0; k < sizeof (struct in_addr); k++ )
 			{
-				((char *)&(addr_ipv4.sin_addr.s_addr))[i] = __lhip_localhost_ipv4[i];
+				((char *)&(addr_ipv4.sin_addr.s_addr))[k] = __lhip_localhost_ipv4[k];
 			}
 #endif
 			ai_res = (*__lhip_real_getnameinfo) ((struct sockaddr *)&addr_ipv4,
@@ -1936,9 +1963,9 @@ __lhip_main (
 			memcpy (&(addr_ipv6.sin6_addr), __lhip_localhost_ipv6,
 				sizeof (struct in6_addr));
 #else
-			for ( i = 0; i < sizeof (struct in6_addr); i++ )
+			for ( k = 0; k < sizeof (struct in6_addr); k++ )
 			{
-				((char *)&(addr_ipv6.sin6_addr))[i] = __lhip_localhost_ipv6[i];
+				((char *)&(addr_ipv6.sin6_addr))[k] = __lhip_localhost_ipv6[k];
 			}
 #endif
 			ai_res = (*__lhip_real_getnameinfo) ((struct sockaddr *)&addr_ipv6,
@@ -1965,7 +1992,7 @@ __lhip_main (
 #ifdef LHIP_DEBUG
 		fprintf (stderr, "LibHideIP: Got addresses and aliases:\n");
 		fflush (stderr);
-#ifndef HAVE_MALLOC
+# ifndef HAVE_MALLOC
 		if ( __lhip_our_real_name_ipv4 != NULL )
 		{
 			fprintf (stderr, "LibHideIP: 1: name=%s, lhip_addr=0x%x\n",
@@ -2006,10 +2033,10 @@ __lhip_main (
 			fprintf (stderr, "\n");
 			fflush (stderr);
 		}
-#else
+# else
 		fprintf (stderr, "HAVE_MALLOC, so skipping gethostbyaddr()\n");
 		fflush (stderr);
-#endif
+# endif
 		if ( __lhip_ai_all != NULL )
 		{
 			tmp = __lhip_ai_all;
@@ -2061,9 +2088,7 @@ __lhip_main (
 
 void LHIP_ATTR ((destructor))
 __lhip_end (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2075,9 +2100,7 @@ __lhip_end (
 
 struct hostent *
 __lhip_get_our_name_ipv4 (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2089,9 +2112,7 @@ __lhip_get_our_name_ipv4 (
 
 struct hostent *
 __lhip_get_our_name_ipv6 (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2103,9 +2124,7 @@ __lhip_get_our_name_ipv6 (
 
 int
 __lhip_get_init_stage (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2117,9 +2136,7 @@ __lhip_get_init_stage (
 
 int
 __lhip_is_local_addr (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const struct hostent * const h)
 #else
 	h)
@@ -2262,7 +2279,7 @@ __lhip_is_local_addr (
 
 	if ( (h->h_addrtype == AF_INET6) && (h->h_addr_list != NULL) && (__lhip_our_real_name_ipv6 != NULL) )
 	{
-		if ( __lhip_our_real_name_ipv4->h_addr_list != NULL )
+		if ( __lhip_our_real_name_ipv6->h_addr_list != NULL )
 		{
 			i = 0;
 			while (__lhip_our_real_name_ipv6->h_addr_list[i] != NULL)
@@ -2436,9 +2453,7 @@ __lhip_is_local_addr (
 
 void
 __lhip_change_data (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	struct hostent * const ret)
 #else
 	ret)
@@ -2502,9 +2517,7 @@ __lhip_change_data (
 
 static int GCC_WARN_UNUSED_RESULT
 __lhip_check_hostname_match (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	const char * const host1, const char * const host2)
 #else
 	host1, host2)
@@ -2541,9 +2554,7 @@ __lhip_check_hostname_match (
 /* =============================================================== */
 
 shp_vp_sl_i __lhip_real_gethostbyaddr_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2554,9 +2565,7 @@ shp_vp_sl_i __lhip_real_gethostbyaddr_location (
 /* =============================================================== */
 
 i_vp_sl_i_shp_cp_s_shpp_ip __lhip_real_gethostbyaddr_r_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2567,9 +2576,7 @@ i_vp_sl_i_shp_cp_s_shpp_ip __lhip_real_gethostbyaddr_r_location (
 /* =============================================================== */
 
 shp_cp __lhip_real_gethostbyname_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2580,9 +2587,7 @@ shp_cp __lhip_real_gethostbyname_location (
 /* =============================================================== */
 
 i_cp_shp_cp_s_shpp_ip __lhip_real_gethostbyname_r_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2593,9 +2598,7 @@ i_cp_shp_cp_s_shpp_ip __lhip_real_gethostbyname_r_location (
 /* =============================================================== */
 
 shp_cp_i __lhip_real_gethostbyname2_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2606,9 +2609,7 @@ shp_cp_i __lhip_real_gethostbyname2_location (
 /* =============================================================== */
 
 i_cp_i_shp_cp_s_shpp_i __lhip_real_gethostbyname2_r_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2619,9 +2620,7 @@ i_cp_i_shp_cp_s_shpp_i __lhip_real_gethostbyname2_r_location (
 /* =============================================================== */
 
 shp_v __lhip_real_gethostent_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2632,9 +2631,7 @@ shp_v __lhip_real_gethostent_location (
 /* =============================================================== */
 
 i_shp_cp_s_shpp_ip __lhip_real_gethostent_r_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2645,9 +2642,7 @@ i_shp_cp_s_shpp_ip __lhip_real_gethostent_r_location (
 /* =============================================================== */
 
 shp_cp_s_i_ip __lhip_real_getipnodebyaddr_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2658,9 +2653,7 @@ shp_cp_s_i_ip __lhip_real_getipnodebyaddr_location (
 /* =============================================================== */
 
 shp_cp_i_i_ip __lhip_real_getipnodebyname_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2671,9 +2664,7 @@ shp_cp_i_i_ip __lhip_real_getipnodebyname_location (
 /* =============================================================== */
 
 i_sipp __lhip_real_getifaddrs_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2684,9 +2675,7 @@ i_sipp __lhip_real_getifaddrs_location (
 /* =============================================================== */
 
 i_ssp_sl_cp_s_cp_s_i __lhip_real_getnameinfo_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2697,9 +2686,7 @@ i_ssp_sl_cp_s_cp_s_i __lhip_real_getnameinfo_location (
 /* =============================================================== */
 
 i_cp_cp_sap_sapp __lhip_real_getaddrinfo_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2710,9 +2697,7 @@ i_cp_cp_sap_sapp __lhip_real_getaddrinfo_location (
 /* =============================================================== */
 
 i_cp_cpp_cpp __lhip_real_execve_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2723,9 +2708,7 @@ i_cp_cpp_cpp __lhip_real_execve_location (
 /* =============================================================== */
 
 i_cp __lhip_real_system_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2736,9 +2719,7 @@ i_cp __lhip_real_system_location (
 /* =============================================================== */
 
 i_i_i_va __lhip_real_ioctl_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2749,9 +2730,7 @@ i_i_i_va __lhip_real_ioctl_location (
 /* =============================================================== */
 
 i_i_i_i __lhip_real_socket_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2762,9 +2741,7 @@ i_i_i_i __lhip_real_socket_location (
 /* =============================================================== */
 
 ss_i_smp_i __lhip_real_recvmsg_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2775,9 +2752,7 @@ ss_i_smp_i __lhip_real_recvmsg_location (
 /* =============================================================== */
 
 ss_i_csmp_i __lhip_real_sendmsg_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2788,9 +2763,7 @@ ss_i_csmp_i __lhip_real_sendmsg_location (
 /* =============================================================== */
 
 i_cp_s __lhip_real_gethostname_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2801,9 +2774,7 @@ i_cp_s __lhip_real_gethostname_location (
 /* =============================================================== */
 
 i_sup __lhip_real_uname_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2814,9 +2785,7 @@ i_sup __lhip_real_uname_location (
 /* =============================================================== */
 
 fp_cp_cp __lhip_real_fopen64_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2827,9 +2796,7 @@ fp_cp_cp __lhip_real_fopen64_location (
 /* =============================================================== */
 
 fp_cp_cp_fp __lhip_real_freopen64_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2840,9 +2807,7 @@ fp_cp_cp_fp __lhip_real_freopen64_location (
 /* =============================================================== */
 
 i_cp_i_ __lhip_real_open64_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2853,9 +2818,7 @@ i_cp_i_ __lhip_real_open64_location (
 /* =============================================================== */
 
 i_i_cp_i_ __lhip_real_openat64_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2866,9 +2829,7 @@ i_i_cp_i_ __lhip_real_openat64_location (
 /* =============================================================== */
 
 fp_cp_cp __lhip_real_fopen_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2879,9 +2840,7 @@ fp_cp_cp __lhip_real_fopen_location (
 /* =============================================================== */
 
 fp_cp_cp_fp __lhip_real_freopen_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2892,9 +2851,7 @@ fp_cp_cp_fp __lhip_real_freopen_location (
 /* =============================================================== */
 
 i_cp_i_ __lhip_real_open_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
@@ -2905,12 +2862,113 @@ i_cp_i_ __lhip_real_open_location (
 /* =============================================================== */
 
 i_i_cp_i_ __lhip_real_openat_location (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
 {
 	return __lhip_real_openat;
 }
+
+/* =============================================================== */
+
+i_i_i_vp_slp __lhip_real_getsockopt_location (
+#ifdef LHIP_ANSIC
+	void
+#endif
+)
+{
+	return __lhip_real_getsockopt;
+}
+
+/* =============================================================== */
+
+i_i_i_cvp_sl __lhip_real_setsockopt_location (
+#ifdef LHIP_ANSIC
+	void
+#endif
+)
+{
+	return __lhip_real_setsockopt;
+}
+
+/* =============================================================== */
+
+i_ssp_slp __lhip_real_getsockname_location (
+#ifdef LHIP_ANSIC
+	void
+#endif
+)
+{
+	return __lhip_real_getsockname;
+}
+
+/* =============================================================== */
+
+i_cssp_sl __lhip_real_bind_location (
+#ifdef LHIP_ANSIC
+	void
+#endif
+)
+{
+	return __lhip_real_bind;
+}
+
+/* =============================================================== */
+
+i_i_ia2 __lhip_real_socketpair_location (
+#ifdef LHIP_ANSIC
+	void
+#endif
+)
+{
+	return __lhip_real_socketpair;
+}
+
+/* =============================================================== */
+
+ccp_i_ucp_i __lhip_real_res_query_location (
+#ifdef LHIP_ANSIC
+	void
+#endif
+)
+{
+	return __lhip_real_res_query;
+}
+
+
+/* =============================================================== */
+
+ccp_i_ucp_i __lhip_real_res_search_location (
+#ifdef LHIP_ANSIC
+	void
+#endif
+)
+{
+	return __lhip_real_res_search;
+}
+
+
+/* =============================================================== */
+
+ccp_cpp_i_ucp_i __lhip_real_res_querydomain_location (
+#ifdef LHIP_ANSIC
+	void
+#endif
+)
+{
+	return __lhip_real_res_querydomain;
+}
+
+
+/* =============================================================== */
+
+i_ccp_i_i_cucp_i_cucp_ucp_i __lhip_real_res_mkquery_location (
+#ifdef LHIP_ANSIC
+	void
+#endif
+)
+{
+	return __lhip_real_res_mkquery;
+}
+

@@ -2,7 +2,7 @@
  * A library for secure removing files.
  *	-- private file and program banning functions.
  *
- * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -45,16 +45,25 @@
 
 #include "lhip_priv.h"
 
-#define  LHIP_MAXPATHLEN 4097
-
+static char __lhip_exename[LHIP_MAXPATHLEN];	/* 4096 */
+static char __lhip_omitfile[LHIP_MAXPATHLEN];
 
 /******************* some of what's below comes from libsafe ***************/
 
+#ifndef LHIP_ANSIC
+static char *
+__lhip_get_exename PARAMS((char * const exename, const size_t size));
+#endif
+
+/**
+ * Gets the running program's name and puts in into the given buffer.
+ * \param exename The buffer to put into.
+ * \param size The size of the buffer.
+ * \return The buffer.
+ */
 static char *
 __lhip_get_exename (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	char * const exename, const size_t size)
 #else
 	exename, size)
@@ -97,22 +106,18 @@ __lhip_get_exename (
 
 int GCC_WARN_UNUSED_RESULT
 __lhip_check_prog_ban (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	void
 #endif
 )
 {
-	char    exename[LHIP_MAXPATHLEN];	/* 4096 */
-	char    omitfile[LHIP_MAXPATHLEN];
 	FILE    *fp;
 	int	ret = 0;	/* DEFAULT: NO, this program is not banned */
 
 	/* Is this process on the list of applications to ignore? */
-	__lhip_get_exename (exename, LHIP_MAXPATHLEN);
-	exename[LHIP_MAXPATHLEN-1] = '\0';
-	if ( strlen (exename) == 0 )
+	__lhip_get_exename (__lhip_exename, LHIP_MAXPATHLEN);
+	__lhip_exename[LHIP_MAXPATHLEN-1] = '\0';
+	if ( strlen (__lhip_exename) == 0 )
 	{
 		/* can't find executable name. Assume not banned */
 		return 0;
@@ -123,17 +128,17 @@ __lhip_check_prog_ban (
 		fp = (*__lhip_real_fopen_location ()) (SYSCONFDIR LHIP_PATH_SEP "libhideip.progban", "r");
 		if (fp != NULL)
 		{
-			while ( fgets (omitfile, sizeof (omitfile), fp) != NULL )
+			while ( fgets (__lhip_omitfile, sizeof (__lhip_omitfile), fp) != NULL )
 			{
-				omitfile[LHIP_MAXPATHLEN - 1] = '\0';
+				__lhip_omitfile[LHIP_MAXPATHLEN - 1] = '\0';
 
-				if ( (strlen (omitfile) > 0) && (omitfile[0] != '\n')
-					&& (omitfile[0] != '\r') )
+				if ( (strlen (__lhip_omitfile) > 0) && (__lhip_omitfile[0] != '\n')
+					&& (__lhip_omitfile[0] != '\r') )
 				{
 					/*if (strncmp (omitfile, exename, sizeof (omitfile)) == 0)*/
 					/* NOTE the reverse parameters */
 					/* char *strstr(const char *haystack, const char *needle); */
-					if (strstr (exename, omitfile) != NULL)
+					if (strstr (__lhip_exename, __lhip_omitfile) != NULL)
 					{
 						/* needle found in haystack */
 						fclose (fp);

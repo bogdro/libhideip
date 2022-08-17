@@ -2,7 +2,8 @@
  * A library for hiding local IP address.
  *	-- uname function replacement.
  *
- * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -52,15 +53,11 @@ struct utsname
 
 #include "lhip_priv.h"
 
-#define LHIP_MIN(a,b) ( ((a)<(b)) ? (a) : (b) )
-
 /* =============================================================== */
 
 int
 uname (
-#if defined (__STDC__) || defined (_AIX) \
-	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
-	|| defined(WIN32) || defined(__cplusplus)
+#ifdef LHIP_ANSIC
 	struct utsname *buf)
 #else
 	buf)
@@ -116,7 +113,7 @@ uname (
 			buf->nodename[i] = '\0';
 		}
 # endif
-		strncpy (buf->nodename, "localhost", LHIP_MIN (sizeof (buf->nodename), 9));
+		strncpy (buf->nodename, "localhost", LHIP_MIN (sizeof (buf->nodename), 9)+1);
 	}
 	return ret;
 }

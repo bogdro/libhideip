@@ -33,7 +33,7 @@ This manual is for libhideip, version @VERSION@
 
 @c ==================================================================
 
-    Copyright (c)  2008-2009 Bogdan Drozdowski
+    Copyright (c)  2008-2010 Bogdan Drozdowski
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -60,12 +60,13 @@ Free Documentation License" in the "Copying" chapter.
 @chapter What is libhideip?
 
 LibHideIP is a set of replacements for those function that could be
-used to fund your local public IP address. These functions include:
+used to find your local public IP address. These functions include:
 gethostent family, getipnodebyaddr, getipnodebyname, gethostname,
 gethostbyaddr family, gethostbyname family, getifaddrs, getaddrinfo,
-getnameinfo, socket (netlink sockets), sendmsg+recvmsg,
+getnameinfo, socket+socketpair (netlink sockets), sendmsg+recvmsg,
 execve (thus the whole exec* family) with the system function (can
-be used to launch bad programs), ioctl, uname, and a bunch of file opening functions
+be used to launch bad programs), ioctl, uname, bind, getsockname,
+getsockopt+setsockopt and a bunch of file opening functions
 (fopen, fopen64, open, open64, freopen, freopen64, openat, openat64)
 which can be used to read IP addresses from files under /proc.
 
@@ -79,6 +80,9 @@ thus bypassing even the C library
 the functions compiled in it).
 @item The operating system doesn't support shared libraries (like DOS)
 @item The operating system doesn't support preloading shared libraries before system libraries.
+@item A program is launched by another program, which clears the environment
+variables used by the dynamic linker, so the dynamic linker doesn't preload
+LibHideIP. Some Java Runtime Environments seem to do this.
 @end itemize
 
 @c ==================================================================
@@ -104,11 +108,11 @@ won't compile without this.
 The stdarg.h/varargs.h header contains stuff needed to intercept ioctl() and the
 opening functions.
 @item Libdl (usually part of the C library) for dynamic function addressing
-  (unless the required functions are in the C library)
+(unless the required functions are in the C library)
 @item the @command{make} program
 @end itemize
 
-Type @command{./configure} to configure libhideip for your system.
+Type @command{./configure} to configure LibHideIP for your system.
 
 Type @command{make} to compile the library.
 LibHideIP assumes that your host has
@@ -162,7 +166,8 @@ dynamic linker, ld.so, load libhideip before loading any other libraries, when
 starting programs. That is, after the line above gets executed, all programs
 from that moment start using libhideip.
 
-You can alternatively put the full path to the library in the /etc/ld.so.preload.
+You can alternatively put the full path to the library in the /etc/ld.so.preload
+(not recommended, because some good programs may need the local IP address).
 No syntax is required, just the path and filename, like this:
 
 /usr/local/lib/libhideip.so
@@ -172,18 +177,30 @@ To load libhideip for just one program, type like this (for BASH):
 LD_PRELOAD=/usr/local/lib/libhideip.so some-program-name
 
 To make LibHideIP impossible to detect, you must change all the internal
-public function names. To do this, open the src/lhip_priv.h file in a text
+public function names. To do this, you can use the name randomizing scripts in the
+src directory. You will need the @command{sed} and @command{sort} programs
+and either Perl or GNU awk.
+You can change the name prefix at the top of these scripts to something unique.
+When the script is done working, recompile and reinstall the library.
+
+If you want to do this manually (or you don't have @command{sed} or
+@command{sort} and Perl or GNU awk),
+open the src/lhip_priv.h file in a text
 editor and look for lines starting with "extern". The __lhip* names in these
 lines are the function names to convert. Take each name and substitue all its
-appearances in each source file in the "src" directory:
+appearances in each source file in the "src" directory using a text editor or
+the following commands:
 
-sed -i 's/__lhip_real_gethostbyaddr_location/_your_function_name1/g' *.c *.h
+sed -i 's/__lhip_real_gethostbyaddr_location/_your_function_name1/g' *.c* *.h*
 
-sed -i 's/__lhip_real_gethostbyaddr_r_location/_your_function_name2/g' *.c *.h
+sed -i 's/__lhip_real_gethostbyaddr_r_location/_your_function_name2/g' *.c* *.h*
 
 ...
 
-sed -i 's/__lhip_get_init_stage/_your_function_nameN/g' *.c *.h
+sed -i 's/__lhip_get_init_stage/_your_function_nameN/g' *.c* *.h*
+
+Then find other symbols that start with __lhip in other files and change them
+too (using a text editor or commands similar to the above).
 
 Then recompile and reinstall the library.
 

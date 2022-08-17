@@ -3,15 +3,17 @@
 %define version @VERSION@
 %define name libhideip
 
-Summary:	Library for IP address hiding.
+Summary:	Library for IP address hiding
 Name:		%{name}
 Version:	%{version}
 Release:	1
 URL:		http://rudy.mif.pg.gda.pl/~bogdro/soft/
-License:	GPL
-Group:		System Utilities
-Packager:	Bogdan Drozdowski <bogdandr@op.pl>
-Prefix:		/usr/local
+License:	GPLv3+
+# group must be one of the listed in /usr/share/doc/rpm-.../GROUPS
+Group:		System Environment/Libraries
+#Group:		System Utilities
+#Packager:	Bogdan Drozdowski <bogdandr@op.pl>
+#Prefix:		/usr/local
 Source:		%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-build
 BuildRequires:	gcc, glibc, glibc-devel, glibc-headers, make
@@ -24,34 +26,40 @@ The potentially-dangerous functions are replaced by safe ones, which return
 neutral data.
 
 %prep
-%{__rm} -rf $RPM_BUILD_ROOT
 %setup -q
 
 %build
 
-CFLAGS='-march=i386' ./configure --prefix=%{prefix} --disable-static \
-	--enable-shared --mandir=/usr/share/man --infodir=/usr/share/info --libdir=%{prefix}/lib
+CFLAGS='-march=i386' ./configure --prefix=/usr/local --disable-static --enable-shared \
+	--mandir=/usr/share/man --infodir=/usr/share/info --libdir=/usr/local/lib --sysconfdir=/usr/local/etc
 %{__make}
-%{__mkdir_p} $RPM_BUILD_ROOT/%{prefix}/etc
 
 %install
-
+%{__rm} -rf $RPM_BUILD_ROOT
 DESTDIR="$RPM_BUILD_ROOT" %{__make} install
 
 %preun
 #sed -i 's/^.*libhideip.so//g' /etc/ld.so.preload
 
-%clean
+%post
+#ldconfig
+#install-info
 
+%postun
+#ldconfig
+
+%clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
 #%define _unpackaged_files_terminate_build 0
 %files
 
 %defattr(-,root,root)
-%{prefix}/lib/libhideip.so
-%{prefix}/lib/libhideip.so.1
-%{prefix}/lib/libhideip.so.1.0.1
-%{prefix}/lib/libhideip.la
+/usr/local/lib/libhideip.so
+/usr/local/lib/libhideip.so.1
+/usr/local/lib/libhideip.so.1.1.0
+/usr/local/lib/libhideip.la
 %doc /usr/share/info/libhideip.info.gz
 %doc /usr/share/man/man3/libhideip.3.gz
+
+%changelog

@@ -2,7 +2,8 @@
  * A library for hiding local IP address.
  *	-- private header file.
  *
- * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -59,8 +60,10 @@
 	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
 	|| defined(WIN32) || defined(__cplusplus)
 #  define PARAMS(protos) protos
+#  define LHIP_ANSIC
 # else
 #  define PARAMS(protos) ()
+#  undef LHIP_ANSIC
 # endif
 
 # ifdef __GNUC__
@@ -96,14 +99,14 @@ struct hostent
 
 struct addrinfo
 {
-  int ai_flags;			/* Input flags.  */
-  int ai_family;		/* Protocol family for socket.  */
-  int ai_socktype;		/* Socket type.  */
-  int ai_protocol;		/* Protocol for socket.  */
-  socklen_t ai_addrlen;		/* Length of socket address.  */
-  struct sockaddr *ai_addr;	/* Socket address for socket.  */
-  char *ai_canonname;		/* Canonical name for service location.  */
-  struct addrinfo *ai_next;	/* Pointer to next in list.  */
+	int ai_flags;			/* Input flags.  */
+	int ai_family;		/* Protocol family for socket.  */
+	int ai_socktype;		/* Socket type.  */
+	int ai_protocol;		/* Protocol for socket.  */
+	socklen_t ai_addrlen;		/* Length of socket address.  */
+	struct sockaddr *ai_addr;	/* Socket address for socket.  */
+	char *ai_canonname;		/* Canonical name for service location.  */
+	struct addrinfo *ai_next;	/* Pointer to next in list.  */
 };
 # endif
 
@@ -124,24 +127,24 @@ typedef int socklen_t;
 # else
 struct ifaddrs
 {
-  struct ifaddrs *ifa_next;	/* Pointer to the next structure.  */
+	struct ifaddrs *ifa_next;	/* Pointer to the next structure.  */
 
-  char *ifa_name;		/* Name of this network interface.  */
-  unsigned int ifa_flags;	/* Flags as from SIOCGIFFLAGS ioctl.  */
+	char *ifa_name;		/* Name of this network interface.  */
+	unsigned int ifa_flags;	/* Flags as from SIOCGIFFLAGS ioctl.  */
 
-  struct sockaddr *ifa_addr;	/* Network address of this interface.  */
-  struct sockaddr *ifa_netmask; /* Netmask of this interface.  */
-  union
-  {
-    /* At most one of the following two is valid.  If the IFF_BROADCAST
-       bit is set in `ifa_flags', then `ifa_broadaddr' is valid.  If the
-       IFF_POINTOPOINT bit is set, then `ifa_dstaddr' is valid.
-       It is never the case that both these bits are set at once.  */
-    struct sockaddr *ifu_broadaddr; /* Broadcast address of this interface. */
-    struct sockaddr *ifu_dstaddr; /* Point-to-point destination address.  */
-  } ifa_ifu;
-  /* These very same macros are defined by <net/if.h> for `struct ifaddr'.
-     So if they are defined already, the existing definitions will be fine.  */
+	struct sockaddr *ifa_addr;	/* Network address of this interface.  */
+	struct sockaddr *ifa_netmask; /* Netmask of this interface.  */
+	union
+	{
+		/* At most one of the following two is valid.  If the IFF_BROADCAST
+		   bit is set in `ifa_flags', then `ifa_broadaddr' is valid.  If the
+		   IFF_POINTOPOINT bit is set, then `ifa_dstaddr' is valid.
+		   It is never the case that both these bits are set at once.  */
+		struct sockaddr *ifu_broadaddr; /* Broadcast address of this interface. */
+		struct sockaddr *ifu_dstaddr; /* Point-to-point destination address.  */
+	} ifa_ifu;
+	/* These very same macros are defined by <net/if.h> for `struct ifaddr'.
+	   So if they are defined already, the existing definitions will be fine.  */
 #  ifndef ifa_broadaddr
 #   define ifa_broadaddr	ifa_ifu.ifu_broadaddr
 #  endif
@@ -149,8 +152,40 @@ struct ifaddrs
 #   define ifa_dstaddr		ifa_ifu.ifu_dstaddr
 #  endif
 
-  void *ifa_data;		/* Address-specific data (may be unused).  */
+	void *ifa_data;		/* Address-specific data (may be unused).  */
 };
+
+#  if (defined __solaris__) && (defined AF_INET6)
+struct lifaddrs
+{
+	struct ifaddrs *lifa_next;	/* Pointer to the next structure.  */
+
+	char *lifa_name;		/* Name of this network interface.  */
+	unsigned int lifa_flags;	/* Flags as from SIOCGIFFLAGS ioctl.  */
+
+	struct sockaddr *lifa_addr;	/* Network address of this interface.  */
+	struct sockaddr *lifa_netmask; /* Netmask of this interface.  */
+	union
+	{
+		/* At most one of the following two is valid.  If the IFF_BROADCAST
+		   bit is set in `ifa_flags', then `ifa_broadaddr' is valid.  If the
+		   IFF_POINTOPOINT bit is set, then `ifa_dstaddr' is valid.
+		   It is never the case that both these bits are set at once.  */
+		struct sockaddr *lifu_broadaddr; /* Broadcast address of this interface. */
+		struct sockaddr *lifu_dstaddr; /* Point-to-point destination address.  */
+	} lifa_ifu;
+	/* These very same macros are defined by <net/if.h> for `struct ifaddr'.
+	   So if they are defined already, the existing definitions will be fine.  */
+#   ifndef lifa_broadaddr
+#    define lifa_broadaddr	lifa_ifu.lifu_broadaddr
+#   endif
+#   ifndef lifa_dstaddr
+#    define lifa_dstaddr	lifa_ifu.lifu_dstaddr
+#   endif
+
+	void *ifa_data;		/* Address-specific data (may be unused).  */
+};
+#  endif
 # endif
 
 # ifdef HAVE_SYS_UTSNAME_H
@@ -203,12 +238,32 @@ typedef ssize_t (*ss_i_smp_i)			PARAMS((int s, struct msghdr *msg, int flags));
 typedef ssize_t (*ss_i_csmp_i)			PARAMS((int s, const struct msghdr *msg, int flags));
 typedef int (*i_cp_s)				PARAMS((char *name, size_t len));
 typedef int (*i_sup)				PARAMS((struct utsname *buf));
+typedef int (*i_i_i_vp_slp)			PARAMS((int s, int level, int optname,
+							void * optval, socklen_t * optlen));
+typedef int (*i_i_i_cvp_sl)			PARAMS((int s, int level, int optname,
+							const void * optval, socklen_t optlen));
+typedef int (*i_ssp_slp)			PARAMS((int s, struct sockaddr *name, socklen_t *namelen));
+typedef int (*i_cssp_sl)			PARAMS((int sockfd, const struct sockaddr *my_addr,
+							socklen_t addrlen));
+typedef int (*i_i_ia2)				PARAMS((int d, int type, int protocol, int sv[2]));
 
 /* file-related functions: */
-typedef FILE*	(*fp_cp_cp)	PARAMS((const char * const name, const char * const mode));
-typedef FILE*	(*fp_cp_cp_fp)	PARAMS((const char * const name, const char * const mode, FILE* stream));
-typedef int	(*i_cp_i_)	PARAMS((const char * const name, const int flags, ...));
-typedef int	(*i_i_cp_i_)	PARAMS((const int dir_fd, const char * const pathname, const int flags, ...));
+typedef FILE*	(*fp_cp_cp)			PARAMS((const char * const name, const char * const mode));
+typedef FILE*	(*fp_cp_cp_fp)			PARAMS((const char * const name, const char * const mode,
+							FILE* stream));
+typedef int	(*i_cp_i_)			PARAMS((const char * const name, const int flags, ...));
+typedef int	(*i_i_cp_i_)			PARAMS((const int dir_fd, const char * const pathname,
+							const int flags, ...));
+
+/* name resolving functions: */
+typedef int (*ccp_i_ucp_i)			PARAMS((const char *dname, int class, int type,
+							unsigned char *answer, int anslen));
+typedef int (*ccp_cpp_i_ucp_i)			PARAMS((const char *name, const char *domain, int class,
+							int type, unsigned char *answer, int anslen));
+typedef int (*i_ccp_i_i_cucp_i_cucp_ucp_i)	PARAMS((int op, const char *dname, int class, int type,
+							const unsigned char *data, int datalen,
+							const unsigned char *newrr, unsigned char *buf,
+							int buflen));
 
 extern GCC_WARN_UNUSED_RESULT shp_vp_sl_i			__lhip_real_gethostbyaddr_location PARAMS((void));
 extern GCC_WARN_UNUSED_RESULT i_vp_sl_i_shp_cp_s_shpp_ip	__lhip_real_gethostbyaddr_r_location PARAMS((void));
@@ -231,6 +286,11 @@ extern GCC_WARN_UNUSED_RESULT ss_i_smp_i			__lhip_real_recvmsg_location PARAMS((
 extern GCC_WARN_UNUSED_RESULT ss_i_csmp_i			__lhip_real_sendmsg_location PARAMS((void));
 extern GCC_WARN_UNUSED_RESULT i_cp_s				__lhip_real_gethostname_location PARAMS((void));
 extern GCC_WARN_UNUSED_RESULT i_sup				__lhip_real_uname_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT i_i_i_vp_slp			__lhip_real_getsockopt_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT i_i_i_cvp_sl			__lhip_real_setsockopt_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT i_ssp_slp				__lhip_real_getsockname_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT i_cssp_sl				__lhip_real_bind_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT i_i_ia2				__lhip_real_socketpair_location PARAMS((void));
 
 /* file-related functions: */
 extern GCC_WARN_UNUSED_RESULT fp_cp_cp				__lhip_real_fopen64_location PARAMS((void));
@@ -243,15 +303,22 @@ extern GCC_WARN_UNUSED_RESULT fp_cp_cp_fp			__lhip_real_freopen_location PARAMS(
 extern GCC_WARN_UNUSED_RESULT i_cp_i_				__lhip_real_open_location PARAMS((void));
 extern GCC_WARN_UNUSED_RESULT i_i_cp_i_				__lhip_real_openat_location PARAMS((void));
 
+/* name resolving functions: */
+extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_query_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_search_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT ccp_cpp_i_ucp_i			__lhip_real_res_querydomain_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery_location PARAMS((void));
 
 /* The library initialization function */
-extern int __lhip_main PARAMS((void));
-extern int GCC_WARN_UNUSED_RESULT __lhip_check_prog_ban PARAMS((void));
-extern int GCC_WARN_UNUSED_RESULT __lhip_is_local_addr PARAMS((const struct hostent * const h));
-extern void __lhip_change_data PARAMS((struct hostent * const ret));
-extern struct hostent * GCC_WARN_UNUSED_RESULT __lhip_get_our_name_ipv4 PARAMS((void));
-extern struct hostent * GCC_WARN_UNUSED_RESULT __lhip_get_our_name_ipv6 PARAMS((void));
-extern int GCC_WARN_UNUSED_RESULT __lhip_get_init_stage PARAMS((void));
+extern int							__lhip_main PARAMS((void));
+extern int GCC_WARN_UNUSED_RESULT				__lhip_check_prog_ban PARAMS((void));
+extern int GCC_WARN_UNUSED_RESULT				__lhip_is_local_addr PARAMS((
+									const struct hostent * const h));
+extern void							__lhip_change_data PARAMS((
+									struct hostent * const ret));
+extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv4 PARAMS((void));
+extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv6 PARAMS((void));
+extern int GCC_WARN_UNUSED_RESULT				__lhip_get_init_stage PARAMS((void));
 
 # define VALUABLE_FILES	\
 	"if_inet6",	\
@@ -266,12 +333,15 @@ extern int GCC_WARN_UNUSED_RESULT __lhip_get_init_stage PARAMS((void));
 # define LOCAL_IPV6_ADDR 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
 # define LOCAL_IPV6_MASK 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
 
-
 # if (PATH_STYLE==32) || (PATH_STYLE==128)	/* unix or mac */
 #  define LHIP_PATH_SEP "/"
 # else
 #  define LHIP_PATH_SEP "\\"
 # endif
+
+# define LHIP_MAX(a, b) ( ((a) > (b)) ? (a) : (b) )
+# define LHIP_MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
+# define LHIP_MAXPATHLEN 4097
 
 #endif /* _LHIP_HEADER */
 
