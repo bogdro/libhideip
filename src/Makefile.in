@@ -77,7 +77,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libhideip_la_LIBADD =
 am_libhideip_la_OBJECTS = lhip_exec.lo lhip_main.lo lhip_net.lo \
 	lhip_banning.lo lhip_ioctl.lo lhip_opens.lo lhip_uname.lo \
-	lhip_resolve.lo
+	lhip_resolve.lo lhip_pcap.lo lhip_addr.lo
 nodist_libhideip_la_OBJECTS =
 libhideip_la_OBJECTS = $(am_libhideip_la_OBJECTS) \
 	$(nodist_libhideip_la_OBJECTS)
@@ -104,7 +104,6 @@ CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
-AM_CFLAGS = @AM_CFLAGS@
 AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -219,7 +218,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libhideip.la
 libhideip_la_SOURCES = lhip_exec.c lhip_main.c lhip_net.c lhip_banning.c \
-	lhip_ioctl.c lhip_opens.c lhip_uname.c lhip_resolve.c lhip_priv.h
+	lhip_ioctl.c lhip_opens.c lhip_uname.c lhip_resolve.c lhip_priv.h \
+	lhip_pcap.c lhip_addr.c
 
 EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh
 
@@ -228,7 +228,7 @@ EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh
 # interface changed => C++, R:=0
 # - interface add => A++
 # - interface removed => A:=0
-libhideip_la_LDFLAGS = -version-info 2:0:1
+libhideip_la_LDFLAGS = -version-info 3:0:2
 
 #nobase_include_HEADERS = lhip_priv.h
 BUILT_SOURCES = lhip_paths.h
@@ -311,12 +311,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_addr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_banning.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_exec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_ioctl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_main.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_net.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_opens.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_pcap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_resolve.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lhip_uname.Plo@am__quote@
 

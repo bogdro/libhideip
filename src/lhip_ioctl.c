@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- ioctl function replacement.
  *
- * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -218,14 +218,16 @@ ioctl (
 	void * data1 = NULL;
 	void * data2 = NULL;
 	int ret;
+#if (defined SIOCGIFADDR) || (defined SIOCGIFCONF) || (defined SIOCGIFHWADDR)
 	struct ifreq * addrs;
 	struct ifconf * cfg;
+	unsigned int buf_index;
+	int req_index;
+#endif
 #if (defined __solaris__) && (defined AF_INET6)
 	struct lifreq * laddrs;
 	struct lifconf * lcfg;
 #endif
-	unsigned int buf_index;
-	int req_index;
 #ifndef HAVE_MEMCPY
 	size_t i;
 #endif

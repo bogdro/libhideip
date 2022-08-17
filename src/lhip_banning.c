@@ -2,7 +2,7 @@
  * A library for secure removing files.
  *	-- private file and program banning functions.
  *
- * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -117,7 +117,7 @@ __lhip_check_prog_ban (
 	/* Is this process on the list of applications to ignore? */
 	__lhip_get_exename (__lhip_exename, LHIP_MAXPATHLEN);
 	__lhip_exename[LHIP_MAXPATHLEN-1] = '\0';
-	if ( strlen (__lhip_exename) == 0 )
+	if ( __lhip_exename[0] == '\0' /*strlen (__lhip_exename) == 0*/ )
 	{
 		/* can't find executable name. Assume not banned */
 		return 0;
@@ -132,7 +132,8 @@ __lhip_check_prog_ban (
 			{
 				__lhip_omitfile[LHIP_MAXPATHLEN - 1] = '\0';
 
-				if ( (strlen (__lhip_omitfile) > 0) && (__lhip_omitfile[0] != '\n')
+				if ( __lhip_omitfile[0] != '\0' /*(strlen (__lhip_omitfile) > 0)*/
+					&& (__lhip_omitfile[0] != '\n')
 					&& (__lhip_omitfile[0] != '\r') )
 				{
 					/*if (strncmp (omitfile, exename, sizeof (omitfile)) == 0)*/

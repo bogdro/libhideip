@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- private header file.
  *
- * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -201,7 +201,30 @@ struct utsname
 };
 # endif
 
-/* function typedefs: */
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>	/* intptr_t */
+#endif
+
+#ifdef HAVE_STDINT_H
+# include <stdint.h>	/* intptr_t */
+#endif
+
+# ifdef HAVE_PCAP_H
+#  include <pcap.h>
+# else
+#  ifdef HAVE_PCAP_PCAP_H
+#   include <pcap/pcap.h>
+#  else
+/* can't find neither pcap.h nor pcap/pcap.h - make up our own declarations: */
+typedef void pcap_t;
+typedef void pcap_if_t;
+typedef unsigned int bpf_u_int32;
+/*typedef unsigned int intptr_t;*/
+#  endif
+# endif
+
+/* --- Function typedefs. */
+/* network-related functions: */
 typedef struct hostent * (*shp_vp_sl_i)		PARAMS((const void * addr, socklen_t len, int type));
 typedef int (*i_vp_sl_i_shp_cp_s_shpp_ip)	PARAMS((const void *addr, socklen_t len, int type,
 							struct hostent *ret, char *buf, size_t buflen,
@@ -264,7 +287,24 @@ typedef int (*i_ccp_i_i_cucp_i_cucp_ucp_i)	PARAMS((int op, const char *dname, in
 							const unsigned char *data, int datalen,
 							const unsigned char *newrr, unsigned char *buf,
 							int buflen));
+/* libpcap functions: */
+typedef char * (*cp_cp)				PARAMS ((char *errbuf));
+typedef int (*i_ccp_uip_uip_cp)			PARAMS ((const char * device, bpf_u_int32 * netp,
+							bpf_u_int32 * maskp, char * errbuf));
 
+typedef pcap_t * (*pp_ccp_cp)			PARAMS ((const char * source, char * errbuf));
+typedef pcap_t * (*pp_i_i)			PARAMS ((int linktype, int snaplen));
+typedef pcap_t * (*pp_ccp_i_i_i_cp)		PARAMS ((const char * device, int snaplen,
+							int promisc, int to_ms, char * errbuf));
+typedef pcap_t * (*pp_Fp_cp)			PARAMS ((FILE * fp, char * errbuf));
+typedef pcap_t * (*pp_ipt_cp)			PARAMS ((intptr_t a, char * errbuf));
+typedef int (*i_ifpp_cp)			PARAMS ((pcap_if_t ** devs, char * errbuf));
+
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+/* network-related functions: */
 extern GCC_WARN_UNUSED_RESULT shp_vp_sl_i			__lhip_real_gethostbyaddr_location PARAMS((void));
 extern GCC_WARN_UNUSED_RESULT i_vp_sl_i_shp_cp_s_shpp_ip	__lhip_real_gethostbyaddr_r_location PARAMS((void));
 extern GCC_WARN_UNUSED_RESULT shp_cp				__lhip_real_gethostbyname_location PARAMS((void));
@@ -309,7 +349,18 @@ extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_search_location PARA
 extern GCC_WARN_UNUSED_RESULT ccp_cpp_i_ucp_i			__lhip_real_res_querydomain_location PARAMS((void));
 extern GCC_WARN_UNUSED_RESULT i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery_location PARAMS((void));
 
-/* The library initialization function */
+/* libpcap functions: */
+extern GCC_WARN_UNUSED_RESULT cp_cp				__lhip_real_pcap_lookupdev_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT i_ccp_uip_uip_cp			__lhip_real_pcap_lookupnet_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_create_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT pp_i_i				__lhip_real_pcap_open_dead_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_i_i_i_cp			__lhip_real_pcap_open_live_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_open_offline_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT pp_Fp_cp				__lhip_real_pcap_fopen_offline_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT pp_ipt_cp				__lhip_real_pcap_hopen_offline_location PARAMS((void));
+extern GCC_WARN_UNUSED_RESULT i_ifpp_cp				__lhip_real_pcap_findalldevs_location PARAMS((void));
+
+/* The library functions: */
 extern int							__lhip_main PARAMS((void));
 extern int GCC_WARN_UNUSED_RESULT				__lhip_check_prog_ban PARAMS((void));
 extern int GCC_WARN_UNUSED_RESULT				__lhip_is_local_addr PARAMS((
@@ -319,6 +370,12 @@ extern void							__lhip_change_data PARAMS((
 extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv4 PARAMS((void));
 extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv6 PARAMS((void));
 extern int GCC_WARN_UNUSED_RESULT				__lhip_get_init_stage PARAMS((void));
+extern void 							__lhip_read_local_addresses PARAMS((void));
+extern void							__lhip_free_local_addresses PARAMS((void));
+
+# ifdef __cplusplus
+}
+# endif
 
 # define VALUABLE_FILES	\
 	"if_inet6",	\
@@ -326,7 +383,10 @@ extern int GCC_WARN_UNUSED_RESULT				__lhip_get_init_stage PARAMS((void));
 	"hosts",	\
 	"ifcfg-",	\
 	"hostname",	\
-	"mactab"
+	"mactab",	\
+	"/dev/net",	\
+	"/dev/udp",	\
+	"/dev/tcp"
 
 # define LOCAL_IPV4_ADDR 127, 0, 0, 1
 # define LOCAL_IPV4_MASK 255, 255, 255, 255

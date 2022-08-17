@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- network functions' replacements.
  *
- * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -1811,7 +1811,7 @@ getsockname (
 #else
 			for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
 			{
-				((char *)&(((struct sockaddr_in *)name))->sin_addr))[i]
+				((char *)&(((struct sockaddr_in *)name)->sin_addr))[i]
 					= __lhip_localhost_ipv4[i];
 			}
 #endif

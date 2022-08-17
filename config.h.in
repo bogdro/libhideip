@@ -118,6 +118,12 @@
 /* Define to 1 if you have the `openat64' function. */
 #undef HAVE_OPENAT64
 
+/* Whether you have the pcap.h header. */
+#undef HAVE_PCAP_H
+
+/* Whether you have the pcap/pcap.h header. */
+#undef HAVE_PCAP_PCAP_H
+
 /* Define to 1 if you have the `readlink' function. */
 #undef HAVE_READLINK
 

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 0.3, bogdandr@op.pl)
+AC_INIT(libhideip, 0.4, bogdandr@op.pl)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h])
@@ -62,7 +62,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h errno.h malloc.h\
 	sys/types.h netdb.h sys/socket.h ifaddrs.h arpa/inet.h\
 	netinet/in.h sys/ioctl.h fcntl.h sys/utsname.h asm/types.h\
-	arpa/nameser.h])
+	arpa/nameser.h stdint.h inttypes.h])
 
 AC_CHECK_HEADER([net/if.h],AC_DEFINE([HAVE_NET_IF_H],[1],
 	[Whether you have the net/if.h header.]),[],
@@ -128,6 +128,13 @@ AC_CHECK_HEADER([stdarg.h],AC_DEFINE([HAVE_STDARG_H],[1],
 	[
 	AC_CHECK_HEADER([varargs.h],AC_DEFINE([HAVE_VARARGS_H],[1],
 		[Whether you have the varargs.h header.]))
+	])
+
+AC_CHECK_HEADER(pcap.h,AC_DEFINE([HAVE_PCAP_H],[1],
+	[Whether you have the pcap.h header.]),
+	[
+	AC_CHECK_HEADER([pcap/pcap.h],AC_DEFINE([HAVE_PCAP_PCAP_H],[1],
+		[Whether you have the pcap/pcap.h header.]))
 	])
 
 # ==================== Checks for typedefs, structures, and compiler characteristics.
@@ -222,6 +229,7 @@ if (test "x$GCC" = "xyes" ); then
 	AX_C_CHECK_FLAG([-O2], [CFLAGS="$CFLAGS -O2"], [CFLAGS="$CFLAGS"])
 fi
 
-AC_SUBST([AM_CFLAGS],[$CFLAGS])
+# this doubles the CFLAGS on compile:
+#AC_SUBST([AM_CFLAGS],[$CFLAGS])
 
 AC_OUTPUT

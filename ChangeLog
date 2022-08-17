@@ -1,3 +1,20 @@
+2011-03-17	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* libhideip version 0.4
+	  Run flawfinder, rats and cppcheck on the code and fixed a few
+	  performance and syntax problems.
+	* src/lhip_net.c (getsockname): fixed syntax error.
+	* src/lhip_priv.h: blocking opening /dev/net*, /dev/tcp*, /dev/udp*,
+	  fixed declarations for C++.
+	* README: added the glibc license block. Updated RPM creating.
+	* libhideip.spec.in: added README, COPYING, AUTHORS and ChangeLog
+	  to the RPM package.
+	* src/lhip_pcap.c, src/lhip_main.c: blocking libpcap functions.
+	* doc/libhideip.texi.in: updated RPM creating and the list of blocked
+	  functions.
+	* configure.ac: fixed double CFLAGS on compile
+	* src/lhip_addr.c: separated address checking from the main file.
+
 2010-05-22	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* libhideip version 0.3

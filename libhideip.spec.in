@@ -57,9 +57,13 @@ DESTDIR="$RPM_BUILD_ROOT" %{__make} install
 %defattr(-,root,root)
 /usr/local/lib/libhideip.so
 /usr/local/lib/libhideip.so.1
-/usr/local/lib/libhideip.so.1.1.0
+/usr/local/lib/libhideip.so.1.2.0
 /usr/local/lib/libhideip.la
 %doc /usr/share/info/libhideip.info.gz
 %doc /usr/share/man/man3/libhideip.3.gz
+%doc README
+%doc COPYING
+%doc AUTHORS
+%doc ChangeLog
 
 %changelog

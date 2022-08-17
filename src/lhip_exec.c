@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- execution functions' replacements.
  *
- * Copyright (C) 2008-2010 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2011 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -335,7 +335,7 @@ static int __lhip_is_forbidden_program (
 			res = stat (__lhip_linkpath, &st);
 		}
 #endif
-		for ( j=0; j < sizeof (programs)/sizeof (programs[0]); j++)
+		for ( j = 0; j < sizeof (programs)/sizeof (programs[0]); j++)
 		{
 			if ( strstr (name, programs[j]) != NULL )
 			{
@@ -354,7 +354,7 @@ static int __lhip_is_forbidden_program (
 			now check if the viewing programs aren't used to get the contents
 			of valuable files like /etc/hosts
 			*/
-			for ( i=0; (ret == 0)
+			for ( i = 0; (ret == 0)
 				&& (i < sizeof (viewing_programs)/sizeof (viewing_programs[0])); i++)
 			{
 				if ( strstr (__lhip_linkpath, viewing_programs[i]) != NULL )
@@ -376,7 +376,7 @@ static int __lhip_is_forbidden_program (
 				}
 			}
 		}
-		for ( j=0; (ret == 0)
+		for ( j = 0; (ret == 0)
 			&& (j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0])); j++)
 		{
 			if ( strstr (__lhip_linkpath, __lhip_valuable_files[j]) != NULL )
@@ -385,7 +385,7 @@ static int __lhip_is_forbidden_program (
 				break;
 			}
 		}
-	}
+	} /* if ( __lhip_linkpath != NULL && __lhip_newlinkpath != NULL ) */
 #ifdef HAVE_MALLOC
 	if ( __lhip_newlinkpath != NULL ) free (__lhip_newlinkpath);
 	if ( __lhip_linkpath != NULL ) free (__lhip_linkpath);
