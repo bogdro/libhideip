@@ -1,22 +1,21 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
-AC_INIT(libhideip, 1.9.1, bogdro@users.sourceforge.net)
-AM_INIT_AUTOMAKE
+AC_PREREQ([2.71])
+AC_INIT([libhideip],[1.9.2],[bogdro@users.sourceforge.net])
+AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
 	libhideip.pc test/Makefile])
 AC_CONFIG_SRCDIR([src/lhip_net.c])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
-
 
 # ==================== configure arguments
 
 AC_ARG_ENABLE([public-interface],
 	AS_HELP_STRING([--enable-public-interface],
-		[Enable the library's public interface @<:@default=no@:>@.]),
+		[[Enable the library's public interface @<:@default=no@:>@.]]),
         [if (test "x$enableval" = "xyes"); then
                 public_if=yes
          else
@@ -24,12 +23,12 @@ AC_ARG_ENABLE([public-interface],
          fi
         ]
         ,[public_if=no])
-
+#'
 AM_CONDITIONAL(PUBLIC_INTERFACE, test "x$public_if" = "xyes")
 
 AC_ARG_ENABLE([environment],
 	AS_HELP_STRING([--enable-environment],
-		[Enable additional ban files pointed to by environment variables @<:@default=yes@:>@.]),
+		[[Enable additional ban files pointed to by environment variables @<:@default=yes@:>@.]]),
         [if (test "x$enableval" = "xyes"); then
                 environment=yes
          else
@@ -46,7 +45,7 @@ fi
 
 AC_ARG_ENABLE([user-files],
 	AS_HELP_STRING([--enable-user-files],
-		[Enable additional ban files located in users' home directories @<:@default=yes@:>@.]),
+		[[Enable additional ban files located in users' home directories @<:@default=yes@:>@.]]),
         [if (test "x$enableval" = "xyes"); then
                 user_files=yes
          else
@@ -54,16 +53,16 @@ AC_ARG_ENABLE([user-files],
          fi
         ]
         ,[user_files=yes])
-
+#'
 if (test "x$user_files" = "xyes"); then
 
 	AC_DEFINE([LHIP_ENABLE_USERBANS], [1],
 		[Whether or not to enable additional ban files located in users' home directories.])
 fi
-
+#'
 AC_ARG_WITH([max-host-names],
 	AS_HELP_STRING([--with-max-host-names=n],
-		[Maximum number of addreses and aliases of your host @<:@default=100@:>@.]),
+		[[Maximum number of addreses and aliases of your host @<:@default=100@:>@.]]),
         [if (test "x$withval" != "x"); then
 		AC_DEFINE_UNQUOTED([LHIP_MAX_HOSTNAMES], [$withval],
 			[Maximum number of addreses and aliases of your host.])
@@ -72,7 +71,7 @@ AC_ARG_WITH([max-host-names],
 
 AC_ARG_ENABLE([gui-applications],
 	AS_HELP_STRING([--enable-gui-applications],
-		[Enable X-based applications to work @<:@default=no@:>@. This disables one of the functions.]),
+		[[Enable X-based applications to work @<:@default=no@:>@. This disables one of the functions.]]),
         [if (test "x$enableval" = "xyes"); then
                 gui_applications=yes
          else
@@ -91,8 +90,9 @@ fi
 AC_LANG(C)
 AC_PROG_CC
 AM_PROG_CC_C_O
+AM_PROG_AR
 AM_CONDITIONAL(ISGCC, test "x$GCC" = "xyes")
-AC_PROG_LIBTOOL
+LT_INIT
 
 # ==================== Checks for libraries.
 libdl=yes
@@ -153,7 +153,15 @@ AC_CHECK_DECL([RTLD_NEXT],[AC_DEFINE([HAVE_DECL_RTLD_NEXT], [1], [Whether RTLD_N
 	#endif
 	])
 
-AC_HEADER_STDC
+# AC_ HEADER_ STDC
+# m4_warn([obsolete],
+# [The preprocessor macro `STDC_HEADERS' is obsolete.
+#   Except in unusual embedded environments, you can safely include all
+#   ISO C90 headers unconditionally.])dnl
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
 
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h errno.h malloc.h\
 	sys/types.h netdb.h sys/socket.h ifaddrs.h arpa/inet.h\
@@ -196,22 +204,7 @@ AC_CHECK_HEADER([linux/netlink.h],AC_DEFINE([HAVE_LINUX_NETLINK_H],[1],
 	#endif
 	])
 
-AC_CHECK_HEADER([resolv.h],AC_DEFINE([HAVE_RESOLV_H],[1],
-	[Whether you have the resolv.h header.]),[],
-	[
-	#ifdef HAVE_SYS_TYPES_H
-	#include <sys/types.h>
-	#endif
-	#ifdef HAVE_NETINET_IN_H
-	#include <netinet/in.h>
-	#endif
-	#ifdef HAVE_ARPA_NAMESER_H
-	#include <arpa/nameser.h>
-	#endif
-	#ifdef HAVE_NETDB_H
-	#include <netdb.h>
-	#endif
-	])
+AC_HEADER_RESOLV
 
 has_sys_stat_h=yes
 AC_CHECK_HEADER([sys/stat.h],AC_DEFINE([HAVE_SYS_STAT_H],[1],
@@ -281,7 +274,7 @@ AH_TEMPLATE([GETNAMEINFO_ARG4TYPE])
 AH_TEMPLATE([GETNAMEINFO_ARG6TYPE])
 AH_TEMPLATE([GETNAMEINFO_ARG7TYPE])
 AC_CHECK_FUNC([getnameinfo], [AC_DEFINE(HAVE_GETNAMEINFO, [1], [Whether you have the getnameinfo function])
-	AC_PROTOTYPE(getnameinfo,
+	AX_PROTOTYPE(getnameinfo,
 	[
 		#ifdef HAVE_SYS_TYPES_H
 		#include <sys/types.h>
@@ -300,14 +293,14 @@ AC_CHECK_FUNC([getnameinfo], [AC_DEFINE(HAVE_GETNAMEINFO, [1], [Whether you have
 	],
 	ARG4TYPE, [socklen_t, size_t],
 	ARG6TYPE, [socklen_t, size_t],
-	ARG7TYPE, [unsigned int, int])
+	ARG7TYPE, [int, unsigned int])
 	])
 
 if (test "x$libpcap" = "xyes"); then
 
 	AH_TEMPLATE([PCAP_FINDALLDEVS_EX_ARG1TYPE])
 	AC_CHECK_FUNC([pcap_findalldevs_ex], [AC_DEFINE(HAVE_PCAP_FINDALLDEVS_EX, [1], [Whether you have the pcap_findalldevs_ex function])
-		AC_PROTOTYPE(pcap_findalldevs_ex,
+		AX_PROTOTYPE(pcap_findalldevs_ex,
 		[
 		#ifdef HAVE_PCAP_H
 		#include <pcap.h>
@@ -403,7 +396,7 @@ if (test "x$public_if" = "xyes"); then
 
 else
 
-	echo " *	Public interface: no (disabled by command line)"
+	echo " *	Public interface: no (default/disabled by command line)"
 
 fi
 

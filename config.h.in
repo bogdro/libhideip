@@ -157,7 +157,7 @@
 /* Define to 1 if you have the `realloc' function. */
 #undef HAVE_REALLOC
 
-/* Whether you have the resolv.h header. */
+/* Define to 1 if you have the <resolv.h> header file. */
 #undef HAVE_RESOLV_H
 
 /* Define to 1 if you have the `res_nquery' function. */

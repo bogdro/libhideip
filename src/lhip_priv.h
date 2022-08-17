@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- private header file.
  *
- * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
+ * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -17,11 +17,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foudation:
- *		Free Software Foundation
- *		51 Franklin Street, Fifth Floor
- *		Boston, MA 02110-1301
- *		USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _LHIP_HEADER
@@ -201,13 +197,13 @@ struct utsname
 };
 # endif
 
-#ifdef HAVE_INTTYPES_H
-# include <inttypes.h>	/* intptr_t */
-#endif
+# ifdef HAVE_INTTYPES_H
+#  include <inttypes.h>	/* intptr_t */
+# endif
 
-#ifdef HAVE_STDINT_H
-# include <stdint.h>	/* intptr_t */
-#endif
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>	/* intptr_t */
+# endif
 
 # ifdef HAVE_PCAP_H
 #  include <pcap.h>
@@ -221,6 +217,18 @@ typedef void pcap_if_t;
 typedef unsigned int bpf_u_int32;
 /*typedef unsigned int intptr_t;*/
 #  endif
+# endif
+
+# ifdef HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+# endif
+
+# ifdef HAVE_ARPA_NAMESER_H
+#  include <arpa/nameser.h>
+# endif
+
+# ifdef HAVE_RESOLV_H
+#  include <resolv.h>
 # endif
 
 # if (!defined HAVE_RES_NQUERY) && (!defined res_nquery)

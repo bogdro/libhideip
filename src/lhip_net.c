@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- network functions' replacements.
  *
- * Copyright (C) 2008-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
+ * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -17,11 +17,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foudation:
- *		Free Software Foundation
- *		51 Franklin Street, Fifth Floor
- *		Boston, MA 02110-1301
- *		USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "lhip_cfg.h"
@@ -438,7 +434,8 @@ gethostbyname_r (
 			(name, ret, buf, buflen, result, h_errnop);
 	}
 
-	my_ret = (*__lhip_real_gethostbyname_r_location ()) (name, ret, buf, buflen, result, h_errnop);
+	my_ret = (*__lhip_real_gethostbyname_r_location ())
+		(name, ret, buf, buflen, result, h_errnop);
 	if ( my_ret == 0 )
 	{
 		__lhip_change_data (ret);
@@ -626,17 +623,20 @@ gethostent_r (
 	if ( ret == NULL )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen, result, h_errnop);
+		return (*__lhip_real_gethostent_r_location ())
+			(ret, buf, buflen, result, h_errnop);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen, result, h_errnop);
+		return (*__lhip_real_gethostent_r_location ())
+			(ret, buf, buflen, result, h_errnop);
 	}
 
-	my_ret = (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen, result, h_errnop);
+	my_ret = (*__lhip_real_gethostent_r_location ())
+		(ret, buf, buflen, result, h_errnop);
 	if ( my_ret == 0 )
 	{
 		__lhip_change_data (ret);
@@ -676,17 +676,20 @@ getipnodebyaddr (
 	if ( addr == NULL )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getipnodebyaddr_location ()) (addr, len, af, error_num);
+		return (*__lhip_real_getipnodebyaddr_location ())
+			(addr, len, af, error_num);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getipnodebyaddr_location ()) (addr, len, af, error_num);
+		return (*__lhip_real_getipnodebyaddr_location ())
+			(addr, len, af, error_num);
 	}
 
-	ret = (*__lhip_real_getipnodebyaddr_location ()) (addr, len, af, error_num);
+	ret = (*__lhip_real_getipnodebyaddr_location ())
+		(addr, len, af, error_num);
 	if ( ret != NULL )
 	{
 		__lhip_change_data (ret);
@@ -726,17 +729,20 @@ getipnodebyname (
 	if ( name == NULL )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getipnodebyname_location ()) (name, af, flags, error_num);
+		return (*__lhip_real_getipnodebyname_location ())
+			(name, af, flags, error_num);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getipnodebyname_location ()) (name, af, flags, error_num);
+		return (*__lhip_real_getipnodebyname_location ())
+			(name, af, flags, error_num);
 	}
 
-	ret = (*__lhip_real_getipnodebyname_location ()) (name, af, flags, error_num);
+	ret = (*__lhip_real_getipnodebyname_location ())
+		(name, af, flags, error_num);
 	if ( ret != NULL )
 	{
 		__lhip_change_data (ret);
@@ -866,7 +872,6 @@ getnameinfo (
 	char addr1[LHIP_MAX (sizeof (struct in_addr), sizeof (struct in6_addr))];
 	char * addrs[2];
 	struct hostent h;
-	size_t len;
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -898,11 +903,6 @@ getnameinfo (
 	ret = (*__lhip_real_getnameinfo_location ()) (sa, salen, host, hostlen, serv, servlen, flags);
 	if ( ret == 0 )
 	{
-		len = strlen (local_name) + 1;
-		if ( len > hostlen )
-		{
-			len = hostlen;
-		}
 		if ( salen == sizeof (struct sockaddr_in) )
 		{
 			h.h_name = NULL;
@@ -919,13 +919,13 @@ getnameinfo (
 			if ( (__lhip_check_ipv4_value ( &(((const struct sockaddr_in *)sa)->sin_addr)) == 1)
 				||
 				(memcmp ( &(((const struct sockaddr_in *)sa)->sin_addr),
-				__lhip_zeroaddr_ipv4,
-				sizeof (__lhip_zeroaddr_ipv4) ) == 0)
+					__lhip_zeroaddr_ipv4,
+					sizeof (__lhip_zeroaddr_ipv4) ) == 0)
 				||
 				(__lhip_is_local_addr (&h) != 0) )
 			{
-				strncpy (host, local_name, len);
-				host[len-1] = '\0';
+				strncpy (host, local_name, hostlen - 1);
+				host[hostlen-1] = '\0';
 			}
 		}
 		else if ( salen == sizeof (struct sockaddr_in6) )
@@ -944,13 +944,13 @@ getnameinfo (
 			if ( (__lhip_check_ipv6_value ( &(((const struct sockaddr_in6 *)sa)->sin6_addr)) == 1)
 				||
 				(memcmp ( &(((const struct sockaddr_in6 *)sa)->sin6_addr),
-				__lhip_zeroaddr_ipv6,
-				sizeof (__lhip_zeroaddr_ipv6) ) == 0)
+					__lhip_zeroaddr_ipv6,
+					sizeof (__lhip_zeroaddr_ipv6) ) == 0)
 				||
 				(__lhip_is_local_addr (&h) != 0) )
 			{
-				strncpy (host, local_name, len);
-				host[len-1] = '\0';
+				strncpy (host, local_name, hostlen - 1);
+				host[hostlen-1] = '\0';
 			}
 		}
 	}
@@ -1314,7 +1314,7 @@ gethostname (
 	}
 
 	LHIP_MEMSET (name, 0, len);
-	strncpy (name, local_name, LHIP_MIN (len-1, 9)+1);
+	strncpy (name, local_name, len-1);
 	return 0;
 #else /* ! LHIP_ENABLE_GUI_APPS */
 	return (*__lhip_real_gethostname_location ()) (name, len);
@@ -1353,14 +1353,16 @@ getsockopt (
 	if ( (optval == NULL) || (optlen == NULL) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_getsockopt_location ()) (s, level, optname, optval, optlen);
+		return (*__lhip_real_getsockopt_location ())
+			(s, level, optname, optval, optlen);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_getsockopt_location ()) (s, level, optname, optval, optlen);
+		return (*__lhip_real_getsockopt_location ())
+			(s, level, optname, optval, optlen);
 	}
 #if (defined SOL_IP) && (defined IP_PKTINFO)
 	if ( (level == SOL_IP) && (optname == IP_PKTINFO) )
@@ -1369,7 +1371,8 @@ getsockopt (
 		return -1;
 	}
 #endif
-	return (*__lhip_real_getsockopt_location ()) (s, level, optname, optval, optlen);
+	return (*__lhip_real_getsockopt_location ())
+		(s, level, optname, optval, optlen);
 }
 
 /* =============================================================== */
@@ -1404,14 +1407,16 @@ setsockopt (
 	if ( optval == NULL )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_setsockopt_location ()) (s, level, optname, optval, optlen);
+		return (*__lhip_real_setsockopt_location ())
+			(s, level, optname, optval, optlen);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_setsockopt_location ()) (s, level, optname, optval, optlen);
+		return (*__lhip_real_setsockopt_location ())
+			(s, level, optname, optval, optlen);
 	}
 
 #if (defined SOL_IP) && (defined IP_PKTINFO)
@@ -1421,7 +1426,8 @@ setsockopt (
 		return -1;
 	}
 #endif
-	return (*__lhip_real_setsockopt_location ()) (s, level, optname, optval, optlen);
+	return (*__lhip_real_setsockopt_location ())
+		(s, level, optname, optval, optlen);
 }
 
 /* =============================================================== */
@@ -1532,8 +1538,8 @@ bind (
 		if ( (__lhip_check_ipv4_value ( &(((const struct sockaddr_in *)my_addr)->sin_addr)) != 1)
 			&&
 			(memcmp ( &(((const struct sockaddr_in *)my_addr)->sin_addr),
-			__lhip_zeroaddr_ipv4,
-			sizeof (__lhip_zeroaddr_ipv4) ) != 0) )
+				__lhip_zeroaddr_ipv4,
+				sizeof (__lhip_zeroaddr_ipv4) ) != 0) )
 		{
 			/* not 127.0.0.1 and not 0.0.0.0 address - forbid, to avoid guessing */
 			LHIP_SET_ERRNO_PERM();
@@ -1545,8 +1551,8 @@ bind (
 		if ( (__lhip_check_ipv6_value ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr)) != 1)
 			&&
 			(memcmp ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr),
-			__lhip_zeroaddr_ipv6,
-			sizeof (__lhip_zeroaddr_ipv6) ) != 0) )
+				__lhip_zeroaddr_ipv6,
+				sizeof (__lhip_zeroaddr_ipv6) ) != 0) )
 		{
 			/* not ::1 and not ::0 address - forbid, to avoid guessing */
 			LHIP_SET_ERRNO_PERM();

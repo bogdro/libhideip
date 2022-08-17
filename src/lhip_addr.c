@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- getting the local address, checking for matches and anonymizing.
  *
- * Copyright (C) 2011-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
+ * Copyright (C) 2011-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -16,11 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foudation:
- *		Free Software Foundation
- *		51 Franklin Street, Fifth Floor
- *		Boston, MA 02110-1301
- *		USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "lhip_cfg.h"
@@ -459,11 +455,9 @@ void __lhip_read_local_addresses (LHIP_VOID)
 			tmp = tmp->ai_next;
 		}
 	}
-	fprintf (stderr, "LibHideIP: 4: name_v4=%s\n",
-		(__lhip_our_hostname_v4 == NULL)? "null" : __lhip_our_hostname_v4);
+	fprintf (stderr, "LibHideIP: 4: name_v4=%s\n", __lhip_our_hostname_v4);
 	fflush (stderr);
-	fprintf (stderr, "LibHideIP: 5: name_v6=%s\n",
-		(__lhip_our_hostname_v6 == NULL)? "null" : __lhip_our_hostname_v6);
+	fprintf (stderr, "LibHideIP: 5: name_v6=%s\n", __lhip_our_hostname_v6);
 	fflush (stderr);
 	for ( i = 0; i < __lhip_number_of_hostnames; i++ )
 	{
@@ -523,7 +517,7 @@ __lhip_get_our_name_ipv6 (LHIP_VOID)
  * @param host2 the second host entry.
  * @return non-zero if the given hostent structures point to the same host.
  */
-int
+static int
 __lhip_check_hostent_match (
 #ifdef LHIP_ANSIC
 	const struct hostent * const host1, const struct hostent * const host2)
@@ -679,7 +673,7 @@ __lhip_is_local_addr (
 				{
 					if ( memcmp (__lhip_our_real_name_ipv6->h_addr_list[i],
 						h->h_addr_list[j],
-						sizeof (struct in_addr)) == 0 )
+						sizeof (struct in6_addr)) == 0 )
 					{
 						return 1;
 					}
@@ -1097,10 +1091,6 @@ __lhip_add_local_address (
 			{
 				for ( i = 0; i < j; i++ )
 				{
-					if ( host->h_length <= 0 )
-					{
-						continue;
-					}
 					__lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list[i] =
 						(char *) malloc ( (size_t) host->h_length );
 					if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list[i] != NULL )

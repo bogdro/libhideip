@@ -1,7 +1,7 @@
 \input texinfo   @c -*-texinfo-*-
 @c %**start of header
 @setfilename libhideip.info
-@settitle LibHideIP manual @VERSION@
+@settitle LibHideIP @VERSION@ manual
 @c %**end of header
 
 @dircategory Libraries
@@ -38,7 +38,7 @@ This manual is for LibHideIP, version @VERSION@
 
 @c ==================================================================
 
-    Copyright (c)  2008-2021 Bogdan Drozdowski
+    Copyright (c)  2008-2022 Bogdan Drozdowski
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -54,6 +54,7 @@ Free Documentation License" in the "Copying" chapter.
 * Installing::			Installation of the library.
 * Developing::			Programming with the library.
 * Manual configuration::	Configuration.
+* Reporting issues::		How to report issues.
 * Author::			How to contact me.
 * Copying::			License - your rights and freedoms.
 @end menu
@@ -67,42 +68,50 @@ Free Documentation License" in the "Copying" chapter.
 
 LibHideIP is a set of replacements for those function that could be
 used to find your local public IP address. These functions include:
-gethostent family, getipnodebyaddr, getipnodebyname, gethostname,
-gethostbyaddr family, gethostbyname family, getifaddrs, getaddrinfo,
-getnameinfo, socket+socketpair (netlink sockets), sendmsg+recvmsg,
-execve (thus the whole exec* family) with the system function (can
-be used to launch bad programs), ioctl, uname, bind, getsockname,
-getsockopt+setsockopt, a bunch of file opening functions
-(fopen, fopen64, open, open64, freopen, freopen64, openat, openat64)
-which can be used to read IP addresses from files under /proc and
-some of the functions from the libpcap library, to prevent raw opening
+@samp{gethostent} family, @samp{getipnodebyaddr}, @samp{getipnodebyname},
+@samp{gethostname}, @samp{gethostbyaddr} family, @samp{gethostbyname} family,
+@samp{getifaddrs}, @samp{getaddrinfo}, @samp{getnameinfo},
+@samp{socket}+@samp{socketpair} (netlink sockets),
+@samp{sendmsg}+@samp{recvmsg}, @samp{execve} (thus the whole @samp{exec...} family)
+with the @samp{system} function (can be used to launch bad programs),
+@samp{ioctl}, @samp{uname}, @samp{bind}, @samp{getsockname},
+@samp{getsockopt}+@samp{setsockopt}, a bunch of file opening functions
+(@samp{fopen}, @samp{fopen64}, @samp{open}, @samp{open64}, @samp{freopen},
+@samp{freopen64}, @samp{openat}, @samp{openat64})
+which can be used to read IP addresses from files under @file{/proc} and
+some of the functions from the @file{libpcap} library, to prevent raw opening
 of network devices.
 
-Intercepting the raw syscall() function is impossible, because the
+Intercepting the raw @samp{syscall()} function is impossible, because the
 number of parameters varies from one syscall to another.
 
 However, there are limitations. LibHideIP can do nothing if:
 
 @itemize
 @item A program is using direct kernel calls or non-standard calls,
-thus bypassing even the C library
-@item LibHideIP is not loaded (@ref{Installing})
-@item A program is linked statically (so it doesn't use shared libraries and has all
-the functions compiled in it)
-@item The operating system doesn't support shared libraries (like DOS)
-@item The operating system doesn't support preloading shared libraries before system libraries
-@item LibHideIP is enabled by setting environment variables and a program is launched by another
-program, which clears the environment
+thus bypassing even the C library,
+@item LibHideIP is not loaded (@ref{Installing}),
+@item A program is linked statically (so it doesn't use shared libraries and
+has all the functions compiled in it),
+@item The operating system doesn't support shared libraries (like DOS),
+@item The operating system doesn't support preloading shared libraries
+before system libraries,
+@item LibHideIP is enabled by setting environment variables and a program
+is launched by another program, which clears the environment,
 variables used by the dynamic linker, so the dynamic linker doesn't preload
-LibHideIP. Some Java Runtime Environments seem to do this
-@item A program is using functions not known to LibHideIP.
+LibHideIP. Some Java Runtime Environments seem to do this,
+@item A program is using functions not known to LibHideIP,
+@item An applications opens a web page that shows the IP address and reads
+the address from the page.
 @end itemize
 
 Additionally, GUI applications may show errors similar to
-@command{cannot connect to X server} when starting if the
-@command{$HOME/.xauth*} file contains the real hostname instead of
-just @command{localhost}. Check the compiling options (@ref{How to compile?})
+@samp{cannot connect to X server} when starting if the
+@file{$HOME/.xauth*} file contains the real hostname instead of
+just @samp{localhost}. Check the compiling options (@ref{How to compile?})
 for a work-around.
+
+LibHideIP's homepage is @url{https://libhideip.sourceforge.io}.
 
 @c ==================================================================
 
@@ -113,33 +122,32 @@ for a work-around.
 Requirements for compiling the library:
 
 @itemize
-@item a non-root account. Please, @strong{NEVER} compile or @command{make} anything as root.
 @item a working C compiler (C++ compilers won't work due to variable casts)
-@item development package for the C library (like glibc-devel and glibc-headers).@*@*
+@item development package for the C library (like @file{glibc-devel}
+and @file{glibc-headers}).@*@*
 @strong{NOTE} Some glibc versions (2.11 is known of this) have a bug in their
-dl(v)sym implementation, which may cause LibHideIP to hang during searching
+@samp{dl(v)sym()} implementation, which may cause LibHideIP to hang during searching
 for the original versions of the substituted C functions. If you observe
 this, it is best to upgrade glibc. If not possible, you can start deleting
-substituted functions from open() and check each time it your current
+substituted functions from @samp{open()} and check each time if your current
 version started to work (yes, this decreases security).
 
-@strong{NOTE} Also, some glibc versions have a bug in their gethostbyaddr_r and related
-functions' implementations, causing overflows (probably stack) which impact
+@strong{NOTE} Also, some glibc versions have a bug in their @samp{gethostbyaddr_r()}
+and related functions' implementations, causing overflows (probably stack) which impact
 the environment variables' usage and thus may disable banning files except
 the global file. Probably fixed in version 2.22.
 
-@sp 1
-The sys/stat.h contains functions needed to check an executable's type.
+The @file{sys/stat.h} contains functions needed to check an executable's type.
 If it is a symbolic link, LibHideIP will follow it.
-@sp 1
-The dlfcn.h header contains functions needed to call the original functions.
-It has to have RTLD_NEXT defined. LibHideIP wouldn't work without this, so it
+
+The @file{dlfcn.h} header contains functions needed to call the original functions.
+It has to have @code{RTLD_NEXT} defined. LibHideIP wouldn't work without this, so it
 won't compile without this.
-@sp 1
-The stdarg.h/varargs.h header contains stuff needed to intercept ioctl() and the
-opening functions.
-@item Libdl (usually part of the C library) for dynamic function addressing
-(unless the required functions are in the C library)
+
+The @file{stdarg.h}/@file{varargs.h} header contains stuff needed to intercept
+@samp{ioctl()} and the opening functions.
+@item The @file{libdl} library (usually part of the C library) for dynamic
+function addressing (unless the required functions are in the C library)
 @item the @command{make} program
 @end itemize
 
@@ -152,29 +160,29 @@ to configure LibHideIP for your system.
 If you want to enable the public interface of LibHideIP, configure the
 library with
 
-	@command{./configure --enable-public-interface}
+	@samp{./configure --enable-public-interface}
 
 See the chapter on developing to learn how to use LibHideIP (@ref{Developing}).
 
 LibHideIP allows some programs to be banned (not allowed to run under
 LibHideIP, because they might need accesss to the IP address). One banning
-file is always supported - $@{sysconfdir@}/libhideip.progban ($@{sysconfdir@} is
-/usr/local/etc unless set otherwise during configure).
+file is always supported - @file{$@{sysconfdir@}/libhideip.progban}
+(@file{$@{sysconfdir@}} is @file{/usr/local/etc} unless set otherwise during configure).
 
 If you want to disable additional banning files pointed to by environment
 variables, configure the library with
 
-	@command{./configure --enable-environment=no}
+	@samp{./configure --enable-environment=no}
 
 If you want to disable additional banning files in users' home directories,
 configure the library with
 
-	@command{./configure --enable-user-files=no}
+	@samp{./configure --enable-user-files=no}
 
 If you want to allow X-based (GUI) applications to run under LibHideIP,
 configure the library with
 
-	@command{./configure --enable-gui-applications=yes}
+	@samp{./configure --enable-gui-applications=yes}
 
 Note, however, that this disables one of the functions (gethostname). In
 other words, this function will not be intercepted by LibHideIP, so programs
@@ -187,23 +195,23 @@ Type
 to compile the library.
 
 LibHideIP assumes that your host has maximum 100 aliases and addresses,
-unless you have the malloc() function. If you think this number is not
-enough and you don't have the malloc() function, configure LibHideIP with
+unless you have the @samp{malloc()} function. If you think this number is not
+enough and you don't have the @samp{malloc()} function, configure LibHideIP with
 
-	@command{./configure --with-max-host-names=n}
+	@samp{./configure --with-max-host-names=n}
 
 or compile LibHideIP with:
 
-	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'
+	@samp{make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'}
 
-where 'n' is your desired number (10 is minimum).
+where @var{n} is your desired number (10 is minimum).
 
 Documentation comes compiled (and can be copied right away), but can be changed
-and recompiled, if you have the @command{makeinfo} program (@command{texinfo} package).
+and recompiled, if you have the @command{makeinfo} program (@file{texinfo} package).
 
 Type
 
-	@command{make install}
+	@samp{make install}
 
 to install the library.
 
@@ -218,56 +226,57 @@ Thus, a typical build sequence with less detection would be
 
 @command{./configure}
 
-@command{cd src}
+@samp{cd src}
 
-@command{./randomize_names_gawk.sh} (or @command{make randomnames})
+@command{./randomize_names_gawk.sh} (or @samp{make randomnames})
 
-@command{cd ..}
+@samp{cd ..}
 
 @command{make}
 
 
 If you want to do this manually (or you don't have @command{sed} or
-@command{sort} and Perl or GNU awk),
-open the src/lhip_priv.h file in a text
-editor and look for lines starting with "extern". The __lhip* names in these
+@command{sort} and Perl or GNU awk), open the @file{src/lhip_priv.h} file in a text
+editor and look for lines starting with @code{extern}. The @code{__lhip...} names in these
 lines are the function names to convert. Take each name and substitue all its
-appearances in each source file in the "src" directory using a text editor or
+appearances in each source file in the @file{src} directory using a text editor or
 the following commands:
 
-@command{sed -i 's/__lhip_real_gethostbyaddr_location/_your_function_name1/g' *.c* *.h*}
+@samp{sed -i 's/__lhip_real_gethostbyaddr_location/_your_function_name1/g' *.c* *.h*}
 
-@command{sed -i 's/__lhip_real_gethostbyaddr_r_location/_your_function_name2/g' *.c* *.h*}
+@samp{sed -i 's/__lhip_real_gethostbyaddr_r_location/_your_function_name2/g' *.c* *.h*}
 
 ...
 
-@command{sed -i 's/__lhip_get_init_stage/_your_function_nameN/g' *.c* *.h*}
+@samp{sed -i 's/__lhip_get_init_stage/_your_function_nameN/g' *.c* *.h*}
 
-Then find other symbols that start with __lhip in other files and change them
-too (using a text editor or commands similar to the above).
+Then find other symbols that start with @code{__lhip...} in other files and
+change them too (using a text editor or commands similar to the above).
 
 Then reconfigure, recompile and reinstall the library.
 
-@strong{NOTE}: @command{make install} is @strong{NOT} recommended. Create and install
+@strong{NOTE}: @samp{make install} is @strong{NOT} recommended. Create and install
 an RPM package instead, if possible.
+
+To create an RPM package:
+
+@enumerate
+@item copy the @file{libhideip.spec} file to @file{$HOME/rpmbuild/SPECS}
+@item copy the source package @file{libhideip-@VERSION@.tar.gz} to @file{$HOME/rpmbuild/SOURCES}
+@item type @samp{rpmbuild -bb $HOME/rpmbuild/SPECS/libhideip.spec}
+@item get the RPMs from @file{$HOME/rpmbuild/RPMS/}
+@end enumerate
 
 To create an RPM package (the old way):
 
 @enumerate
-@item copy the libhideip.spec file to /usr/src/redhat/SPECS
-@item copy the source package libhideip-@VERSION@.tar.gz to /usr/src/redhat/SOURCES
-@item type @command{rpmbuild -bb /usr/src/redhat/SPECS/libhideip.spec}
-@item get the RPMs from /usr/src/redhat/RPMS/
+@item copy the @file{libhideip.spec} file to @file{/usr/src/redhat/SPECS}
+@item copy the source package @file{libhideip-@VERSION@.tar.gz} to @file{/usr/src/redhat/SOURCES}
+@item type @samp{rpmbuild -bb /usr/src/redhat/SPECS/libhideip.spec}
+@item get the RPMs from @file{/usr/src/redhat/RPMS/}
 @end enumerate
 
-To create an RPM package (the new way):
-
-@enumerate
-@item copy the libhideip.spec file to $HOME/rpmbuild/SPECS
-@item copy the source package libhideip-@VERSION@.tar.gz to $HOME/rpmbuild/SOURCES
-@item type @command{rpmbuild -bb $HOME/rpmbuild/SPECS/libhideip.spec}
-@item get the RPMs from $HOME/rpmbuild/RPMS/
-@end enumerate
+@strong{NOTE}: some systems may use other directories than these.
 
 @c ==================================================================
 
@@ -279,30 +288,31 @@ To create an RPM package (the new way):
 LibHideIP has no magic in it, it won't intercept calls to the mentioned functions
 just because it is compiled. Even installing the library in a system directory
 isn't enough. The library needs to be loaded into memory. More strictly, it needs
-to be PRELOADED (loaded before other libraries). This is achieved easily, if you
-are using ld.so(8) (or derivatives) to load libraries (like on GNU/Linux).
+to be @strong{PRELOADED} (loaded before other libraries). This is achieved easily, if you
+are using @file{ld.so} (or derivatives) to load libraries (like on GNU/Linux).
 Just add the following line:
 
-@command{export LD_PRELOAD=/usr/local/lib/libhideip.so}
+@samp{export LD_PRELOAD=/usr/local/lib/libhideip.so}
 
-to your startup scripts (like $HOME/.bashrc, $HOME/.bash_profile). You should change
-the path to the correct one. If you aren't using BASH, consult your shell
-manual for details on how to export an environment variable.
+to your startup scripts (like @file{$HOME/.bashrc}, @file{$HOME/.bash_profile}).
+You should change the path to the correct one. If you aren't using @command{bash},
+consult your shell manual for details on how to export an environment variable.
 
-This will make the
-dynamic linker, ld.so, load LibHideIP before loading any other libraries, when
-starting programs. That is, after the line above gets executed, all programs
-from that moment start using LibHideIP.
+This will make the dynamic linker, @file{ld.so}, load LibHideIP before loading
+any other libraries, when starting programs. That is, after the line above gets
+executed, all programs from that moment start using LibHideIP.
 
-You can alternatively put the full path to the library in the /etc/ld.so.preload
+You can alternatively put the full path to the library in the @file{/etc/ld.so.preload}
 (not recommended, because some good programs may need the local IP address).
 No syntax is required, just the path and filename, like this:
 
+@verbatim
 /usr/local/lib/libhideip.so
+@end verbatim
 
-To load LibHideIP for just one program, type like this (for BASH):
+To load LibHideIP for just one program, type like this (for @command{bash}):
 
-@command{LD_PRELOAD=/usr/local/lib/libhideip.so some-program-name}
+@samp{LD_PRELOAD=/usr/local/lib/libhideip.so some-program-name}
 
 @c ==================================================================
 
@@ -315,51 +325,53 @@ LibHideIP comes with a development package. You can use the following
 public functions and constants:
 
 @itemize
-@item void libhideip_enable(void) - enables LibHideIP for the program
+@item @code{void libhideip_enable(void)} - enables LibHideIP for the program
 that calls this function
-@item const char * libhideip_version(void) - returns the runtime version
+@item @code{const char * libhideip_version(void)} - returns the runtime version
 of the library the program is using
-@item LHIP_VERSION is the compile-time preprocessor string constant containing
-the version of the library the program is compiled against
-@item LHIP_BANNING_ENV is the name of the environment variable that can point
-to an additional banning file
-@item LHIP_BANNING_USERFILE is the name of the additional banning file that
-can be located in the users' home directories.
+@item @code{LHIP_VERSION} is the compile-time preprocessor string constant
+containing the version of the library the program is compiled against
+@item @code{LHIP_BANNING_ENV} is the name of the environment variable that
+can point to an additional banning file
+@item @code{LHIP_BANNING_USERFILE} is the name of the additional banning
+file that can be located in the users' home directories.
 @end itemize
 
 If you're using C or C++ (or any language that can parse C header files),
 you can use the header file directly. Simply type:
 
+@verbatim
 	#include <libhideip.h>
+@end verbatim
 
 and compile the program with the library, e.g.:
 
-	@command{gcc -o your_prog your_prog.c -lhideip -ldl}
+	@samp{gcc -o your_prog your_prog.c -lhideip -ldl}
 
 If needed, LibHideIP should be first in link order.
 
 If you want to use LibHideIP with some other programming language,
 you can generate bindings to LibHideIP for that language. You can use
-SWIG (@url{http://www.swig.org}) for this purpose. The header file is compatible
+@url{http://www.swig.org, SWIG} for this purpose. The header file is compatible
 with SWIG, so you can simply run:
 
-	@command{swig -<your_lang> [<other options>] /path/to/libhideip.h}
+	@samp{swig -<your_lang> [<other options>] /path/to/libhideip.h}
 
 e.g.
 
-	@command{swig -php -o lhip_wrap_php.c /usr/include/libhideip.h}
+	@samp{swig -php -o lhip_wrap_php.c /usr/include/libhideip.h}
 
 You can then compile the generated wrapper files:
 
-	@command{gcc -fpic -c lhip_wrap_*.c}
+	@samp{gcc -fpic -c lhip_wrap_*.c}
 
 and link them into one or separate shared libraries:
 
-	@command{gcc -shared lhip_wrap_*.o -lhideip -o lhip_wrapper.so}
+	@samp{gcc -shared lhip_wrap_*.o -lhideip -o lhip_wrapper.so}
 
 After this, you can link your program with the wrapper library and LibHideIP:
 
-	@command{gcc -o your_prog your_prog.c lhip_wrapper.so -lhideip -ldl}
+	@samp{gcc -o your_prog your_prog.c lhip_wrapper.so -lhideip -ldl}
 
 or use the library in other languages, as shown in the SWIG examples.
 
@@ -373,27 +385,54 @@ By using SWIG yourself, you can be sure that such problems will not occur.
 
 @c ==================================================================
 
-@node Manual configuration, Author, Developing, Top
+@node Manual configuration, Reporting issues, Developing, Top
 @chapter Manual configuration
 
-You can use the configuration file $@{sysconfdir@}/libhideip.progban to
+You can use the configuration file @file{$@{sysconfdir@}/libhideip.progban} to
 specify which programs should LibHideIP not mess with. Put each entry on its own line.
 
-$@{sysconfdir@} is /usr/local/etc unless set otherwise during configure.
+@file{$@{sysconfdir@}} is @file{/usr/local/etc} unless set otherwise during configure.
 
 If additional banning files haven't been disabled (@ref{How to compile?}), they can
-be located in users' home directories (e.g. /home/user1/.libhideip.progban).
+be located in users' home directories (e.g. @file{/home/user1/.libhideip.progban}).
 You can also put the file in any location and set the environment variable
-LIBHIDEIP_BANFILE to point at that file, e.g.@*
+@code{LIBHIDEIP_BANFILE} to point at that file, e.g.@*
 
-	@command{export LIBHIDEIP_BANFILE=/opt/config/libhideip.progban}
+	@samp{export LIBHIDEIP_BANFILE=/opt/config/libhideip.progban}
 
-The /proc filesystem must be mounted in order for program banning to work right now.
-
+The @file{/proc} filesystem must be mounted in order for program banning to work right now.
 
 @c ==================================================================
 
-@node Author, Copying, Manual configuration, Top
+@node Reporting issues, Author, Manual configuration, Top
+@comment  node-name, next,      previous,  up
+@chapter Reporting issues
+
+To report build or installation problems, include:
+@enumerate
+@item the compiler name and version (e.g. @command{gcc} version 10),
+@item the C standard library name and version (e.g. @file{glibc} version 2.x),
+@item the output of the @command{configure} script. You can capture it by running
+ @samp{./configure > configure-output.txt 2>&1},
+@item the generated @file{config.log} file,
+@item the generated @file{config.h} file, if it exists,
+@item the output of the @command{make} command. You can capture it by running
+ @samp{make > make-output.txt 2>&1},
+@item any other error messages,
+@item any other information that you think could lead to solving the problem.
+@end enumerate
+
+To report usage problems, include:
+@enumerate
+@item all the above things you include when reporting building problems,
+@item a description of the problem that the software causes,
+@item any error messages that are displayed,
+@item any other information that you think could lead to solving the problem.
+@end enumerate
+
+@c ==================================================================
+
+@node Author, Copying, Reporting issues, Top
 @chapter Author
 
 Bogdan 'bogdro' Drozdowski.
@@ -405,14 +444,16 @@ bogdro-soft (at) gmx . com
 @end quotation
 
 
-or look at my website:@*
-[EN] @url{https://libhideip.sourceforge.io}@*
-[EN] @url{http://bogdro.evai.pl/soft/}@*
-[EN] @url{http://bogdro.evai.pl/soft4asm/}@*
-[EN] @url{http://bogdro.evai.pl/index-en.php}@*
-[EN] @url{http://bogdro.byethost18.com/soft/}@*
-[EN] @url{http://bogdro.byethost18.com/soft4asm/}@*
-[EN] @url{http://bogdro.byethost18.com/index-en.php}@*
+or look at the websites:
+@itemize
+@item [EN] @url{https://libhideip.sourceforge.io}
+@item [EN] @url{http://bogdro.evai.pl/soft/}
+@item [EN] @url{http://bogdro.evai.pl/soft4asm/}
+@item [EN] @url{http://bogdro.evai.pl/index-en.php}
+@item [EN] @url{http://bogdro.byethost18.com/soft/}
+@item [EN] @url{http://bogdro.byethost18.com/soft4asm/}
+@item [EN] @url{http://bogdro.byethost18.com/index-en.php}
+@end itemize
 
 @c ==================================================================
 

@@ -34,11 +34,9 @@ BuildRequires:	gcc, glibc, glibc-devel, make
 %configure --enable-static --enable-shared --enable-public-interface
 
 %build
-# % make - deprecated
 %make_build
 
 %install
-# % makeinstall_std - deprecated
 %make_install
 
 %preun
@@ -59,7 +57,7 @@ ldconfig
 %defattr(-,root,root)
 %{_libdir}/libhideip.so
 %{_libdir}/libhideip.so.8
-%{_libdir}/libhideip.so.8.0.0
+%{_libdir}/libhideip.so.8.0.1
 %{_libdir}/libhideip.la
 %doc %{_infodir}/libhideip.info%_extension
 %doc %{_mandir}/man3/libhideip.3%_extension

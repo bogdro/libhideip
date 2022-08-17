@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- execution functions' replacements.
  *
- * Copyright (C) 2008-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
+ * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -16,11 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foudation:
- *		Free Software Foundation
- *		51 Franklin Street, Fifth Floor
- *		Boston, MA 02110-1301
- *		USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "lhip_cfg.h"
@@ -318,7 +314,9 @@ static char * __lhip_get_target_link_path (
 			lnk_res = readlink (current_name, __lhip_newlinkpath, (size_t)lsize);
 			if ( (lnk_res < 0) || (lnk_res > lsize) )
 			{
+# ifdef HAVE_MALLOC
 				free (__lhip_newlinkpath);
+# endif /* HAVE_MALLOC */
 				break;
 			}
 			__lhip_newlinkpath[lnk_res] = '\0';
@@ -377,11 +375,16 @@ static char * __lhip_get_target_link_path (
 	}
 	else
 	{
-		/* memory not allocated - return the original */
-		return name;
+		/* NOTE: memory not allocated - return NULL to avoid returning
+		 * a local variable from __lhip_get_target_link_path_fd()
+	 	 */
+		return NULL /*name*/;
 	}
 #else
-	return name;
+	/* NOTE: return a copy to avoid returning a local variable
+	 * from __lhip_get_target_link_path_fd()
+	 */
+	return LHIP_STRDUP (name) /*name*/;
 #endif /* (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK) && (defined HAVE_LSTAT) */
 }
 
@@ -640,15 +643,15 @@ static int __lhip_is_forbidden_program (
 									= '\0';
 								__lhip_append_path (path_dir, __lhip_linkpath, j);
 								path_dir[j] = '\0';
-# ifdef HAVE_STAT64
+#   ifdef HAVE_STAT64
 								res = stat64 (path_dir, &st);
-# else
-#  ifdef HAVE_STAT
+#   else
+#    ifdef HAVE_STAT
 								res = stat (path_dir, &st);
-#  else
+#    else
 								res = -1;
-#  endif
-# endif
+#    endif
+#   endif
 								if ( res >= 0 )
 								{
 									break;	/* object was found */
@@ -678,7 +681,7 @@ static int __lhip_is_forbidden_program (
 						__lhip_linkpath[j] = '\0';
 						free (path_dir);
 					}
-#  else
+#  else /* ! HAVE_MALLOC */
 					if ( first_char != NULL )
 					{
 						strncpy (__lhip_newlinkpath, path,
@@ -699,7 +702,7 @@ static int __lhip_is_forbidden_program (
 					strncpy (__lhip_linkpath, __lhip_newlinkpath,
 						sizeof (__lhip_newlinkpath) - 1);
 					__lhip_linkpath[sizeof (__lhip_linkpath) - 1] = '\0';
-#  endif
+#  endif /* HAVE_MALLOC */
 				}
 # endif /* (defined HAVE_GETENV) && (defined HAVE_SYS_STAT_H) */
 			} /* if (path is not absolute) */

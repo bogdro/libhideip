@@ -1,3 +1,49 @@
+2022-03-19	Bogdan Drozdowski <bogdro@users.sourceforge.net>
+
+	* LibHideIP version 1.9.2
+	  This is a bugfix- and compatibility-improvement-only release. No new
+	  features are added. Fixed compile errors on newer systems. Fixed
+	  errors related to special situations, found by 'cppcheck'. Updated
+	  copyright and license blocks. Other fixes. Documentation updated.
+	* configure.ac: Updated using Autoconf 2.71. Double-quote all AC_MSG_*
+	  messages. Added enabling all Automake warnings. Added calling
+	  AM_PROG_AR as recommended by Automake warnings. Switched to using
+	  AC_HEADER_RESOLV to check for the <resolv.h> header. The summary
+	  shows disabled public interface also as the default. Changed the
+	  order of parameter types when searching for getnameinfo() to match
+	  newer C libraries earlier.
+	* m4/ax_gcc_warn_unused_result.m4: Updated for Autoconf 2.71.
+	* m4/ax_prototype.m4: Replaced ac_prototype.m4 and updated for
+	  Autoconf 2.71.
+	* src/lhip_priv.h: Added missing #includes to fix compile errors on
+	  glibc 2.34.
+	* src/lhip_net.c (getnameinfo, gethostname): Simplified the code,
+	  fixing compiler warnings.
+	* src/lhip_exec.c (__lhip_get_target_link_path): Fixed free()ing the
+	  static array when malloc() is unavailable. Always return a copy of
+	  the input that can be free()d, to avoid returning a local variable
+	  from __lhip_get_target_link_path_fd() (found by 'cppcheck').
+	* src/lhip_addr.c (__lhip_read_local_addresses,
+	  __lhip_add_local_address): Removed useless code found by 'cppcheck'.
+	* src/lhip_addr.c (__lhip_check_hostent_match): Made the function's
+	  definition also 'static' to match the declaration.
+	* src/lhip_addr.c (__lhip_is_local_addr): Fixed wrong length when
+	  checking IPv6 addresses.
+	* src/banning-generic.c (__banning_is_banned): Simplified some code,
+	  fixing warnings found by 'cppcheck'.
+	* Makefile.am: Replaced ac_prototype.m4 with ax_prototype.m4.
+	* test/lhiptest_exec.c: Defined _GNU_SOURCE to fix compile error on
+	  glibc 2.34.
+	* libhideip.spec.in: Removed commented-out deprecated commands.
+	* README: Restored the file. Moved building RPMs the new way above
+	  the old way.
+	* INSTALL: Moved building RPMs the new way above the old way.
+	* doc/libhideip.texi.in: Many improvements in the documentation: made
+	  URLs into proper links, use the TeXinfo @file, @samp, @command,
+	  @code and @verbatim properly, added a link to the home page on the
+	  "What is LibHideIP" page, added "Reporting issues".
+	* doc/Makefile.am: Added flags for generating the HTML documentation.
+
 2021-08-25	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* LibHideIP version 1.9.1

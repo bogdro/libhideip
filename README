@@ -1,29 +1,164 @@
 This is the README file for LibHideIP, a library which
  hides your local IP address from programs.
 
+Author: Bogdan Drozdowski, bogdro (at) users . sourceforge . net
+License: GPLv3+
+
+================================================================
+
+The binary version of LibHideIP is linked with the GNU C Library,
+ licensed under the GNU LGPL:
+
+Copyright (C) 1991,92,93,94,95,96,97,98,99,2000,2001,2002,2003,2004,2005,
+ 2006,2007 Free Software Foundation, Inc.
+
+The GNU C Library is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published
+ by the Free Software Foundation; either version 2.1 of the License, or
+ (at your option) any later version.
+
+The GNU C Library is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ License for more details.
+
+You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 ================================================================
 
 Requirements for compiling:
 
 - a working C compiler (C++ compilers won't work due to variable casts)
+
 - development package for the C library (like glibc-devel and glibc-headers)
+
+  Note that some glibc versions (2.11 is known of this) have a bug in their
+  dl(v)sym implementation, which may cause LibHideIP to hang during searching
+  for the original versions of the substituted C functions. If you observe
+  this, it is best to upgrade glibc. If not possible, you can start deleting
+  substituted functions from open() and check each time it your current
+  version started to work (yes, this decreases security).
+
+  Also, some glibc versions have a bug in their gethostbyaddr_r and related
+  functions' implementations, causing overflows (probably stack) which impact
+  the environment variables' usage and thus may disable banning files except
+  the global file. Probably fixed in version 2.22.
+
+  The sys/stat.h contains functions needed to check an executable's type.
+  If it is a symbolic link, LibHideIP will follow it.
+
+  The dlfcn.h header contains functions needed to call the original functions.
+  It has to have RTLD_NEXT defined. LibHideIP wouldn't work without this, so
+  it won't compile without this.
+
 - libdl, the dynamic loading library, with its development package
   (unless the required functions are in the C library)
+
 - the 'make' program
 
 Type
+
 	./configure
+
 to configure the library for your system.
 
+If you want to enable the public interface of LibHideIP, configure the
+ library with
+
+	./configure --enable-public-interface
+
+ The public interface is compatible with SWIG (http://www.swig.org), so
+ you can make native bindings to LibHideIP for any supported language.
+
+LibHideIP allows some programs to be banned (not allowed to run under
+ LibHideIP, because they might need accesss to the IP address). One banning
+ file is always supported - ${sysconfdir}/libhideip.progban (${sysconfdir} is
+ /usr/local/etc unless set otherwise during configure).
+
+If you want to disable additional banning files pointed to by environment
+ variables, configure the library with
+
+	./configure --enable-environment=no
+
+If you want to disable additional banning files in users' home directories,
+ configure the library with
+
+	./configure --enable-user-files=no
+
+If you want to allow X-based (GUI) applications to run under LibHideIP,
+ configure the library with
+
+	./configure --enable-gui-applications=yes
+
+Note, however, that this disables one of the functions (gethostname). In
+ other words, this function will not be intercepted by LibHideIP, so programs
+ using it will be able to get its real result.
+
 Type
+
 	make
 
-to compile the library.
+ to compile the library.
+
+LibHideIP assumes that your host has maximum 100 aliases and addresses,
+ unless you have the malloc() function. If you think this number is not
+ enough and you don't have the malloc() function, configure LibHideIP with
+
+	./configure --with-max-host-names=n
+
+ or compile LibHideIP with:
+
+	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'
+
+ where 'n' is your desired number (10 is minimum).
+
+Documentation comes complied (and can be copied right away), but can be
+  changed and recompiled, if you have the 'makeinfo' program
+  ('texinfo' package).
 
 Type
+
 	make install
 
 to install the library.
 
+To make LibHideIP impossible to detect, you must change all the internal
+ public function names. To do this, you can use the name randomizing scripts
+ in the src directory. You will need the 'sed' and 'sort' programs and either
+ Perl or GNU awk.
+You can change the name prefix at the top of these scripts to something
+ unique. When the script is done working, reconfigure, recompile and reinstall
+ the library.
+Thus, a typical build sequence with less detection would be
+
+	./configure
+	cd src
+	./randomize_names_gawk.sh (or 'make randomnames')
+	cd ..
+	make
+
+
 NOTE: 'make install' is NOT recommended. Create and install an RPM package
  instead, if possible.
+
+Type 'info libhideip' (after installation) or 'info doc/libhideip.info'
+(before installation) to get help on installing and loading the library.
+
+=======================================================
+
+Building an RPM package:
+
+1) copy the libhideip.spec file to $HOME/rpmbuild/SPECS
+2) copy the source package libhideip-XX.tar.gz to $HOME/rpmbuild/SOURCES
+3) type
+	rpmbuild -ba $HOME/rpmbuild/SPECS/libhideip.spec
+4) get the RPMs from $HOME/rpmbuild/RPMS/i386 and $HOME/rpmbuild/SRPMS
+
+Building an RPM package (the old way):
+
+1) copy the libhideip.spec file to /usr/src/redhat/SPECS
+2) copy the source package libhideip-XX.tar.gz to /usr/src/redhat/SOURCES
+3) type
+	rpmbuild -ba /usr/src/redhat/SPECS/libhideip.spec
+4) get the RPMs from /usr/src/redhat/RPMS/i386 and /usr/src/redhat/SRPMS
