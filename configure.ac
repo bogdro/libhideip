@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 0.7, bogdandr@op.pl)
+AC_INIT(libhideip, 0.7.1, bogdandr@op.pl)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
@@ -219,7 +219,7 @@ AC_CHECK_FUNC([malloc],
 	AC_DEFINE([HAVE_MALLOC],[1],[Whether you have the malloc function.]),
 	[AC_MSG_ERROR([[I need the malloc() function.]])])
 
-AC_CHECK_FUNCS([memcpy snprintf lstat memset readlink getipnodebyname \
+AC_CHECK_FUNCS([memcpy memset readlink getipnodebyname \
 	getipnodebyaddr getenv gethostbyaddr_r gethostbyname_r gethostbyname2_r\
 	gethostent_r openat openat64])
 

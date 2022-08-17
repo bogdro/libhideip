@@ -1,3 +1,11 @@
+2012-09-30	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* LibHideIP version 0.7.1
+	  This is a bugfix-only release.
+	* configure.ac: Not checking for snprintf() and lstat().
+	* src/lhip_banning.c (__lhip_is_banned_in_file): removed incorrect
+	  debugging messages.
+
 2012-09-23	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* LibHideIP version 0.7
@@ -120,7 +128,7 @@
 	* src/lhip_opens.c, src/lhip_exec.c: zeroing buffers for file names.
 	* src/lhip_priv.h: defined LHIP_MIN, LHIP_MAX, LHIP_MAXPATHLEN
 	  LHIP_ANSIC (for function prototypes) here.
-	* doc/libsecrm.texi.in: added one more limitation of LibHideIP.
+	* doc/libhideip.texi.in: added one more limitation of LibHideIP.
 	  Updated information how to hide LibHideIP.
 	* src/lhip_resolve.c: new file that blocks name resolving functions
 	  for localhost/localdomain.

@@ -145,14 +145,12 @@ __lhip_is_banned_in_file (
 #ifdef HAVE_ERRNO_H
 	err = errno;
 #endif
-printf("---LSR: looking in ban file: '%s'\n", ban_file_name);
 	fp = (*__lhip_real_fopen_location ()) (ban_file_name, "r");
 	if ( fp != NULL )
 	{
 		while ( fgets (__lhip_omitfile, sizeof (__lhip_omitfile), fp) != NULL )
 		{
 			__lhip_omitfile[LHIP_MAXPATHLEN - 1] = '\0';
-printf("---LSR: got name '%s' from ban file: '%s'\n", __lhip_omitfile, ban_file_name);
 
 			if ( (__lhip_omitfile[0] != '\0') /*(strlen (__lhip_omitfile) > 0)*/
 				&& (__lhip_omitfile[0] != '\n')
@@ -186,7 +184,6 @@ printf("---LSR: got name '%s' from ban file: '%s'\n", __lhip_omitfile, ban_file_
 				/* char *strstr(const char *haystack, const char *needle); */
 				if (strstr (exename, __lhip_omitfile) != NULL)
 				{
-printf("---LSR: found '%s' in name '%s' from ban file: '%s'\n", exename, __lhip_omitfile, ban_file_name);
 					/* needle found in haystack */
 					ret = 1;	/* YES, this program is banned */
 					break;

@@ -82,9 +82,6 @@
 /* Whether you have the linux/netlink.h header. */
 #undef HAVE_LINUX_NETLINK_H
 
-/* Define to 1 if you have the `lstat' function. */
-#undef HAVE_LSTAT
-
 /* Whether you have the malloc function. */
 #undef HAVE_MALLOC
 
@@ -132,9 +129,6 @@
 
 /* Define to 1 if the system has the type `size_t'. */
 #undef HAVE_SIZE_T
-
-/* Define to 1 if you have the `snprintf' function. */
-#undef HAVE_SNPRINTF
 
 /* Define to 1 if the system has the type `socklen_t'. */
 #undef HAVE_SOCKLEN_T

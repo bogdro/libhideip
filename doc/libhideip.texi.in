@@ -274,6 +274,8 @@ and compile the program with the library, e.g.:
 
 	gcc -o your_prog your_prog.c -lhideip -ldl
 
+If needed, LibHideIP should be first in link order.
+
 If you want to use LibHideIP with some other programming language,
 you can generate bindings to LibHideIP for that language. You can use
 SWIG (@url{http://www.swig.org}) for this purpose. The header file is compatible
