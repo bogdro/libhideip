@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- unit test for I/O CTL functions.
  *
- * Copyright (C) 2015-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2015-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -131,44 +131,30 @@ struct msghdr
 # define O_TRUNC	01000
 #endif
 
-static char buf[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
-static const unsigned char __lhip_localhost_ipv4[4] = {127, 0, 0, 1};
-static const unsigned char __lhip_localhost_ipv6[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+#ifdef HAVE_LINUX_RANDOM_H
+# include <linux/random.h>
+#else
+# define RNDGETENTCNT 0
+#endif
+
+#ifdef HAVE_DIRENT_H
+# include <dirent.h>
+# define NAMLEN(dirent) strlen((dirent)->d_name)
+#else
+# define dirent direct
+# define NAMLEN(dirent) (dirent)->d_namlen
+# ifdef HAVE_SYS_NDIR_H
+#  include <sys/ndir.h>
+# endif
+# ifdef HAVE_SYS_DIR_H
+#  include <sys/dir.h>
+# endif
+# ifdef HAVE_NDIR_H
+#  include <ndir.h>
+# endif
+#endif
+
 static const unsigned char __lhip_fake_mac[6] = {1, 2, 3, 4, 5, 6};
-
-/**
- * Checks if the given IPv4 address is anonymized (contains 127.0.0.1)
- * @return 1 if OK
- */
-static void verify_ipv4(void * addr4)
-{
-	if ( addr4 == NULL )
-	{
-		return;
-	}
-	if ( memcmp (addr4, __lhip_localhost_ipv4, sizeof (__lhip_localhost_ipv4)) == 0 )
-	{
-		return;
-	}
-	fail("IPv4 address contains something else than '127.0.0.1': '0x%x'\n", *((int *)addr4));
-}
-
-/**
- * Checks if the given IPv6 address is anonymized (contains ::1)
- * @return 1 if OK
- */
-static void verify_ipv6(void * addr_ip6)
-{
-	if ( addr_ip6 == NULL )
-	{
-		return;
-	}
-	if ( memcmp (addr_ip6, __lhip_localhost_ipv6, sizeof (__lhip_localhost_ipv6)) == 0 )
-	{
-		return;
-	}
-	fail("IPv6 address contains something else than '::1': '0x%x'\n", *((int *)addr_ip6));
-}
 
 /**
  * Checks if the given MAC address is anonymized (contains 01:02:03:04:05:06)
@@ -195,12 +181,12 @@ START_TEST(test_ioctl)
 	int fd;
 	int a;
 	int err;
-	printf("test_ioctl\n");
-	fd = open("/dev/ttyS0", O_RDONLY);
+
+	LHIP_PROLOG_FOR_TEST();
+	fd = open("/dev/random", O_RDONLY);
 	if ( fd >= 0 )
 	{
-# define TCGETS 0x5401
-		a = ioctl(fd, TCGETS, buf);
+		a = ioctl(fd, RNDGETENTCNT, &a);
 		err = errno;
 		close(fd);
 		if ( a < 0 )
@@ -224,33 +210,19 @@ START_TEST(test_ioctl_banned1)
 	struct ifreq reqs;
 
 	printf("test_ioctl_banned1: SIOCGIFADDR\n");
+	strncpy(reqs.ifr_name, "lo", sizeof(reqs.ifr_name));
+	reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
+
 	fd = socket (AF_INET, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		strncpy(reqs.ifr_name, "eth0", sizeof(reqs.ifr_name));
-		reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
 		a = ioctl(fd, SIOCGIFADDR, &reqs);
 		if ( a < 0 )
 		{
 			err = errno;
-			if ( errno == ENODEV )
-			{
-				/* device not found - try another default */
-				strncpy(reqs.ifr_name, "eno1", sizeof(reqs.ifr_name));
-				reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
-				a = ioctl(fd, SIOCGIFADDR, &reqs);
-				if ( a < 0 )
-				{
-					err = errno;
-					close(fd);
-					fail("test_ioctl_banned1: SIOCGIFADDR: ioctl not performed, but should have been: errno=%d\n", err);
-				}
-			}
-			else
-			{
-				close(fd);
-				fail("test_ioctl_banned1: SIOCGIFADDR: ioctl not performed, but should have been (2): errno=%d\n", err);
-			}
+			close(fd);
+			fail("test_ioctl_banned1: SIOCGIFADDR: ioctl not performed, but should have been: dev=%s errno=%d\n",
+				reqs.ifr_name, err);
 		}
 		if ( reqs.ifr_ifru.ifru_addr.sa_family == AF_INET )
 		{
@@ -281,11 +253,12 @@ START_TEST(test_ioctl_banned1_ipv6)
 	struct ifreq reqs;
 
 	printf("test_ioctl_banned1_ipv6: SIOCGIFADDR\n");
+	strncpy(reqs.ifr_name, "lo", sizeof(reqs.ifr_name));
+	reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
+
 	fd = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		strncpy(reqs.ifr_name, "eth0", sizeof(reqs.ifr_name));
-		reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
 / * doesn't help:
 err = 1;
 a = setsockopt(fd, IPPROTO_IPV6, IPV6_RECVPKTINFO, &err, sizeof(err));
@@ -319,9 +292,8 @@ END_TEST
 # endif
 
 # if (defined SIOCGIFCONF) && (defined HAVE_MALLOC)
-START_TEST(test_ioctl_banned2)
+static void run_siocgifconf_on_socket (int sock_fd)
 {
-	int fd;
 	int a;
 	int err;
 	struct ifconf cfg;
@@ -329,58 +301,67 @@ START_TEST(test_ioctl_banned2)
 	unsigned int req_index;
 	struct ifreq * addrs;
 
+	cfg.ifc_len = 100 * sizeof (struct ifreq);
+	cfg.ifc_req = (struct ifreq *) malloc ((size_t) cfg.ifc_len);
+	if ( cfg.ifc_req != NULL )
+	{
+		memset (cfg.ifc_req, 0, (size_t) cfg.ifc_len);
+		a = ioctl (sock_fd, SIOCGIFCONF, &cfg);
+		if ( a < 0 )
+		{
+			err = errno;
+			close (sock_fd);
+			free (cfg.ifc_req);
+			fail ("SIOCGIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
+		}
+		if ( cfg.ifc_len > 0 )
+		{
+			buf_index = 0;
+			req_index = 0;
+			while ( buf_index <= (unsigned int)cfg.ifc_len )
+			{
+				addrs = (struct ifreq *) &(cfg.ifc_req[req_index]);
+				if ( addrs != NULL )
+				{
+					if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET )
+					{
+						verify_ipv4 (&(((struct sockaddr_in *)
+							&(addrs->ifr_addr))->sin_addr));
+					}
+					else if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET6 )
+					{
+						verify_ipv6 (&(((struct sockaddr_in6 *)
+							&(addrs->ifr_addr))->sin6_addr));
+					}
+					buf_index += sizeof (struct ifreq);
+				}
+				else
+				{
+					break;
+				}
+				req_index++;
+			}
+		}
+		free (cfg.ifc_req);
+		close (sock_fd);
+	}
+	else
+	{
+		close (sock_fd);
+		fail ("SIOCGIFCONF: memory NOT allocated\n");
+	}
+
+}
+
+START_TEST(test_ioctl_banned2)
+{
+	int fd;
+
 	printf("test_ioctl_banned2: SIOCGIFCONF\n");
 	fd = socket (AF_INET, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		cfg.ifc_len = 100 * sizeof (struct ifreq);
-		cfg.ifc_req = (struct ifreq *) malloc ((size_t) cfg.ifc_len);
-		if ( cfg.ifc_req != NULL )
-		{
-			memset (cfg.ifc_req, 0, (size_t) cfg.ifc_len);
-			a = ioctl(fd, SIOCGIFCONF, &cfg);
-			if ( a < 0 )
-			{
-				err = errno;
-				close(fd);
-				free (cfg.ifc_req);
-				fail("test_ioctl_banned2: SIOCGIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
-			}
-			if ( cfg.ifc_len > 0 )
-			{
-				buf_index = 0;
-				req_index = 0;
-				while ( buf_index <= (unsigned int)cfg.ifc_len )
-				{
-					addrs = (struct ifreq *) &(cfg.ifc_req[req_index]);
-					if ( addrs != NULL )
-					{
-						if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET )
-						{
-							verify_ipv4 (&(((struct sockaddr_in *)
-								&(addrs->ifr_addr))->sin_addr));
-						}
-						else if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET6 )
-						{
-							verify_ipv6 (&(((struct sockaddr_in6 *)
-								&(addrs->ifr_addr))->sin6_addr));
-						}
-						buf_index += sizeof (struct ifreq);
-					}
-					else
-					{
-						break;
-					}
-					req_index++;
-				}
-			}
-			free (cfg.ifc_req);
-		}
-		else
-		{
-			fail("test_ioctl_banned2: SIOCGIFCONF: memory NOT allocated\n");
-		}
-		close(fd);
+		run_siocgifconf_on_socket (fd);
 	}
 	else
 	{
@@ -392,65 +373,12 @@ END_TEST
 START_TEST(test_ioctl_banned2_ipv6)
 {
 	int fd;
-	int a;
-	int err;
-	struct ifconf cfg;
-	size_t buf_index;
-	unsigned int req_index;
-	struct ifreq * addrs;
 
 	printf("test_ioctl_banned2_ipv6: SIOCGIFCONF\n");
 	fd = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		cfg.ifc_len = 100 * sizeof (struct ifreq);
-		cfg.ifc_req = (struct ifreq *) malloc ((size_t) cfg.ifc_len);
-		if ( cfg.ifc_req != NULL )
-		{
-			memset (cfg.ifc_req, 0, (size_t) cfg.ifc_len);
-			a = ioctl(fd, SIOCGIFCONF, &cfg);
-			if ( a < 0 )
-			{
-				err = errno;
-				close(fd);
-				free (cfg.ifc_req);
-				fail("test_ioctl_banned2_ipv6: SIOCGIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
-			}
-			if ( cfg.ifc_len > 0 )
-			{
-				buf_index = 0;
-				req_index = 0;
-				while ( buf_index <= (unsigned int)cfg.ifc_len )
-				{
-					addrs = (struct ifreq *) &(cfg.ifc_req[req_index]);
-					if ( addrs != NULL )
-					{
-						if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET )
-						{
-							verify_ipv4 (&(((struct sockaddr_in *)
-								&(addrs->ifr_addr))->sin_addr));
-						}
-						else if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET6 )
-						{
-							verify_ipv6 (&(((struct sockaddr_in6 *)
-								&(addrs->ifr_addr))->sin6_addr));
-						}
-						buf_index += sizeof (struct ifreq);
-					}
-					else
-					{
-						break;
-					}
-					req_index++;
-				}
-			}
-			free (cfg.ifc_req);
-		}
-		else
-		{
-			fail("test_ioctl_banned2_ipv6: SIOCGIFCONF: memory NOT allocated\n");
-		}
-		close(fd);
+		run_siocgifconf_on_socket (fd);
 	}
 	else
 	{
@@ -461,44 +389,35 @@ END_TEST
 # endif /* (defined SIOCGIFCONF) && (defined HAVE_MALLOC) */
 
 # ifdef SIOCGIFHWADDR
-START_TEST(test_ioctl_banned3)
+static void run_siocgifhwaddr_on_socket (int sock_fd)
 {
-	int fd;
 	int a;
 	int err;
 	struct ifreq reqs;
+
+	strncpy(reqs.ifr_name, "lo", sizeof(reqs.ifr_name));
+	reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
+
+	a = ioctl(sock_fd, SIOCGIFHWADDR, &reqs);
+	if ( a < 0 )
+	{
+		err = errno;
+		close(sock_fd);
+		fail("SIOCGIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
+	}
+	close(sock_fd);
+	verify_mac (&(reqs.ifr_addr.sa_data));
+}
+
+START_TEST(test_ioctl_banned3)
+{
+	int fd;
 
 	printf("test_ioctl_banned3: SIOCGIFHWADDR\n");
 	fd = socket (AF_INET, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		strncpy(reqs.ifr_name, "eth0", sizeof(reqs.ifr_name));
-		reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
-		a = ioctl(fd, SIOCGIFHWADDR, &reqs);
-		if ( a < 0 )
-		{
-			err = errno;
-			if ( errno == ENODEV )
-			{
-				/* device not found - try another default */
-				strncpy(reqs.ifr_name, "eno1", sizeof(reqs.ifr_name));
-				reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
-				a = ioctl(fd, SIOCGIFHWADDR, &reqs);
-				if ( a < 0 )
-				{
-					err = errno;
-					close(fd);
-					fail("test_ioctl_banned3: SIOCGIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
-				}
-			}
-			else
-			{
-				close(fd);
-				fail("test_ioctl_banned3: SIOCGIFHWADDR: ioctl not performed, but should have been (2): errno=%d\n", err);
-			}
-		}
-		verify_mac (&(reqs.ifr_addr.sa_data));
-		close(fd);
+		run_siocgifhwaddr_on_socket (fd);
 	}
 	else
 	{
@@ -510,41 +429,12 @@ END_TEST
 START_TEST(test_ioctl_banned3_ipv6)
 {
 	int fd;
-	int a;
-	int err;
-	struct ifreq reqs;
 
 	printf("test_ioctl_banned3_ipv6: SIOCGIFHWADDR\n");
 	fd = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		strncpy(reqs.ifr_name, "eth0", sizeof(reqs.ifr_name));
-		reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
-		a = ioctl(fd, SIOCGIFHWADDR, &reqs);
-		if ( a < 0 )
-		{
-			err = errno;
-			if ( errno == ENODEV )
-			{
-				/* device not found - try another default */
-				strncpy(reqs.ifr_name, "eno1", sizeof(reqs.ifr_name));
-				reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
-				a = ioctl(fd, SIOCGIFHWADDR, &reqs);
-				if ( a < 0 )
-				{
-					err = errno;
-					close(fd);
-					fail("test_ioctl_banned3_ipv6: SIOCGIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
-				}
-			}
-			else
-			{
-				close(fd);
-				fail("test_ioctl_banned3_ipv6: SIOCGIFHWADDR: ioctl not performed, but should have been (2): errno=%d\n", err);
-			}
-		}
-		verify_mac (&(reqs.ifr_addr.sa_data));
-		close(fd);
+		run_siocgifhwaddr_on_socket (fd);
 	}
 	else
 	{
@@ -605,37 +495,44 @@ struct lifconf
 #endif /* LHIP_COMPILE_TEST */
 
 # if (defined SIOCGLIFADDR) && (defined __solaris__) && (defined AF_INET6)
-START_TEST(test_ioctl_banned4)
+static void run_siocglifaddr_on_socket (int sock_fd)
 {
-	int fd;
 	int a;
 	int err;
 	struct lifreq lreqs;
+
+	strncpy (lreqs.lifr_name, "lo", sizeof(lreqs.lifr_name));
+	lreqs.lifr_name[sizeof(lreqs.lifr_name)-1] = '\0';
+
+	a = ioctl (sock_fd, SIOCGLIFADDR, &lreqs);
+	if ( a < 0 )
+	{
+		err = errno;
+		close (sock_fd);
+		fail ("SIOCGLIFADDR: ioctl not performed, but should have been: errno=%d\n", err);
+	}
+	if ( lreqs.lifr_addr.sa_family == AF_INET )
+	{
+		verify_ipv4 (&(((struct sockaddr_in *)
+			&(lreqs.lifr_addr))->sin_addr));
+	}
+	else if ( lreqs.lifr_addr.sa_family == AF_INET6 )
+	{
+		verify_ipv6 (&(((struct sockaddr_in6 *)
+			&(lreqs.lifr_addr))->sin6_addr));
+	}
+	close (sock_fd);
+}
+
+START_TEST(test_ioctl_banned4)
+{
+	int fd;
 
 	printf("test_ioctl_banned4: SIOCGLIFADDR\n");
 	fd = socket (AF_INET, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		strncpy(lreqs.lifr_name, "eth0", sizeof(lreqs.lifr_name));
-		lreqs.lifr_name[sizeof(lreqs.lifr_name)-1] = '\0';
-		a = ioctl(fd, SIOCGLIFADDR, &lreqs);
-		if ( a < 0 )
-		{
-			err = errno;
-			close(fd);
-			fail("test_ioctl_banned4: SIOCGLIFADDR: ioctl not performed, but should have been: errno=%d\n", err);
-		}
-		if ( lreqs.lifr_addr.sa_family == AF_INET )
-		{
-			verify_ipv4 (&(((struct sockaddr_in *)
-				&(lreqs.lifr_addr))->sin_addr));
-		}
-		else if ( lreqs.lifr_addr.sa_family == AF_INET6 )
-		{
-			verify_ipv6 (&(((struct sockaddr_in6 *)
-				&(lreqs.lifr_addr))->sin6_addr));
-		}
-		close(fd);
+		run_siocglifaddr_on_socket (fd);
 	}
 	else
 	{
@@ -655,26 +552,7 @@ START_TEST(test_ioctl_banned4_ipv6)
 	fd = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		strncpy(lreqs.lifr_name, "eth0", sizeof(lreqs.lifr_name));
-		lreqs.lifr_name[sizeof(lreqs.lifr_name)-1] = '\0';
-		a = ioctl(fd, SIOCGLIFADDR, &lreqs);
-		if ( a < 0 )
-		{
-			err = errno;
-			close(fd);
-			fail("test_ioctl_banned4_ipv6: SIOCGLIFADDR: ioctl not performed, but should have been: errno=%d\n", err);
-		}
-		if ( lreqs.lifr_addr.sa_family == AF_INET )
-		{
-			verify_ipv4 (&(((struct sockaddr_in *)
-				&(lreqs.lifr_addr))->sin_addr));
-		}
-		else if ( lreqs.lifr_addr.sa_family == AF_INET6 )
-		{
-			verify_ipv6 (&(((struct sockaddr_in6 *)
-				&(lreqs.lifr_addr))->sin6_addr));
-		}
-		close(fd);
+		run_siocglifaddr_on_socket (fd);
 	}
 	else
 	{
@@ -685,9 +563,8 @@ END_TEST
 # endif /* #if (defined SIOCGLIFADDR) && (defined __solaris__) && (defined AF_INET6) */
 
 # if (defined SIOCGLIFCONF) && (defined __solaris__) && (defined AF_INET6)
-START_TEST(test_ioctl_banned5)
+static void run_siocglifconf_on_socket (int sock_fd)
 {
-	int fd;
 	int a;
 	int err;
 	struct lifconf lcfg;
@@ -695,57 +572,65 @@ START_TEST(test_ioctl_banned5)
 	size_t buf_index;
 	unsigned int req_index;
 
+	memset (&lcfg, 0, sizeof (struct lifconf));
+	lcfg.lifc_len = 100 * sizeof (struct lifreq);
+	lcfg.lifc_req = (struct lifreq *) malloc ((size_t) lcfg.lifc_len);
+	if ( lcfg.lifc_req != NULL )
+	{
+		a = ioctl(fd, SIOCGLIFCONF, &lcfg);
+		if ( a < 0 )
+		{
+			err = errno;
+			close (sock_fd);
+			fail("SIOCGLIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
+		}
+		if ( lcfg.lifc_len > 0 )
+		{
+			buf_index = 0;
+			req_index = 0;
+			while ( buf_index <= (unsigned int)lcfg.lifc_len )
+			{
+				laddrs = (struct lifreq *) &(lcfg.lifc_req[req_index]);
+				if ( laddrs != NULL )
+				{
+					if ( laddrs->lifr_addr.sa_family == AF_INET )
+					{
+						verify_ipv4 (&(((struct sockaddr_in *)
+							&(laddrs->lifr_addr))->sin_addr));
+					}
+					else if ( laddrs->lifr_addr.sa_family == AF_INET6 )
+					{
+						verify_ipv6 (&(((struct sockaddr_in6 *)
+							&(laddrs->lifr_addr))->sin6_addr));
+					}
+					buf_index += sizeof (struct lifreq);
+				}
+				else
+				{
+					break;
+				}
+				req_index++;
+			}
+		}
+		free (lcfg.lifc_req);
+		close (sock_fd);
+	}
+	else
+	{
+		close (sock_fd);
+		fail("SIOCGIFCONF: memory NOT allocated\n");
+	}
+}
+
+START_TEST(test_ioctl_banned5)
+{
+	int fd;
+
 	printf("test_ioctl_banned5: SIOCGLIFCONF\n");
 	fd = socket (AF_INET, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		memset (&lcfg, 0, sizeof (struct lifconf));
-		lcfg.lifc_len = 100 * sizeof (struct lifreq);
-		lcfg.lifc_req = (struct lifreq *) malloc ((size_t) lcfg.lifc_len);
-		if ( lcfg.lifc_req != NULL )
-		{
-			a = ioctl(fd, SIOCGLIFCONF, &lcfg);
-			if ( a < 0 )
-			{
-				err = errno;
-				close(fd);
-				fail("test_ioctl_banned5: SIOCGLIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
-			}
-			if ( lcfg.lifc_len > 0 )
-			{
-				buf_index = 0;
-				req_index = 0;
-				while ( buf_index <= (unsigned int)lcfg.lifc_len )
-				{
-					laddrs = (struct lifreq *) &(lcfg.lifc_req[req_index]);
-					if ( laddrs != NULL )
-					{
-						if ( laddrs->lifr_addr.sa_family == AF_INET )
-						{
-							verify_ipv4 (&(((struct sockaddr_in *)
-								&(laddrs->lifr_addr))->sin_addr));
-						}
-						else if ( laddrs->lifr_addr.sa_family == AF_INET6 )
-						{
-							verify_ipv6 (&(((struct sockaddr_in6 *)
-								&(laddrs->lifr_addr))->sin6_addr));
-						}
-						buf_index += sizeof (struct lifreq);
-					}
-					else
-					{
-						break;
-					}
-					req_index++;
-				}
-			}
-			free (lcfg.lifc_req);
-		}
-		else
-		{
-			fail("test_ioctl_banned5: SIOCGIFCONF: memory NOT allocated\n");
-		}
-		close(fd);
+		run_siocglifconf_on_socket (fd);
 	}
 	else
 	{
@@ -768,53 +653,7 @@ START_TEST(test_ioctl_banned5_ipv6)
 	fd = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		memset (&lcfg, 0, sizeof (struct lifconf));
-		lcfg.lifc_len = 100 * sizeof (struct lifreq);
-		lcfg.lifc_req = (struct lifreq *) malloc ((size_t) lcfg.lifc_len);
-		if ( lcfg.lifc_req != NULL )
-		{
-			a = ioctl(fd, SIOCGLIFCONF, &lcfg);
-			if ( a < 0 )
-			{
-				err = errno;
-				close(fd);
-				fail("test_ioctl_banned5_ipv6: SIOCGLIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
-			}
-			if ( lcfg.lifc_len > 0 )
-			{
-				buf_index = 0;
-				req_index = 0;
-				while ( buf_index <= (unsigned int)lcfg.lifc_len )
-				{
-					laddrs = (struct lifreq *) &(lcfg.lifc_req[req_index]);
-					if ( laddrs != NULL )
-					{
-						if ( laddrs->lifr_addr.sa_family == AF_INET )
-						{
-							verify_ipv4 (&(((struct sockaddr_in *)
-								&(laddrs->lifr_addr))->sin_addr));
-						}
-						else if ( laddrs->lifr_addr.sa_family == AF_INET6 )
-						{
-							verify_ipv6 (&(((struct sockaddr_in6 *)
-								&(laddrs->lifr_addr))->sin6_addr));
-						}
-						buf_index += sizeof (struct lifreq);
-					}
-					else
-					{
-						break;
-					}
-					req_index++;
-				}
-			}
-			free (lcfg.lifc_req);
-		}
-		else
-		{
-			fail("test_ioctl_banned5_ipv6: SIOCGIFCONF: memory NOT allocated\n");
-		}
-		close(fd);
+		run_siocglifconf_on_socket (fd);
 	}
 	else
 	{
@@ -825,6 +664,22 @@ END_TEST
 # endif /* (defined SIOCGLIFCONF) && (defined __solaris__) && (defined AF_INET6) */
 
 # if (defined SIOCGLIFHWADDR) && (defined __solaris__) && (defined AF_INET6)
+static void run_siocglifhwaddr_on_socket (int sock_fd)
+{
+	strncpy(lreqs.lifr_name, "lo", sizeof(lreqs.lifr_name));
+	lreqs.lifr_name[sizeof(lreqs.lifr_name)-1] = '\0';
+
+	a = ioctl(fd, SIOCGLIFHWADDR, &lreqs);
+	if ( a < 0 )
+	{
+		err = errno;
+		close (sock_fd);
+		fail("SIOCGLIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
+	}
+	close (sock_fd);
+	verify_mac (&(lreqs.lifr_addr.sa_data));
+}
+
 START_TEST(test_ioctl_banned6)
 {
 	int fd;
@@ -836,17 +691,7 @@ START_TEST(test_ioctl_banned6)
 	fd = socket (AF_INET, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		strncpy(lreqs.lifr_name, "eth0", sizeof(lreqs.lifr_name));
-		lreqs.lifr_name[sizeof(lreqs.lifr_name)-1] = '\0';
-		a = ioctl(fd, SIOCGLIFHWADDR, &lreqs);
-		if ( a < 0 )
-		{
-			err = errno;
-			close(fd);
-			fail("test_ioctl_banned6: SIOCGLIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
-		}
-		verify_mac (&(lreqs.lifr_addr.sa_data));
-		close(fd);
+		run_siocglifhwaddr_on_socket (fd);
 	}
 	else
 	{
@@ -866,17 +711,7 @@ START_TEST(test_ioctl_banned6_ipv6)
 	fd = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( fd >= 0 )
 	{
-		strncpy(lreqs.lifr_name, "eth0", sizeof(lreqs.lifr_name));
-		lreqs.lifr_name[sizeof(lreqs.lifr_name)-1] = '\0';
-		a = ioctl(fd, SIOCGLIFHWADDR, &lreqs);
-		if ( a < 0 )
-		{
-			err = errno;
-			close(fd);
-			fail("test_ioctl_banned6_ipv6: SIOCGLIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
-		}
-		verify_mac (&(lreqs.lifr_addr.sa_data));
-		close(fd);
+		run_siocglifhwaddr_on_socket (fd);
 	}
 	else
 	{
@@ -890,22 +725,9 @@ END_TEST
 
 /* ======================================================= */
 
-/*
-__attribute__ ((constructor))
-static void setup_global(void) / * unchecked * /
-{
-}
-*/
-
-/*
-static void teardown_global(void)
-{
-}
-*/
-
 static Suite * lhip_create_suite(void)
 {
-	Suite * s = suite_create("libhideip");
+	Suite * s = suite_create("libhideip_ioctl");
 
 #ifdef HAVE_SYS_IOCTL_H
 	TCase * tests_ioctl = tcase_create("ioctl");

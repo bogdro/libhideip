@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- private file and program banning functions.
  *
- * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -25,6 +25,8 @@
 
 #include "lhip_cfg.h"
 #include "lhip_paths.h"
+
+#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 
 #include <stdio.h>
 
@@ -53,6 +55,10 @@
 #else
 # undef LHIP_CAN_USE_ENV
 # define BANNING_ENABLE_ENV 0
+#endif
+
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
 #endif
 
 #ifdef LHIP_ANSIC

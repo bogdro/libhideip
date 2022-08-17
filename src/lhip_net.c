@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- network functions' replacements.
  *
- * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -29,6 +29,7 @@
 #define _BSD_SOURCE 1
 #define _SVID_SOURCE 1
 #define _DEFAULT_SOURCE 1
+#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
@@ -223,6 +224,10 @@ static const char local_name[] = "localhost";
 
 #ifndef PF_NETLINK
 # define PF_NETLINK AF_NETLINK
+#endif
+
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
 #endif
 
 /* =============================================================== */
@@ -1152,7 +1157,12 @@ socket (
 		return (*__lhip_real_socket_location ()) (domain, type, protocol);
 	}
 
-	if ( (domain == AF_NETLINK) || (domain == PF_NETLINK)
+	if ( (domain == AF_NETLINK)
+#ifdef PF_NETLINK
+# if PF_NETLINK != AF_NETLINK
+		|| (domain == PF_NETLINK)
+# endif
+#endif
 		|| (type == SOCK_RAW)
 #ifdef SOCK_PACKET
 		|| (type == SOCK_PACKET)
@@ -1282,7 +1292,7 @@ gethostname (
 		return -1;
 	}
 
-	if ( name == NULL )
+	if ( ( name == NULL ) || ( len == 0 ) )
 	{
 		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_gethostname_location ()) (name, len);
@@ -1302,6 +1312,7 @@ gethostname (
 	return (*__lhip_real_gethostname_location ()) (name, len);
 #endif /* LHIP_ENABLE_GUI_APPS */
 }
+
 /* =============================================================== */
 
 int
@@ -1410,7 +1421,7 @@ setsockopt (
 int
 getsockname (
 #ifdef LHIP_ANSIC
-	int s, struct sockaddr * name, socklen_t *namelen)
+	int s, struct sockaddr * name, socklen_t * namelen)
 #else
 	s, name, namelen)
 	int s;
@@ -1531,6 +1542,7 @@ bind (
 	}
 	return (*__lhip_real_bind_location ()) (sockfd, my_addr, addrlen);
 }
+
 /* =============================================================== */
 
 int
@@ -1566,7 +1578,12 @@ socketpair (
 		return (*__lhip_real_socketpair_location ()) (domain, type, protocol, sv);
 	}
 
-	if ( (domain == AF_NETLINK) || (domain == PF_NETLINK)
+	if ( (domain == AF_NETLINK)
+#ifdef PF_NETLINK
+# if PF_NETLINK != AF_NETLINK
+		|| (domain == PF_NETLINK)
+# endif
+#endif
 		|| (type == SOCK_RAW)
 #ifdef SOCK_PACKET
 		|| (type == SOCK_PACKET)

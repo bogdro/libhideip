@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- libpcap functions' replacements.
  *
- * Copyright (C) 2011-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2011-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -24,6 +24,8 @@
  */
 
 #include "lhip_cfg.h"
+
+#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 
 #include "lhip_priv.h"
 
@@ -68,6 +70,8 @@ extern pcap_t * pcap_open_offline_with_tstamp_precision LHIP_PARAMS ((const char
 extern pcap_t * pcap_fopen_offline LHIP_PARAMS ((FILE * fp, char * errbuf));
 extern pcap_t * pcap_fopen_offline_with_tstamp_precision LHIP_PARAMS ((FILE *, u_int, char *));
 extern int pcap_findalldevs LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
+extern int pcap_findalldevs_ex LHIP_PARAMS ((char *source, struct pcap_rmtauth *auth,
+            pcap_if_t **alldevs, char *errbuf));
 
 #  ifdef __cplusplus
 }
@@ -88,6 +92,10 @@ extern pcap_t * pcap_hopen_offline_with_tstamp_precision LHIP_PARAMS ((intptr_t,
 }
 # endif
 
+#endif
+
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
 #endif
 
 /* =============================================================== */
@@ -528,6 +536,44 @@ pcap_findalldevs (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_findalldevs_location ()) (devs, errbuf);
+	}
+
+	return -1;
+}
+
+/* =============================================================== */
+
+int
+pcap_findalldevs_ex (
+#ifdef LHIP_ANSIC
+	char *source, struct pcap_rmtauth *auth,
+		pcap_if_t **alldevs, char *errbuf)
+#else
+	source, auth, alldevs, errbuf)
+	char *source;
+	struct pcap_rmtauth *auth;
+	pcap_if_t **alldevs;
+	char *errbuf;
+#endif
+{
+	__lhip_main ();
+
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: pcap_findalldevs_ex(0x%x, 0x%x, 0x%x, 0x%x)\n",
+		(unsigned int)devs, (unsigned int)auth, (unsigned int)alldevs,
+		(unsigned int)errbuf);
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_pcap_findalldevs_ex_location () == NULL )
+	{
+		return -1;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		return (*__lhip_real_pcap_findalldevs_ex_location ()) (source, auth, alldevs, errbuf);
 	}
 
 	return -1;

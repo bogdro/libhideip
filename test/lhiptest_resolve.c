@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- unit test for name resolution (DNS) functions.
  *
- * Copyright (C) 2015-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2015-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@
 #define _BSD_SOURCE 1
 #define _SVID_SOURCE 1
 #define _DEFAULT_SOURCE 1
+#define _GNU_SOURCE 1		/* getaddrinfo_a */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -52,6 +53,18 @@
 # include <resolv.h>
 #endif
 
+#ifdef HAVE_NETDB_H
+# include <netdb.h>
+#endif
+
+#ifdef HAVE_MALLOC_H
+# include <malloc.h>
+#endif
+
+#ifdef HAVE_STDLIB_H
+# include <stdlib.h>
+#endif
+
 static char buf[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
 
 /* ====================== Name resolver functions */
@@ -61,7 +74,7 @@ START_TEST(test_res_query)
 {
 	int a;
 
-	printf("test_res_query\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_init();
 	a = res_query("www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
@@ -75,7 +88,7 @@ START_TEST(test_res_query_banned)
 {
 	int a;
 
-	printf("test_res_query_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_init();
 	a = res_query("localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
@@ -89,7 +102,7 @@ START_TEST(test_res_search)
 {
 	int a;
 
-	printf("test_res_search\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_init();
 	a = res_search("www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
@@ -103,7 +116,7 @@ START_TEST(test_res_search_banned)
 {
 	int a;
 
-	printf("test_res_search_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_init();
 	a = res_search("localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
@@ -117,7 +130,7 @@ START_TEST(test_res_querydomain)
 {
 	int a;
 
-	printf("test_res_querydomain\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_init();
 	a = res_querydomain("www", "google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
@@ -131,7 +144,7 @@ START_TEST(test_res_querydomain_banned)
 {
 	int a;
 
-	printf("test_res_querydomain_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_init();
 	a = res_querydomain("localhost", "localdomain", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
@@ -145,7 +158,7 @@ START_TEST(test_res_mkquery)
 {
 	int a;
 
-	printf("test_res_mkquery\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_init();
 	a = res_mkquery(QUERY, "www.google.com", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
@@ -159,7 +172,7 @@ START_TEST(test_res_mkquery_banned)
 {
 	int a;
 
-	printf("test_res_mkquery_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_init();
 	a = res_mkquery(QUERY, "localhost", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
@@ -175,7 +188,7 @@ START_TEST(test_res_nquery)
 	int a;
 	struct __res_state state;
 
-	printf("test_res_nquery\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nquery(&state, "www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
@@ -190,7 +203,7 @@ START_TEST(test_res_nquery_banned)
 	int a;
 	struct __res_state state;
 
-	printf("test_res_nquery_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nquery(&state, "localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
@@ -205,7 +218,7 @@ START_TEST(test_res_nsearch)
 	int a;
 	struct __res_state state;
 
-	printf("test_res_nsearch\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nsearch(&state, "www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
@@ -220,7 +233,7 @@ START_TEST(test_res_nsearch_banned)
 	int a;
 	struct __res_state state;
 
-	printf("test_res_nsearch_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nsearch(&state, "localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
@@ -235,7 +248,7 @@ START_TEST(test_res_nquerydomain)
 	int a;
 	struct __res_state state;
 
-	printf("test_res_nquerydomain\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nquerydomain(&state, "www", "google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
@@ -250,7 +263,7 @@ START_TEST(test_res_nquerydomain_banned)
 	int a;
 	struct __res_state state;
 
-	printf("test_res_nquerydomain_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nquerydomain(&state, "localhost", "localdomain", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
@@ -265,7 +278,7 @@ START_TEST(test_res_nmkquery)
 	int a;
 	struct __res_state state;
 
-	printf("test_res_nmkquery\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nmkquery(&state, QUERY, "www.google.com", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
@@ -280,7 +293,7 @@ START_TEST(test_res_nmkquery_banned)
 	int a;
 	struct __res_state state;
 
-	printf("test_res_nmkquery_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nmkquery(&state, QUERY, "localhost", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
@@ -293,24 +306,86 @@ END_TEST
 
 #endif /* HAVE_RESOLV_H */
 
+#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
+static struct addrinfo * prepare_hints (struct addrinfo * ai_hints)
+{
+	if ( ai_hints != NULL )
+	{
+		memset (ai_hints, 0, sizeof (struct addrinfo));
+		ai_hints->ai_flags = /*AI_NUMERICHOST |*/ AI_CANONNAME;
+		ai_hints->ai_family = AF_UNSPEC;
+		ai_hints->ai_socktype = 0;
+		ai_hints->ai_protocol = 0;
+		ai_hints->ai_addr = NULL;
+		ai_hints->ai_canonname = NULL;
+		ai_hints->ai_next = NULL;
+	}
+	return ai_hints;
+}
+
+START_TEST(test_getaddrinfo_a)
+{
+	int a;
+	struct addrinfo ai_hints;
+	struct gaicb *reqs[1];
+
+	LHIP_PROLOG_FOR_TEST();
+	reqs[0] = (struct gaicb *) malloc (sizeof (struct gaicb));
+	if ( reqs[0] == NULL )
+	{
+		return;
+	}
+	memset (reqs[0], 0, sizeof (struct gaicb));
+	reqs[0]->ar_name = "www.google.com";
+	reqs[0]->ar_request = prepare_hints (&ai_hints);
+	a = getaddrinfo_a (GAI_WAIT, reqs, 1, NULL);
+
+	if ( reqs[0]->ar_result != NULL )
+	{
+		freeaddrinfo (reqs[0]->ar_result);
+	}
+	free (reqs[0]);
+	if ( a < 0 )
+	{
+		fail("test_getaddrinfo_a: query failed, but shouldn't have. Return=%d (%s)\n", a, gai_strerror (a));
+	}
+}
+END_TEST
+
+START_TEST(test_getaddrinfo_a_banned)
+{
+	int a;
+	struct addrinfo ai_hints;
+	struct gaicb *reqs[1];
+
+	LHIP_PROLOG_FOR_TEST();
+	reqs[0] = (struct gaicb *) malloc (sizeof (struct gaicb));
+	if ( reqs[0] == NULL )
+	{
+		return;
+	}
+	memset (reqs[0], 0, sizeof (struct gaicb));
+	reqs[0]->ar_name = "localhost";
+	reqs[0]->ar_request = prepare_hints (&ai_hints);
+	a = getaddrinfo_a (GAI_WAIT, reqs, 1, NULL);
+	if ( reqs[0]->ar_result != NULL )
+	{
+		freeaddrinfo (reqs[0]->ar_result);
+	}
+	free (reqs[0]);
+	if ( a >= 0 )
+	{
+		fail("test_getaddrinfo_a_banned: query succeeded, but shouldn't have\n");
+	}
+}
+END_TEST
+#endif /*  (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL) */
+
 /* ======================================================= */
-
-/*
-__attribute__ ((constructor))
-static void setup_global(void) / * unchecked * /
-{
-}
-*/
-
-/*
-static void teardown_global(void)
-{
-}
-*/
 
 static Suite * lhip_create_suite(void)
 {
-	Suite * s = suite_create("libhideip");
+	Suite * s = suite_create("libhideip_resolve");
 
 	TCase * tests_resolve = tcase_create("resolve");
 
@@ -333,11 +408,15 @@ static Suite * lhip_create_suite(void)
 	tcase_add_test(tests_resolve, test_res_nmkquery);
 	tcase_add_test(tests_resolve, test_res_nmkquery_banned);
 # endif
+#endif
+#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
+	tcase_add_test(tests_resolve, test_getaddrinfo_a);
+	tcase_add_test(tests_resolve, test_getaddrinfo_a_banned);
+#endif
 
 	tcase_set_timeout(tests_resolve, 30);
 
 	suite_add_tcase(s, tests_resolve);
-#endif
 	return s;
 }
 

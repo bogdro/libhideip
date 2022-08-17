@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- execution functions' replacements.
  *
- * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -90,6 +90,7 @@ static const char *programs[] =
 	"lynx",
 	"wget",
 	"host",
+	"hostid",
 	"hostname",
 	"uname",
 	"arp",
@@ -122,6 +123,7 @@ static const char *viewing_programs[] =
 	"tac",
 	"less",
 	"more",
+	"coreutils",
 
 	/* editors: */
 	"vi",	/* also matches "vim" */
@@ -183,7 +185,8 @@ static const char * __lhip_valuable_files[] =
 	"mactab",
 	"/dev/net",
 	"/dev/udp",
-	"/dev/tcp"
+	"/dev/tcp",
+	"/proc/net/fib_trie"
 };
 
 #ifndef HAVE_MALLOC
@@ -208,6 +211,10 @@ extern int fexecve LHIP_PARAMS ((int fd, char *const argv[], char *const envp[])
 }
 #endif
 
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
+#endif
+
 /* ======================================================= */
 
 #ifndef LHIP_ANSIC
@@ -229,12 +236,18 @@ static char * __lhip_get_target_link_path (
 	char * const name;
 #endif
 {
-#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK) && (defined HAVE_LSTAT)
+#if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
 	int res;
 	ssize_t lnk_res;
 	char * current_name;
 	off_t lsize;
+# ifdef HAVE_LSTAT64
+	struct stat64 st;
+# else
+#  ifdef HAVE_LSTAT
 	struct stat st;
+#  endif
+# endif
 # ifdef HAVE_MALLOC
 	char * __lhip_newlinkpath;
 	char * __lhip_newlinkdir;
@@ -250,7 +263,15 @@ static char * __lhip_get_target_link_path (
 	current_name = LHIP_STRDUP (name);
 	if ( current_name != NULL )
 	{
+# ifdef HAVE_LSTAT64
+		res = lstat64 (current_name, &st);
+# else
+#  ifdef HAVE_LSTAT
 		res = lstat (current_name, &st);
+#  else
+		res = -1;
+#  endif
+# endif
 		while ( res >= 0 )
 		{
 			if ( ! S_ISLNK (st.st_mode) )
@@ -264,7 +285,13 @@ static char * __lhip_get_target_link_path (
 			}
 			/* in case the link's target is a relative path,
 			prepare to prepend the link's directory name */
-			last_slash = rindex (current_name, '/');
+			/*
+			 * BUG in glibc (2.30?) or gcc - when not run with
+			 * -Os, rindex/strrchr reaches outside of the buffer.
+			 * glibc-X/sysdeps/x86_64/multiarch/strchr-sse2-no-bsf.S?
+			 */
+			/*last_slash = rindex (current_name, '/');*/
+			last_slash = strrchr (current_name, '/');
 			if ( last_slash != NULL )
 			{
 				dirname_len = (size_t)(last_slash - current_name);
@@ -326,7 +353,15 @@ static char * __lhip_get_target_link_path (
 # endif /* HAVE_MALLOC */
 			current_name = __lhip_newlinkpath;
 
+# ifdef HAVE_LSTAT64
+			res = lstat64 (current_name, &st);
+# else
+#  ifdef HAVE_LSTAT
 			res = lstat (current_name, &st);
+#  else
+			res = -1;
+#  endif
+# endif
 		}
 		return current_name;
 	}
@@ -369,7 +404,7 @@ static char * __lhip_get_target_link_path_fd (
 		return NULL;
 	}
 #ifdef HAVE_SNPRINTF
-	snprintf (linkpath, sizeof(linkpath) - 1, "/proc/self/fd/%d", fd);
+	snprintf (linkpath, sizeof(linkpath), "/proc/self/fd/%d", fd);
 #else
 	sprintf (linkpath, "/proc/self/fd/%d", fd);
 #endif
@@ -513,7 +548,13 @@ static int __lhip_is_forbidden_program (
 #endif
 #if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
 	int res;
+# ifdef HAVE_STAT64
+	struct stat64 st;
+# else
+#  ifdef HAVE_STAT
 	struct stat st;
+#  endif
+# endif
 	char *first_char = NULL;
 # if (defined HAVE_GETENV) && (defined HAVE_SYS_STAT_H)
 	char *path = NULL;
@@ -589,7 +630,15 @@ static int __lhip_is_forbidden_program (
 									= '\0';
 								__lhip_append_path (path_dir, __lhip_linkpath, j);
 								path_dir[j] = '\0';
+# ifdef HAVE_STAT64
+								res = stat64 (path_dir, &st);
+# else
+#  ifdef HAVE_STAT
 								res = stat (path_dir, &st);
+#  else
+								res = -1;
+#  endif
+# endif
 								if ( res >= 0 )
 								{
 									break;	/* object was found */

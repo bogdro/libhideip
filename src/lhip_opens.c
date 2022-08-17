@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- file opening functions' replacements.
  *
- * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -28,6 +28,7 @@
 # define _LARGEFILE64_SOURCE 1
 /*# define _FILE_OFFSET_BITS 64*/
 #define _ATFILE_SOURCE 1
+#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 
 #ifdef HAVE_STDARG_H
 # include <stdarg.h>
@@ -107,6 +108,13 @@ extern int open64 LHIP_PARAMS ((const char * const path, const int flags, ... ))
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef TEST_COMPILE
+# ifdef LHIP_ANSIC
+#  define WAS_LHIP_ANSIC
+# endif
+# undef LHIP_ANSIC
 #endif
 
 /* ======================================================= */
@@ -413,6 +421,10 @@ generic_open (
 
 /* ======================================================= */
 
+#if (defined TEST_COMPILE) && (defined WAS_LHIP_ANSIC)
+# define LHIP_ANSIC 1
+#endif
+
 /* 'man 2 open' gives:
     int open(const char *pathname, int flags);
     int open(const char *pathname, int flags, mode_t mode);
@@ -550,6 +562,10 @@ open (
 
 /* ======================================================= */
 
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
+#endif
+
 #ifndef LHIP_ANSIC
 static int generic_openat LHIP_PARAMS((
 	const int dirfd, const char * const path, const int flags,
@@ -602,6 +618,10 @@ generic_openat (
 }
 
 /* ======================================================= */
+
+#if (defined TEST_COMPILE) && (defined WAS_LHIP_ANSIC)
+# define LHIP_ANSIC 1
+#endif
 
 #ifdef openat64
 # undef openat64

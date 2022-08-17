@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- uname function replacement.
  *
- * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -25,6 +25,8 @@
  */
 
 #include "lhip_cfg.h"
+
+#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 
 #ifdef HAVE_SYS_UTSNAME_H
 # include <sys/utsname.h>
@@ -52,6 +54,10 @@ struct utsname
 #endif
 
 #include "lhip_priv.h"
+
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
+#endif
 
 /* =============================================================== */
 

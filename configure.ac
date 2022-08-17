@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 1.8, bogdandr@op.pl)
+AC_INIT(libhideip, 1.9, bogdro@users.sourceforge.net)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
@@ -134,6 +134,8 @@ AC_CHECK_LIB([resolv],[res_query], [],
 	)
 ])
 
+AC_CHECK_LIB([anl],[getaddrinfo_a])
+
 # ==================== Checks for header files.
 AC_CHECK_HEADER([dlfcn.h],[AC_DEFINE([HAVE_DLFCN_H], [1], [Whether you have the dlfcn.h header])],
 	AC_MSG_ERROR([[I need the dlfcn.h file to work.]]), [])
@@ -155,7 +157,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h errno.h malloc.h\
 	sys/types.h netdb.h sys/socket.h ifaddrs.h arpa/inet.h\
 	netinet/in.h sys/ioctl.h fcntl.h sys/utsname.h asm/types.h\
-	arpa/nameser.h stdint.h inttypes.h])
+	arpa/nameser.h stdint.h inttypes.h linux/random.h])
 
 AC_CHECK_HEADER([net/if.h],AC_DEFINE([HAVE_NET_IF_H],[1],
 	[Whether you have the net/if.h header.]),[],
@@ -230,6 +232,22 @@ AC_CHECK_HEADER(pcap.h,AC_DEFINE([HAVE_PCAP_H],[1],
 		[Whether you have the pcap/pcap.h header.]))
 	])
 
+AC_HEADER_DIRENT
+
+has_dirent_h=yes
+AC_CHECK_HEADER([dirent.h],AC_DEFINE([HAVE_DIRENT_H],[1],
+	[Whether you have the dirent.h header.]),
+		[AC_CHECK_HEADER([sys/ndir.h],AC_DEFINE([HAVE_SYS_NDIR_H],[1],
+		[Whether you have the sys/ndir.h header.]),
+			[AC_CHECK_HEADER([sys/ndir.h],AC_DEFINE([HAVE_SYS_NDIR_H],[1],
+			[Whether you have the sys/ndir.h header.]),
+				[AC_CHECK_HEADER([sys/dir.h],AC_DEFINE([HAVE_SYS_DIR_H],[1],
+				[Whether you have the sys/dir.h header.]),
+					[AC_CHECK_HEADER([ndir.h],AC_DEFINE([HAVE_NDIR_H],[1],
+					[Whether you have the ndir.h header.]),
+						[has_dirent_h=no])])])])])
+
+
 # ==================== Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_VOLATILE
@@ -256,7 +274,7 @@ AC_CHECK_FUNC([malloc],
 AC_CHECK_FUNCS([memcpy memset readlink getipnodebyname getipnodebyaddr \
 	getenv gethostbyaddr_r gethostbyname_r gethostbyname2_r \
 	gethostent_r openat openat64 realloc symlink lstat res_nquery \
-	execveat fexecve snprintf strdup])
+	execveat fexecve snprintf strdup stat stat64 lstat64])
 
 AH_TEMPLATE([GETNAMEINFO_ARG4TYPE])
 AH_TEMPLATE([GETNAMEINFO_ARG6TYPE])
@@ -336,6 +354,8 @@ if (test "x$GCC" = "xyes" ); then
         AX_C_CHECK_FLAG([-Wrestrict], [CFLAGS="$CFLAGS -Wrestrict"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Woverlength-strings], [CFLAGS="$CFLAGS -Woverlength-strings"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wno-nonnull-compare], [CFLAGS="$CFLAGS -Wno-nonnull-compare"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-Wstringop-truncation], [CFLAGS="$CFLAGS -Wstringop-truncation"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-Wduplicated-branches], [CFLAGS="$CFLAGS -Wduplicated-branches"], [CFLAGS="$CFLAGS"])
 
 	# required for the compiler, which is used by libtool instead of the linker
 	AX_C_CHECK_FLAG([-Wl,-z -Wl,noexecstack], [CFLAGS="$CFLAGS -Wl,-z -Wl,noexecstack"], [CFLAGS="$CFLAGS"])

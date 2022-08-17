@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- unit test for packet capture functions.
  *
- * Copyright (C) 2015-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2015-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -67,7 +67,7 @@ START_TEST(test_pcap_lookupdev)
 {
 	char * pcap_dev;
 
-	printf("test_pcap_lookupdev\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	pcap_dev = pcap_lookupdev (buf);
 	fail_if(pcap_dev != NULL);
@@ -80,7 +80,7 @@ START_TEST(test_pcap_lookupnet)
 	bpf_u_int32 ip;
 	bpf_u_int32 mask;
 
-	printf("test_pcap_lookupnet\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = pcap_lookupnet ("eth0", &ip, &mask, buf);
 	ck_assert_int_eq(a, -1);
 }
@@ -90,7 +90,7 @@ START_TEST(test_pcap_create)
 {
 	pcap_t * ret;
 
-	printf("test_pcap_create\n");
+	LHIP_PROLOG_FOR_TEST();
 	ret = pcap_create ("eth0", buf);
 	if (ret != NULL)
 	{
@@ -104,7 +104,7 @@ START_TEST(test_pcap_open_dead)
 {
 	pcap_t * ret;
 
-	printf("test_pcap_open_dead\n");
+	LHIP_PROLOG_FOR_TEST();
 	ret = pcap_open_dead (100, 100);
 	if (ret != NULL)
 	{
@@ -118,7 +118,7 @@ START_TEST(test_pcap_open_dead_with_ts)
 {
 	pcap_t * ret;
 
-	printf("test_pcap_open_dead_with_ts\n");
+	LHIP_PROLOG_FOR_TEST();
 	ret = pcap_open_dead_with_tstamp_precision (100, 100, 100);
 	if (ret != NULL)
 	{
@@ -132,7 +132,7 @@ START_TEST(test_pcap_open_live)
 {
 	pcap_t * ret;
 
-	printf("test_pcap_open_live\n");
+	LHIP_PROLOG_FOR_TEST();
 	ret = pcap_open_live ("eth0", 100, 0, 1000, buf);
 	if (ret != NULL)
 	{
@@ -146,7 +146,7 @@ START_TEST(test_pcap_open_offline)
 {
 	pcap_t * ret;
 
-	printf("test_pcap_open_offline\n");
+	LHIP_PROLOG_FOR_TEST();
 	ret = pcap_open_offline (LHIP_TEST_FILENAME, buf);
 	if (ret != NULL)
 	{
@@ -160,7 +160,7 @@ START_TEST(test_pcap_open_offline_with_ts)
 {
 	pcap_t * ret;
 
-	printf("test_pcap_open_offline_with_ts\n");
+	LHIP_PROLOG_FOR_TEST();
 	ret = pcap_open_offline_with_tstamp_precision (LHIP_TEST_FILENAME, 100, buf);
 	if (ret != NULL)
 	{
@@ -175,7 +175,7 @@ START_TEST(test_pcap_fopen_offline)
 	pcap_t * ret;
 	FILE *f;
 
-	printf("test_pcap_fopen_offline\n");
+	LHIP_PROLOG_FOR_TEST();
 	f = fopen(LHIP_TEST_FILENAME, "w+");
 	if (f != NULL)
 	{
@@ -202,7 +202,7 @@ START_TEST(test_pcap_fopen_offline_with_ts)
 	pcap_t * ret;
 	FILE *f;
 
-	printf("test_pcap_fopen_offline_with_ts\n");
+	LHIP_PROLOG_FOR_TEST();
 	f = fopen(LHIP_TEST_FILENAME, "w+");
 	if (f != NULL)
 	{
@@ -229,7 +229,7 @@ START_TEST(test_pcap_hopen_offline)
 {
 	pcap_t * ret;
 
-	printf("test_pcap_hopen_offline\n");
+	LHIP_PROLOG_FOR_TEST();
 	ret = pcap_hopen_offline (0, buf);
 	if (ret != NULL)
 	{
@@ -243,7 +243,7 @@ START_TEST(test_pcap_hopen_offline_with_ts)
 {
 	pcap_t * ret;
 
-	printf("test_pcap_hopen_offline_with_ts\n");
+	LHIP_PROLOG_FOR_TEST();
 	ret = pcap_hopen_offline_with_tstamp_precision (0, 100, buf);
 	if (ret != NULL)
 	{
@@ -258,7 +258,7 @@ START_TEST(test_pcap_findalldevs)
 	pcap_if_t * devs = NULL;
 	int a;
 
-	printf("test_pcap_findalldevs\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = pcap_findalldevs (&devs, buf);
 	if ( (a == 0) && (devs != NULL) )
 	{
@@ -272,22 +272,9 @@ END_TEST
 
 /* ======================================================= */
 
-/*
-__attribute__ ((constructor))
-static void setup_global(void) / * unchecked * /
-{
-}
-*/
-
-/*
-static void teardown_global(void)
-{
-}
-*/
-
 static Suite * lhip_create_suite(void)
 {
-	Suite * s = suite_create("libhideip");
+	Suite * s = suite_create("libhideip_pcap");
 
 #if (defined HAVE_PCAP_H) || (defined HAVE_PCAP_PCAP_H)
 	TCase * tests_pcap = tcase_create("pcap");

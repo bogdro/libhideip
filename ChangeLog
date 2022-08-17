@@ -1,4 +1,68 @@
-2019-02-08	Bogdan Drozdowski <bogdandr@op.pl>
+2021-01-10	Bogdan Drozdowski <bogdro@users.sourceforge.net>
+
+	* LibHideIP version 1.9
+	  Added intercepting new functions. Portability improvements.
+	  LibHideIP should work better with some filesystems which have i-node
+	  numbers greater than 2^32-1 and compile under non-ANSI-C. Checked
+	  running LibHideIP under GCC address & undefined behaviour sanitizers.
+	  Improvements in unit tests.
+	* configure.ac: added checking for the stat(), stat64(), lstat64() and
+	  getaddrinfo_a functions. Added checking for the -Wstringop-truncation
+	  and -Wduplicated-branches compiler options. Added checking for the 
+	  linux/random.h and the directory headers, for unit tests.
+	* src/lhip_cfg.h.in: added new constants
+	* src/lhip_exec.c (__lhip_get_target_link_path_fd): fixed a warning
+	  about a potential buffer overflow.
+	* src/lhip_net.c (socket, socketpair): skip checking PF_NETLINK if
+	  it's the same as AF_NETLINK to avoid compiler warnings
+	* src/lhip_net.c (gethostname): call the original function also if the
+	  given buffer size is 0
+	* src/lhip_resolve.c, src/lhip_main.c: added intercepting
+	  getaddrinfo_a()
+	* src/lhip_exec.c (__lhip_is_forbidden_program): Check also for
+	  stat64() and skip if both stat64() and stat() are not available.
+	* src/lhip_exec.c (__lhip_get_target_link_path): replace rindex() with
+	  the more portable strrchr(). Check also for lstat64() and skip if
+	  both lstat64() and lstat() are not available.
+	* src/lhip_exec.c: forbid executing of 'coreutils' and 'hostid'. Forbid
+	  reading '/proc/net/fib_trie'.
+	* src/lhip_pcap.c, src/lhip_main.c: added intercepting
+	  pcap_findalldevs_ex()
+	* src/banning_generic.c (__banning_is_banned): fixed using the user
+	  banning filename instead of the global one
+	* src/*.c*: added a preprocessor block that marks ANSI C as disabled,
+	  for internal testing compiler compatibility.
+	* src/lhip_priv.h: corrected some declarations to avoid warnings
+	* doc/libhideip.texi.in, doc/libhideip.3: updated the addresses
+	* doc/libhideip.texi.in: more blocks in @command{}
+	* Makefile.am: stop using 'tar --delete', for systems where GNU tar is
+	  not installed or is not the default. Marked the 'pack' target PHONY
+	* libhideip.spec.in: removed obsolete commented-out commands, updated
+	  the URL, added BugURL. Using macros for common elements.
+	* test/lhiptest_common.c: a new file with code common to tests
+	* test/{lhiptest_exec.c,lhiptest_opens.c,lhiptest_banning.c}: Moved
+	  common code to lhiptest_common.c.
+	* test/*.c, test/lhiptest_common.h: added a prolog macro with logging
+	  common for all tests
+	* test/lhiptest_other.c: new tests for finding private symbols in the
+	  library.
+	* test/{lhiptest_ioctl.c,lhiptest_net.c}: moved common code to
+	  separate functions
+	* test/lhiptest_ioctl.c (test_ioctl): switch the test to call ioctl()
+	  on /dev/random, which should be accessible by everybody and not
+	  cause access problems or other errors
+	* test/lhiptest_ioctl.c: use the looback interface name in tests
+	  instead of hardcoded system-dependent names
+	* test/lhiptest_fopens.c: added tests for a device file and for an
+	  object in the /proc filesystem.
+	* test/lhiptest_net.c (test_getsockname6): use the structures for IPv6
+	  instead of IPv6. This fixes a logical error and a buffer overrun.
+	* test/lhiptest_net.c: free()ing some of the test results to avoid
+	  memory leaking warnings from sanitizers
+	* test/Makefile.am: added the new lhiptest_other test, added a target
+	  to just compile the tests
+
+2019-02-08	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* LibHideIP version 1.8
 	  Added intercepting new functions. Fixed initialization code - fixed
@@ -17,7 +81,7 @@
 	* src/lhip_main.c (__lhip_main): when the fopen() functions can't be
 	  found by versioned lookup, try normal lookup. This should fix
 	  compatibility with newer systems and make banning work there
-	* src/*.c: defined LHIP_VOID to be void in ANSI C void and use that in
+	* src/*.c: define LHIP_VOID to be 'void' in ANSI C and use that in
 	  function definitions for better readability
 	* src/lhip_net.c, src/lhip_opens.c, src/lhip_pcap.c: simplified the
 	  missing functions' declarations
@@ -108,7 +172,7 @@
 	  types to more correct ones
 	* test/lhiptest_banning.c: a new unit test for testing banning
 
-2017-04-25	Bogdan Drozdowski <bogdandr@op.pl>
+2017-04-25	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* LibHideIP version 1.5
 	  Fixes and improvements to code related with banning the library from
@@ -195,7 +259,7 @@
 	  anyway).
 	* test/lhiptest.c (test_open_link_banned): fixed logger
 
-2015-09-06	Bogdan Drozdowski <bogdandr@op.pl>
+2015-09-06	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* LibHideIP version 0.9
 	  Library marked as not requiring executable stack (security reasons).
@@ -235,7 +299,7 @@
 	* src/lhip_addr.c (__lhip_is_local_addr): fixed one check in
 	  comparing the given address to a local IPv6 address.
 
-2013-06-02	Bogdan Drozdowski <bogdandr@op.pl>
+2013-06-02	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* LibHideIP version 0.8
 	  Corrected getting the local addresses and limitations on
@@ -263,7 +327,7 @@
 	* src/lhip_ioctl.c: removed unnecessary variables
 	* src/lhip_exec.c: added a missing "unused" attribute
 
-2012-09-30	Bogdan Drozdowski <bogdandr@op.pl>
+2012-09-30	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* LibHideIP version 0.7.1
 	  This is a bugfix-only release.
@@ -271,7 +335,7 @@
 	* src/lhip_banning.c (__lhip_is_banned_in_file): removed incorrect
 	  debugging messages.
 
-2012-09-23	Bogdan Drozdowski <bogdandr@op.pl>
+2012-09-23	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* LibHideIP version 0.7
 	  Banning mechanism fixed and updated with new possibilities.
@@ -296,7 +360,7 @@
 	* README, INSTALL, doc/libhideip.texi.in, doc/libhideip.3: updated
 	  with new banning information. Minor corrections.
 
-2012-02-12	Bogdan Drozdowski <bogdandr@op.pl>
+2012-02-12	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* libhideip version 0.6
 	  Made the header file SWIG-enabled, updated copyright, code cleanup,
@@ -314,7 +378,7 @@
 	  and using libhideip with SWIG, added links to SourceForge pages,
 	  marked the URLs.
 
-2011-10-05	Bogdan Drozdowski <bogdandr@op.pl>
+2011-10-05	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* libhideip version 0.5
 	  Providing a public interface to use by programmers to secure their
@@ -338,7 +402,7 @@
 	* libhideip.spec.in: added the -devel package
 	* Makefile.am: added the file for pkg-config.
 
-2011-03-17	Bogdan Drozdowski <bogdandr@op.pl>
+2011-03-17	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* libhideip version 0.4
 	  Run flawfinder, rats and cppcheck on the code and fixed a few
@@ -355,7 +419,7 @@
 	* configure.ac: fixed double CFLAGS on compile
 	* src/lhip_addr.c: separated address checking from the main file.
 
-2010-05-22	Bogdan Drozdowski <bogdandr@op.pl>
+2010-05-22	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* libhideip version 0.3
 	  Upgrade to newer autotools, gcc and libtool. Added some copyright
@@ -399,7 +463,7 @@
 	  for localhost/localdomain.
 	* libhideip.spec.in: corrected warnings displayed by rpmlint.
 
-2009-02-16	Bogdan Drozdowski <bogdandr@op.pl>
+2009-02-16	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* libhideip version 0.2
 	  Renamed PATH_SEP to LHIP_PATH_SEP to avoid conflicts.
@@ -413,7 +477,7 @@
 	* src/lhip_opens.c, src/lhip_ioctl.c: better checking for
 	  stdarg.h/varargs.h.
 
-2008-12-23	Bogdan Drozdowski <bogdandr@op.pl>
+2008-12-23	Bogdan Drozdowski <bogdro@users.sourceforge.net>
 
 	* libhideip version 0.1
 	  Intercepting the following functions: gethostbyaddr, gethostbyaddr_r,

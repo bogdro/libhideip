@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- getting the local address, checking for matches and anonymizing.
  *
- * Copyright (C) 2011-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2011-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -24,6 +24,8 @@
  */
 
 #include "lhip_cfg.h"
+
+#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 
 #ifdef HAVE_STRING_H
 # if (!defined STDC_HEADERS) && (defined HAVE_MEMORY_H)
@@ -165,6 +167,10 @@ __lhip_get_address_info LHIP_PARAMS ((const char host[]));
 static int GCC_WARN_UNUSED_RESULT
 __lhip_check_hostent_match LHIP_PARAMS ((
 	const struct hostent * const host1, const struct hostent * const host2));
+
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
+#endif
 
 /* =============================================================== */
 

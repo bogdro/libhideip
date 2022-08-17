@@ -2,7 +2,7 @@
  * A library for secure removing files.
  *	-- unit test common functions - header file.
  *
- * Copyright (C) 2015-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2015-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -55,25 +55,55 @@
 #  define LHIP_ALIGN(x)
 # endif
 
-#if (defined LHIP_ENABLE_USERBANS) && (defined HAVE_GETENV) \
+/* LHIP_PARAMS is a macro used to wrap function prototypes, so that
+        compilers that don't understand ANSI C prototypes still work,
+        and ANSI C compilers can issue warnings about type mismatches. */
+# undef LHIP_PARAMS
+# if defined (__STDC__) || defined (_AIX) \
+	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
+	|| defined (WIN32) || defined (__cplusplus)
+#  define LHIP_PARAMS(protos) protos
+#  define LHIP_ANSIC
+# else
+#  define LHIP_PARAMS(protos) ()
+#  undef LHIP_ANSIC
+# endif
+
+# if (defined LHIP_ENABLE_USERBANS) && (defined HAVE_GETENV) \
 	&& (defined HAVE_STDLIB_H) && (defined HAVE_MALLOC)
-# define LHIP_CAN_USE_BANS 1
-#else
-# undef LHIP_CAN_USE_BANS
-#endif
+#  define LHIP_CAN_USE_BANS 1
+# else
+#  undef LHIP_CAN_USE_BANS
+# endif
 
-#if (defined LHIP_ENABLE_ENV) && (defined HAVE_STDLIB_H) && (defined HAVE_GETENV)
-# define LHIP_CAN_USE_ENV 1
-#else
-# undef LHIP_CAN_USE_ENV
-#endif
+# if (defined LHIP_ENABLE_ENV) && (defined HAVE_STDLIB_H) && (defined HAVE_GETENV)
+#  define LHIP_CAN_USE_ENV 1
+# else
+#  undef LHIP_CAN_USE_ENV
+# endif
 
-#define LHIP_TEST_FILENAME "zz1"
-#define LHIP_TEST_FILE_LENGTH 3
-#define LHIP_LINK_FILENAME "zz1link"
-#define LHIP_TEST_BANNED_FILENAME "/etc/hosts"
-#define LHIP_TEST_BANNED_FILENAME_SHORT "hosts"
-#define LHIP_TEST_BANNED_LINKNAME "banlink"
-#define LHIP_EXIT_VALUE (-222)
+# define LHIP_TEST_FILENAME "zz1"
+# define LHIP_TEST_FILE_LENGTH 3
+# define LHIP_LINK_FILENAME "zz1link"
+# define LHIP_TEST_BANNED_FILENAME "/etc/hosts"
+# define LHIP_TEST_BANNED_FILENAME_SHORT "hosts"
+# define LHIP_TEST_BANNED_LINKNAME "banlink"
+# define LHIP_EXIT_VALUE (-222)
+
+# define LHIP_PROLOG_FOR_TEST() \
+	puts(__func__)
+
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+extern void verify_ipv4 LHIP_PARAMS((void * addr4));
+extern void verify_ipv6 LHIP_PARAMS((void * addr_ip6));
+extern void lhiptest_prepare_banned_file LHIP_PARAMS((void));
+extern TCase * lhiptest_add_fixtures LHIP_PARAMS((TCase * tests));
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif /* LHIPTEST_COMMON_HEADER */

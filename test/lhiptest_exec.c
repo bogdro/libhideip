@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- unit test for program execution functions.
  *
- * Copyright (C) 2015-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2015-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -110,7 +110,7 @@ START_TEST(test_execve)
 	char * args[] = { NULL, NULL, NULL };
 	char * envp[] = { NULL };
 
-	printf("test_execve\n");
+	LHIP_PROLOG_FOR_TEST();
 	args[0] = progname;
 	args[1] = fname;
 	execve (progname, args, envp);
@@ -124,7 +124,7 @@ START_TEST(test_execve_banned)
 	char * args[] = { NULL };
 	char * envp[] = { NULL };
 
-	printf("test_execve_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = execve ("/sbin/ifconfig", args, envp);
 	ck_assert_int_ne(a, 0);
 	exit (LHIP_EXIT_VALUE); /* expected exit value if the banned program didn't indeed run */
@@ -141,7 +141,7 @@ START_TEST(test_execveat)
 	int dirfd;
 	int err;
 
-	printf("test_execveat\n");
+	LHIP_PROLOG_FOR_TEST();
 	dirfd = open ("/bin", O_DIRECTORY | O_PATH);
 	if ( dirfd >= 0 )
 	{
@@ -167,7 +167,7 @@ START_TEST(test_execveat_banned)
 	char * envp[] = { NULL };
 	int dirfd;
 
-	printf("test_execveat_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	dirfd = open ("/sbin", O_DIRECTORY | O_PATH);
 	if ( dirfd >= 0 )
 	{
@@ -194,7 +194,7 @@ START_TEST(test_fexecve)
 	int prog_fd;
 	int err;
 
-	printf("test_fexecve\n");
+	LHIP_PROLOG_FOR_TEST();
 	prog_fd = open (progname, O_RDONLY);
 	if ( prog_fd >= 0 )
 	{
@@ -220,7 +220,7 @@ START_TEST(test_fexecve_banned)
 	char * envp[] = { NULL };
 	int prog_fd;
 
-	printf("test_fexecve_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	prog_fd = open (progname, O_RDONLY);
 	if ( prog_fd >= 0 )
 	{
@@ -243,7 +243,7 @@ START_TEST(test_system)
 {
 	int a;
 
-	printf("test_system\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = system ("/bin/cat " LHIP_TEST_FILENAME);
 	ck_assert_int_eq(a, 0);
 }
@@ -253,7 +253,7 @@ START_TEST(test_system_banned)
 {
 	int a;
 
-	printf("test_system_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = system ("/sbin/ifconfig");
 	ck_assert_int_ne(a, 0);
 }
@@ -263,7 +263,7 @@ START_TEST(test_system_banned2)
 {
 	int a;
 
-	printf("test_system_banned2\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = system ("/sbin/ifconfig -a");
 	ck_assert_int_ne(a, 0);
 }
@@ -271,39 +271,9 @@ END_TEST
 
 /* ======================================================= */
 
-/*
-__attribute__ ((constructor))
-static void setup_global(void) / * unchecked * /
-{
-}
-*/
-
-/*
-static void teardown_global(void)
-{
-}
-*/
-
-static void setup_file_test(void) /* checked */
-{
-	FILE *f;
-
-	f = fopen(LHIP_TEST_FILENAME, "w");
-	if (f != NULL)
-	{
-		fwrite("aaa", 1, LHIP_TEST_FILE_LENGTH, f);
-		fclose(f);
-	}
-}
-
-static void teardown_file_test(void)
-{
-	unlink(LHIP_TEST_FILENAME);
-}
-
 static Suite * lhip_create_suite(void)
 {
-	Suite * s = suite_create("libhideip");
+	Suite * s = suite_create("libhideip_exec");
 
 	TCase * tests_exec = tcase_create("exec");
 
@@ -327,7 +297,7 @@ static Suite * lhip_create_suite(void)
 	tcase_add_test(tests_exec, test_system_banned);
 	tcase_add_test(tests_exec, test_system_banned2);
 
-	tcase_add_checked_fixture(tests_exec, &setup_file_test, &teardown_file_test);
+	lhiptest_add_fixtures (tests_exec);
 
 	/* set 30-second timeouts */
 	tcase_set_timeout(tests_exec, 30);

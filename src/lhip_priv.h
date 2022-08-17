@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- private header file.
  *
- * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -280,6 +280,10 @@ typedef int (*i_ssp_slp)			LHIP_PARAMS ((int s, struct sockaddr *name, socklen_t
 typedef int (*i_cssp_sl)			LHIP_PARAMS ((int sockfd, const struct sockaddr *my_addr,
 							socklen_t addrlen));
 typedef int (*i_i_ia2)				LHIP_PARAMS ((int d, int type, int protocol, int sv[2]));
+# if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
+typedef int (*i_i_sgpp_i_ssp)			LHIP_PARAMS ((int mode, struct gaicb *list[],
+							int nitems, struct sigevent *sevp));
+# endif
 
 /* file-related functions: */
 typedef FILE*	(*fp_cp_cp)			LHIP_PARAMS ((const char * const name, const char * const mode));
@@ -325,6 +329,9 @@ typedef pcap_t * (*pp_Fp_ui_cp)			LHIP_PARAMS ((FILE * fp, u_int t, char * errbu
 typedef pcap_t * (*pp_ipt_cp)			LHIP_PARAMS ((intptr_t a, char * errbuf));
 typedef pcap_t * (*pp_ipt_ui_cp)		LHIP_PARAMS ((intptr_t a, u_int t, char * errbuf));
 typedef int (*i_ifpp_cp)			LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
+typedef int (*i_cp_rmtp_ifpp_cp)		LHIP_PARAMS ((char *source,
+							struct pcap_rmtauth *auth,
+							pcap_if_t **alldevs, char *errbuf));
 
 # ifdef __cplusplus
 extern "C" {
@@ -359,6 +366,9 @@ extern GCC_WARN_UNUSED_RESULT i_i_i_cvp_sl			__lhip_real_setsockopt_location LHI
 extern GCC_WARN_UNUSED_RESULT i_ssp_slp				__lhip_real_getsockname_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_cssp_sl				__lhip_real_bind_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_i_ia2				__lhip_real_socketpair_location LHIP_PARAMS ((void));
+# if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
+extern GCC_WARN_UNUSED_RESULT i_i_sgpp_i_ssp			__lhip_real_getaddrinfo_a_location LHIP_PARAMS ((void));
+# endif
 
 /* file-related functions: */
 extern GCC_WARN_UNUSED_RESULT fp_cp_cp				__lhip_real_fopen64_location LHIP_PARAMS ((void));
@@ -395,6 +405,7 @@ extern GCC_WARN_UNUSED_RESULT pp_Fp_ui_cp			__lhip_real_pcap_fopen_offline_ts_lo
 extern GCC_WARN_UNUSED_RESULT pp_ipt_cp				__lhip_real_pcap_hopen_offline_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT pp_ipt_ui_cp			__lhip_real_pcap_hopen_offline_ts_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_ifpp_cp				__lhip_real_pcap_findalldevs_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_rmtp_ifpp_cp			__lhip_real_pcap_findalldevs_ex_location LHIP_PARAMS ((void));
 
 /* The library functions: */
 extern int							__lhip_main LHIP_PARAMS ((void));
@@ -478,13 +489,13 @@ extern char * __lhip_duplicate_string LHIP_PARAMS ((const char src[]));
 
 # ifdef HAVE_ERRNO_H
 #  ifdef ENOSYS
-#   define LHIP_SET_ERRNO_MISSING() {errno = ENOSYS;}
+#   define LHIP_SET_ERRNO_MISSING() do {errno = ENOSYS;} while (0)
 #  else
-#   define LHIP_SET_ERRNO_MISSING() {errno = 38;}
+#   define LHIP_SET_ERRNO_MISSING() do {errno = 38;} while (0)
 #  endif
-#  define LHIP_SET_ERRNO_PERM() {errno = EPERM;}
-#  define LHIP_SET_ERRNO(value) {errno = value;}
-#  define LHIP_GET_ERRNO(variable) {variable = errno;}
+#  define LHIP_SET_ERRNO_PERM() do {errno = EPERM;} while (0)
+#  define LHIP_SET_ERRNO(value) do {errno = value;} while (0)
+#  define LHIP_GET_ERRNO(variable) do {variable = errno;} while (0)
 #  define LHIP_MAKE_ERRNO_VAR(name) int name = errno
 # else
 #  define LHIP_SET_ERRNO_MISSING()

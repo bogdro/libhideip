@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- unit test for banning functions.
  *
- * Copyright (C) 2015-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2015-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -97,7 +97,7 @@ START_TEST(test_banned_in_userfile_prog)
 	int err;
 	long file_len;
 
-	printf("test_banned_in_userfile_prog\n");
+	LHIP_PROLOG_FOR_TEST();
 
 	home_env = getenv("HOME");
 	if ( home_env == NULL )
@@ -161,7 +161,7 @@ START_TEST(test_banned_in_env_prog)
 	long file_len;
 	int res;
 
-	printf("test_banned_in_env_prog\n");
+	LHIP_PROLOG_FOR_TEST();
 
 	res = setenv(LHIP_BANNING_ENV, env_ban_file_name, 1);
 	if ( res != 0 )
@@ -206,39 +206,9 @@ END_TEST
 
 /* ======================================================= */
 
-/*
-__attribute__ ((constructor))
-static void setup_global(void) / * unchecked * /
-{
-}
-*/
-
-/*
-static void teardown_global(void)
-{
-}
-*/
-
-static void setup_file_test(void) /* checked */
-{
-	FILE *f;
-
-	f = fopen(LHIP_TEST_FILENAME, "w");
-	if (f != NULL)
-	{
-		fwrite("aaa", 1, LHIP_TEST_FILE_LENGTH, f);
-		fclose(f);
-	}
-}
-
-static void teardown_file_test(void)
-{
-	unlink(LHIP_TEST_FILENAME);
-}
-
 static Suite * lhip_create_suite(void)
 {
-	Suite * s = suite_create("libhideip");
+	Suite * s = suite_create("libhideip_banning");
 
 	TCase * tests_banned = tcase_create("banning");
 
@@ -248,7 +218,7 @@ static Suite * lhip_create_suite(void)
 #ifdef LHIP_CAN_USE_ENV
 	tcase_add_test(tests_banned, test_banned_in_env_prog);
 #endif
-	tcase_add_checked_fixture(tests_banned, &setup_file_test, &teardown_file_test);
+	lhiptest_add_fixtures (tests_banned);
 
 	/* set 30-second timeouts */
 	tcase_set_timeout(tests_banned, 30);

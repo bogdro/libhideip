@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- unit test for system name functions.
  *
- * Copyright (C) 2015-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2015-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -52,7 +52,7 @@ START_TEST(test_uname)
 	int a;
 	struct utsname u;
 
-	printf("test_uname\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = uname (&u);
 	ck_assert_int_eq(a, 0);
 	if (u.nodename != NULL)
@@ -68,22 +68,9 @@ END_TEST
 
 /* ======================================================= */
 
-/*
-__attribute__ ((constructor))
-static void setup_global(void) / * unchecked * /
-{
-}
-*/
-
-/*
-static void teardown_global(void)
-{
-}
-*/
-
 static Suite * lhip_create_suite(void)
 {
-	Suite * s = suite_create("libhideip");
+	Suite * s = suite_create("libhideip_uname");
 
 #ifdef HAVE_SYS_UTSNAME_H
 	TCase * tests_uname = tcase_create("uname");

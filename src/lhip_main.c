@@ -1,7 +1,7 @@
 /*
  * A library for hiding local IP address.
  *
- * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -71,6 +71,7 @@
 
 static int	__lhip_is_initialized		= LHIP_INIT_STAGE_NOT_INITIALIZED;
 static void *	__lhip_handle_resolv		= NULL;
+static void *	__lhip_handle_anl		= NULL;
 
 /* --- Pointers to original functions. */
 /* network-related functions: */
@@ -102,6 +103,9 @@ static i_i_i_cvp_sl			__lhip_real_setsockopt		= NULL;
 static i_ssp_slp			__lhip_real_getsockname		= NULL;
 static i_cssp_sl			__lhip_real_bind		= NULL;
 static i_i_ia2				__lhip_real_socketpair		= NULL;
+#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
+static i_i_sgpp_i_ssp			__lhip_real_getaddrinfo_a	= NULL;
+#endif
 
 /* file-related functions: */
 static fp_cp_cp				__lhip_real_fopen64		= NULL;
@@ -137,6 +141,7 @@ static pp_Fp_ui_cp			__lhip_real_pcap_fopen_offline_ts	= NULL;
 static pp_ipt_cp			__lhip_real_pcap_hopen_offline		= NULL;
 static pp_ipt_ui_cp			__lhip_real_pcap_hopen_offline_ts	= NULL;
 static i_ifpp_cp			__lhip_real_pcap_findalldevs		= NULL;
+static i_cp_rmtp_ifpp_cp		__lhip_real_pcap_findalldevs_ex		= NULL;
 
 #if ((defined HAVE_DLSYM) || (defined HAVE_LIBDL_DLSYM))		\
 	&& (!defined HAVE_DLVSYM) && (!defined HAVE_LIBDL_DLVSYM)	\
@@ -145,6 +150,10 @@ static i_ifpp_cp			__lhip_real_pcap_findalldevs		= NULL;
 /*# warning Versioned fopen is unavailable, so LibHideIP may crash on some glibc versions.*/
 #else
 # undef LHIP_CANT_USE_VERSIONED_FOPEN
+#endif
+
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
 #endif
 
 /* =============================================================== */
@@ -367,6 +376,16 @@ __lhip_main (LHIP_VOID)
 		*(void **) (&__lhip_real_pcap_hopen_offline)    = dlsym  (RTLD_NEXT, "pcap_hopen_offline");
 		*(void **) (&__lhip_real_pcap_hopen_offline_ts) = dlsym  (RTLD_NEXT, "pcap_hopen_offline_with_tstamp_precision");
 		*(void **) (&__lhip_real_pcap_findalldevs)      = dlsym  (RTLD_NEXT, "pcap_findalldevs");
+		*(void **) (&__lhip_real_pcap_findalldevs_ex)   = dlsym  (RTLD_NEXT, "pcap_findalldevs_ex");
+
+		*(void **) (&__lhip_real_getaddrinfo_a)         = dlsym  (RTLD_NEXT, "getaddrinfo_a");
+		if ( __lhip_real_getaddrinfo_a == NULL )
+		{
+			__lhip_handle_anl = dlopen("libanl.so", RTLD_NOW);
+#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
+			*(void **) (&__lhip_real_getaddrinfo_a) = dlsym  (__lhip_handle_anl, "getaddrinfo_a");
+#endif
+		}
 
 		__lhip_is_initialized = LHIP_INIT_STAGE_AFTER_DLSYM;
 
@@ -386,6 +405,12 @@ __lhip_end (LHIP_VOID)
 	if ( __lhip_handle_resolv != NULL )
 	{
 		dlclose (__lhip_handle_resolv);
+		__lhip_handle_resolv = NULL;
+	}
+	if ( __lhip_handle_anl != NULL )
+	{
+		dlclose (__lhip_handle_anl);
+		__lhip_handle_anl = NULL;
 	}
 	__lhip_free_local_addresses ();
 	endhostent();
@@ -796,3 +821,19 @@ i_ifpp_cp __lhip_real_pcap_findalldevs_location (LHIP_VOID)
 {
 	return __lhip_real_pcap_findalldevs;
 }
+
+/* =============================================================== */
+
+i_cp_rmtp_ifpp_cp __lhip_real_pcap_findalldevs_ex_location (LHIP_VOID)
+{
+	return __lhip_real_pcap_findalldevs_ex;
+}
+
+/* =============================================================== */
+
+#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
+i_i_sgpp_i_ssp __lhip_real_getaddrinfo_a_location (LHIP_VOID)
+{
+	return __lhip_real_getaddrinfo_a;
+}
+#endif

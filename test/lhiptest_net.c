@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- unit test for network-related functions.
  *
- * Copyright (C) 2015-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2015-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -129,45 +129,9 @@ static struct sockaddr_in sa_in;
 static struct sockaddr_in6 sa_in6;
 #endif
 
-static const unsigned char __lhip_localhost_ipv4[4] = {127, 0, 0, 1};
-static const unsigned char __lhip_localhost_ipv6[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 static char buf[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
 
 /* ====================== Network functions */
-
-/**
- * Checks if the given IPv4 address is anonymized (contains 127.0.0.1)
- * @return 1 if OK
- */
-static void verify_ipv4(void * addr4)
-{
-	if ( addr4 == NULL )
-	{
-		return;
-	}
-	if ( memcmp (addr4, __lhip_localhost_ipv4, sizeof (__lhip_localhost_ipv4)) == 0 )
-	{
-		return;
-	}
-	fail("IPv4 address contains something else than '127.0.0.1': '0x%x'\n", *((int *)addr4));
-}
-
-/**
- * Checks if the given IPv6 address is anonymized (contains ::1)
- * @return 1 if OK
- */
-static void verify_ipv6(void * addr_ip6)
-{
-	if ( addr_ip6 == NULL )
-	{
-		return;
-	}
-	if ( memcmp (addr_ip6, __lhip_localhost_ipv6, sizeof (__lhip_localhost_ipv6)) == 0 )
-	{
-		return;
-	}
-	fail("IPv6 address contains something else than '::1': '0x%x'\n", *((int *)addr_ip6));
-}
 
 static void verify_addrinfo (struct addrinfo * ai)
 {
@@ -275,10 +239,11 @@ START_TEST(test_gethostbyaddr)
 {
 	struct hostent * h;
 
-	printf("test_gethostbyaddr\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = gethostbyaddr (&addr, 4, AF_INET);
 	fail_if(h == NULL);
 	verify_hostent(h);
+	/*freehostent (h);*/
 }
 END_TEST
 
@@ -286,10 +251,11 @@ START_TEST(test_gethostbyaddr6)
 {
 	struct hostent * h;
 
-	printf("test_gethostbyaddr6\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = gethostbyaddr (&addr6, 16, AF_INET6);
 	fail_if(h == NULL);
 	verify_hostent(h);
+	/*freehostent (h);*/
 }
 END_TEST
 
@@ -301,12 +267,13 @@ START_TEST(test_gethostbyaddr_r)
 	struct hostent * tmp;
 	struct hostent res;
 
-	printf("test_gethostbyaddr_r\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	a = gethostbyaddr_r (&addr, 4, AF_INET,
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
 	verify_hostent(&res);
+	/*freehostent (&res);*/
 }
 END_TEST
 
@@ -317,12 +284,13 @@ START_TEST(test_gethostbyaddr_r6)
 	struct hostent * tmp;
 	struct hostent res;
 
-	printf("test_gethostbyaddr_r6\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	a = gethostbyaddr_r (&addr6, 16, AF_INET6,
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
 	verify_hostent(&res);
+	/*freehostent (&res);*/
 }
 END_TEST
 # endif /* HAVE_GETHOSTBYADDR_R */
@@ -331,9 +299,10 @@ START_TEST(test_gethostbyname)
 {
 	struct hostent * h;
 
-	printf("test_gethostbyname\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = gethostbyname ("www.google.com");
 	fail_if(h == NULL);
+	/*freehostent (h);*/
 }
 END_TEST
 
@@ -341,10 +310,11 @@ START_TEST(test_gethostbyname_banned)
 {
 	struct hostent * h;
 
-	printf("test_gethostbyname_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = gethostbyname ("127.0.0.1");
 	fail_if(h == NULL);
 	verify_hostent(h);
+	/*freehostent (h);*/
 }
 END_TEST
 
@@ -356,11 +326,12 @@ START_TEST(test_gethostbyname_r)
 	struct hostent * tmp;
 	struct hostent res;
 
-	printf("test_gethostbyname_r\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	a = gethostbyname_r ("www.google.com",
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
+	/*freehostent (&res);*/
 }
 END_TEST
 
@@ -371,12 +342,13 @@ START_TEST(test_gethostbyname_r_banned)
 	struct hostent * tmp;
 	struct hostent res;
 
-	printf("test_gethostbyname_r_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	a = gethostbyname_r ("127.0.0.1",
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
 	verify_hostent(&res);
+	/*freehostent (&res);*/
 }
 END_TEST
 # endif /* HAVE_GETHOSTBYNAME_R */
@@ -385,9 +357,10 @@ START_TEST(test_gethostbyname2)
 {
 	struct hostent * h;
 
-	printf("test_gethostbyname2\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = gethostbyname2 ("www.google.com", AF_INET);
 	fail_if(h == NULL);
+	/*freehostent (h);*/
 }
 END_TEST
 
@@ -395,10 +368,11 @@ START_TEST(test_gethostbyname2_banned)
 {
 	struct hostent * h;
 
-	printf("test_gethostbyname2_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = gethostbyname2 ("127.0.0.1", AF_INET);
 	fail_if(h == NULL);
 	verify_hostent(h);
+	/*freehostent (h);*/
 }
 END_TEST
 
@@ -406,10 +380,11 @@ START_TEST(test_gethostbyname2_banned6)
 {
 	struct hostent * h;
 
-	printf("test_gethostbyname2_banned6\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = gethostbyname2 ("::1", AF_INET6);
 	fail_if(h == NULL);
 	verify_hostent(h);
+	/*freehostent (h);*/
 }
 END_TEST
 
@@ -421,11 +396,12 @@ START_TEST(test_gethostbyname2_r)
 	struct hostent * tmp;
 	struct hostent res;
 
-	printf("test_gethostbyname2_r\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	a = gethostbyname2_r ("www.google.com", AF_INET,
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
+	/*freehostent (&res);*/
 }
 END_TEST
 
@@ -436,12 +412,13 @@ START_TEST(test_gethostbyname2_r_banned)
 	struct hostent * tmp;
 	struct hostent res;
 
-	printf("test_gethostbyname2_r_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	a = gethostbyname2_r ("127.0.0.1", AF_INET,
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
 	verify_hostent(&res);
+	/*freehostent (&res);*/
 }
 END_TEST
 
@@ -452,12 +429,13 @@ START_TEST(test_gethostbyname2_r_banned6)
 	struct hostent * tmp;
 	struct hostent res;
 
-	printf("test_gethostbyname2_r_banned6\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	a = gethostbyname2_r ("::1", AF_INET6,
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
 	verify_hostent(&res);
+	/*freehostent (&res);*/
 }
 END_TEST
 # endif /* HAVE_GETHOSTBYNAME2_R */
@@ -466,11 +444,12 @@ START_TEST(test_gethostent)
 {
 	struct hostent * h;
 
-	printf("test_gethostent\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = gethostent ();
 	if (h != NULL)
 	{
 		verify_hostent(h);
+		/*freehostent (h);*/
 	}
 }
 END_TEST
@@ -483,12 +462,13 @@ START_TEST(test_gethostent_r)
 	struct hostent * tmp;
 	struct hostent res;
 
-	printf("test_gethostent_r\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	a = gethostent_r (&res, buf, sizeof (buf), &tmp, &err);
 	if ((a == 0) && (tmp != NULL))
 	{
 		verify_hostent(&res);
+		/*freehostent (&res);*/
 	}
 }
 END_TEST
@@ -500,10 +480,11 @@ START_TEST(test_getipnodebyaddr)
 	struct hostent * h;
 	int err;
 
-	printf("test_getipnodebyaddr\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = getipnodebyaddr (&addr, 4, AF_INET, &err);
 	fail_if(h == NULL);
 	verify_hostent(h);
+	/*freehostent (h);*/
 }
 END_TEST
 
@@ -512,10 +493,11 @@ START_TEST(test_getipnodebyaddr6)
 	struct hostent * h;
 	int err;
 
-	printf("test_getipnodebyaddr6\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = getipnodebyaddr (&addr6, 16, AF_INET6, &err);
 	fail_if(h == NULL);
 	verify_hostent(h);
+	/*freehostent (h);*/
 }
 END_TEST
 # endif /* HAVE_GETIPNODEBYADDR */
@@ -526,10 +508,11 @@ START_TEST(test_getipnodebyname)
 	struct hostent * h;
 	int err;
 
-	printf("test_getipnodebyname\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = getipnodebyname ("127.0.0.1", AF_INET, 0, &err);
 	fail_if(h == NULL);
 	verify_hostent(h);
+	/*freehostent (h);*/
 }
 END_TEST
 
@@ -538,10 +521,11 @@ START_TEST(test_getipnodebyname6)
 	struct hostent * h;
 	int err;
 
-	printf("test_getipnodebyname6\n");
+	LHIP_PROLOG_FOR_TEST();
 	h = getipnodebyname ("::1", AF_INET6, 0, &err);
 	fail_if(h == NULL);
 	verify_hostent(h);
+	/*freehostent (h);*/
 }
 END_TEST
 # endif /* HAVE_GETIPNODEBYNAME */
@@ -551,7 +535,7 @@ START_TEST(test_getnameinfo)
 {
 	int a;
 
-	printf("test_getnameinfo\n");
+	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
 	a = getnameinfo ((struct sockaddr*)&sa_in, sizeof (struct sockaddr_in),
 		buf, sizeof (buf), NULL, 0, 0);
@@ -563,23 +547,35 @@ START_TEST(test_getnameinfo)
 }
 END_TEST
 
+static struct addrinfo * prepare_hints (struct addrinfo * ai_hints)
+{
+	if ( ai_hints != NULL )
+	{
+		memset (ai_hints, 0, sizeof (struct addrinfo));
+		ai_hints->ai_flags = /*AI_NUMERICHOST |*/ AI_CANONNAME;
+		ai_hints->ai_family = AF_UNSPEC;
+		ai_hints->ai_socktype = 0;
+		ai_hints->ai_protocol = 0;
+		ai_hints->ai_addr = NULL;
+		ai_hints->ai_canonname = NULL;
+		ai_hints->ai_next = NULL;
+	}
+	return ai_hints;
+}
+
 START_TEST(test_getaddrinfo)
 {
 	int a;
 	struct addrinfo * addrinfo_all = NULL;
 	struct addrinfo ai_hints;
 
-	printf("test_getaddrinfo\n");
-	memset (&ai_hints, 0, sizeof (struct addrinfo));
-	ai_hints.ai_flags = /*AI_NUMERICHOST |*/ AI_CANONNAME;
-	ai_hints.ai_family = AF_UNSPEC;
-	ai_hints.ai_socktype = 0;
-	ai_hints.ai_protocol = 0;
-	ai_hints.ai_addr = NULL;
-	ai_hints.ai_canonname = NULL;
-	ai_hints.ai_next = NULL;
+	LHIP_PROLOG_FOR_TEST();
 	a = getaddrinfo ("www.google.com", NULL /* service */,
-		&ai_hints, &addrinfo_all);
+		prepare_hints (&ai_hints), &addrinfo_all);
+	if ( addrinfo_all != NULL )
+	{
+		freeaddrinfo (addrinfo_all);
+	}
 	ck_assert_int_eq(a, 0);
 	fail_if(addrinfo_all == NULL);
 }
@@ -591,21 +587,14 @@ START_TEST(test_getaddrinfo_banned)
 	struct addrinfo * addrinfo_all = NULL;
 	struct addrinfo ai_hints;
 
-	printf("test_getaddrinfo_banned\n");
-	memset (&ai_hints, 0, sizeof (struct addrinfo));
-	ai_hints.ai_flags = /*AI_NUMERICHOST |*/ AI_CANONNAME;
-	ai_hints.ai_family = AF_UNSPEC;
-	ai_hints.ai_socktype = 0;
-	ai_hints.ai_protocol = 0;
-	ai_hints.ai_addr = NULL;
-	ai_hints.ai_canonname = NULL;
-	ai_hints.ai_next = NULL;
+	LHIP_PROLOG_FOR_TEST();
 	a = getaddrinfo ("127.0.0.1", NULL /* service */,
-		&ai_hints, &addrinfo_all);
+		prepare_hints (&ai_hints), &addrinfo_all);
 	ck_assert_int_eq(a, 0);
 	if ( addrinfo_all != NULL )
 	{
 		verify_addrinfo (addrinfo_all);
+		freeaddrinfo (addrinfo_all);
 	}
 }
 END_TEST
@@ -616,21 +605,14 @@ START_TEST(test_getaddrinfo_banned6)
 	struct addrinfo * addrinfo_all = NULL;
 	struct addrinfo ai_hints;
 
-	printf("test_getaddrinfo_banned6\n");
-	memset (&ai_hints, 0, sizeof (struct addrinfo));
-	ai_hints.ai_flags = /*AI_NUMERICHOST |*/ AI_CANONNAME;
-	ai_hints.ai_family = AF_UNSPEC;
-	ai_hints.ai_socktype = 0;
-	ai_hints.ai_protocol = 0;
-	ai_hints.ai_addr = NULL;
-	ai_hints.ai_canonname = NULL;
-	ai_hints.ai_next = NULL;
+	LHIP_PROLOG_FOR_TEST();
 	a = getaddrinfo ("::1", NULL /* service */,
-		&ai_hints, &addrinfo_all);
+		prepare_hints (&ai_hints), &addrinfo_all);
 	ck_assert_int_eq(a, 0);
 	if ( addrinfo_all != NULL )
 	{
 		verify_addrinfo (addrinfo_all);
+		freeaddrinfo (addrinfo_all);
 	}
 }
 END_TEST
@@ -645,7 +627,7 @@ START_TEST(test_getifaddrs)
 	struct ifaddrs * ifa;
 	struct ifaddrs * c;
 
-	printf("test_getifaddrs\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = getifaddrs (&ifa);
 	ck_assert_int_eq(a, 0);
 	c = ifa;
@@ -666,6 +648,10 @@ START_TEST(test_getifaddrs)
 		}
 		c = c->ifa_next;
 	}
+	if ( ifa != NULL )
+	{
+		freeifaddrs (ifa);
+	}
 }
 END_TEST
 #endif /* HAVE_IFADDRS_H */
@@ -675,7 +661,7 @@ START_TEST(test_socket_inet)
 {
 	int a;
 
-	printf("test_socket_inet\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = socket (AF_INET, SOCK_STREAM, 0);
 	if ( a >= 0 )
 	{
@@ -692,7 +678,7 @@ START_TEST(test_socket_unix)
 {
 	int a;
 
-	printf("test_socket_unix\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = socket (AF_UNIX, SOCK_STREAM, 0);
 	if ( a >= 0 )
 	{
@@ -709,7 +695,7 @@ START_TEST(test_socket_inet6)
 {
 	int a;
 
-	printf("test_socket_inet6\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( a >= 0 )
 	{
@@ -726,7 +712,7 @@ START_TEST(test_socket_banned_netlink)
 {
 	int a;
 
-	printf("test_socket_banned_netlink\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = socket (AF_NETLINK, SOCK_STREAM, PF_INET);
 	if ( a >= 0 )
 	{
@@ -743,7 +729,7 @@ START_TEST(test_socket_banned_raw)
 {
 	int a;
 
-	printf("test_socket_banned_raw\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = socket (AF_INET, SOCK_RAW, PF_INET);
 	if ( a >= 0 )
 	{
@@ -760,7 +746,7 @@ START_TEST(test_socket_banned_raw6)
 {
 	int a;
 
-	printf("test_socket_banned_raw6\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = socket (AF_INET6, SOCK_RAW, PF_INET);
 	if ( a >= 0 )
 	{
@@ -777,7 +763,7 @@ START_TEST(test_recvmsg)
 {
 	ssize_t a;
 
-	printf("test_recvmsg\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = recvmsg (1, NULL, 0);
 	if ( a >= 0 )
 	{
@@ -793,7 +779,7 @@ START_TEST(test_sendmsg)
 {
 	ssize_t a;
 
-	printf("test_sendmsg\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = sendmsg (1, NULL, 0);
 	if ( a >= 0 )
 	{
@@ -808,21 +794,21 @@ END_TEST
 START_TEST(test_getsockname)
 {
 	int a;
-	int sock;
 	socklen_t sa;
+	int sock;
 
-	printf("test_getsockname\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if ( sock >= 0 )
 	{
 		sa = sizeof (sa_in);
-		a = getsockname (sock, (struct sockaddr*)&sa_in, &sa);
+		a = getsockname (sock, (struct sockaddr *)&sa_in, &sa);
 		close (sock);
 		if ( a >= 0 )
 		{
 			if ( sa_in.sin_family == AF_INET )
 			{
-				verify_ipv4 (&(((struct sockaddr_in *)(&sa_in))->sin_addr));
+				verify_ipv4 (&(sa_in.sin_addr));
 			}
 			else if ( sa_in.sin_family == AF_INET6 )
 			{
@@ -844,25 +830,25 @@ END_TEST
 START_TEST(test_getsockname6)
 {
 	int a;
-	int sock;
 	socklen_t sa;
+	int sock;
 
-	printf("test_getsockname6\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 	if ( sock >= 0 )
 	{
-		sa = sizeof (sa_in);
-		a = getsockname (sock, (struct sockaddr*)&sa_in, &sa);
+		sa = sizeof (sa_in6);
+		a = getsockname (sock, (struct sockaddr *)&sa_in6, &sa);
 		close (sock);
 		if ( a >= 0 )
 		{
-			if ( sa_in.sin_family == AF_INET )
+			if ( sa_in6.sin6_family == AF_INET )
 			{
-				verify_ipv4 (&(((struct sockaddr_in *)(&sa_in))->sin_addr));
+				verify_ipv4 (&(((struct sockaddr_in *)(&sa_in6))->sin_addr));
 			}
-			else if ( sa_in.sin_family == AF_INET6 )
+			else if ( sa_in6.sin6_family == AF_INET6 )
 			{
-				verify_ipv6 (&(((struct sockaddr_in6 *)(&sa_in))->sin6_addr));
+				verify_ipv6 (&(sa_in6.sin6_addr));
 			}
 		}
 		else
@@ -883,7 +869,7 @@ START_TEST(test_bind)
 	int sock;
 	int err;
 
-	printf("test_bind\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
@@ -913,7 +899,7 @@ START_TEST(test_bind6)
 	const unsigned char zero_ipv6[16]
 		= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	printf("test_bind6\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
@@ -942,12 +928,19 @@ START_TEST(test_bind_banned)
 	int a;
 	int sock;
 
-	printf("test_bind_banned\n");
+	LHIP_PROLOG_FOR_TEST();
+#if 0
+	/*
+	Files with IP addresses are forbidden to be read, and also LibHideIP
+	forbids any other method to get the IP address. The user's address
+	must be hardcoded in the test.
+	*/
+#endif
 	sock = socket (AF_INET, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
 		sa_in.sin_family = AF_INET;
-		sa_in.sin_addr.s_addr = inet_addr ("192.168.1.250");
+		sa_in.sin_addr.s_addr = inet_addr ("192.168.1.226");
 		sa_in.sin_port = 5553;
 		a = bind (sock, (struct sockaddr*)&sa_in, sizeof (struct sockaddr_in));
 		close (sock);
@@ -967,10 +960,48 @@ START_TEST(test_bind_banned6)
 {
 	int a;
 	int sock;
-	const unsigned char addr_ipv6[16]
-		= {0x20, 0x02, 0xc0, 0xa8, 0xc0, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	unsigned char addr_ipv6[16]
+		= {0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0x53, 0x10, 0x3c, 0x51, 0x8f, 0x6d, 0xe7, 0x03 };
 
-	printf("test_bind_banned6\n");
+	LHIP_PROLOG_FOR_TEST();
+#if 0
+	/*
+	Files with IP addresses are forbidden to be read, and also LibHideIP
+	forbids any other method to get the IP address. The user's address
+	must be hardcoded in the test.
+	*/
+	ipv6_file = fopen ("/proc/net/if_inet6", "r");
+	if ( ipv6_file == NULL )
+	{
+		return;
+	}
+	do
+	{
+		fgets (line, sizeof (line), ipv6_file);
+		if ( strstr (line, "lo") != NULL )
+		{
+			/* the loopback line - skip */
+			continue;
+		}
+		/* not the loopback line - read the IP address */
+		a = sscanf (line, "%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx %*x %*x %*x %*x %*s ",
+			&addr_ipv6[0],  &addr_ipv6[1],  &addr_ipv6[2],  &addr_ipv6[3],
+			&addr_ipv6[4],  &addr_ipv6[5],  &addr_ipv6[6],  &addr_ipv6[7],
+			&addr_ipv6[8],  &addr_ipv6[9],  &addr_ipv6[10], &addr_ipv6[11],
+			&addr_ipv6[12], &addr_ipv6[13], &addr_ipv6[14], &addr_ipv6[15]);
+		if ( a != 16 )
+		{
+			continue;
+		}
+		got_addr = 1;
+		break;
+	} while ( ! feof (ipv6_file) );
+	fclose (ipv6_file);
+	if ( got_addr == 0 )
+	{
+		return;
+	}
+#endif
 	sock = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
@@ -999,7 +1030,7 @@ START_TEST(test_socketpair)
 	int twosocks[2];
 	int a;
 
-	printf("test_socketpair\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = socketpair (AF_UNIX, SOCK_STREAM, 0, twosocks);
 	if ( a >= 0 )
 	{
@@ -1018,7 +1049,7 @@ START_TEST(test_socketpair_banned_netlink)
 	int twosocks[2];
 	int a;
 
-	printf("test_socketpair_banned_netlink\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = socketpair (AF_NETLINK, SOCK_STREAM, PF_INET, twosocks);
 	if ( a >= 0 )
 	{
@@ -1040,7 +1071,7 @@ START_TEST(test_socketpair_banned_raw)
 	int twosocks[2];
 	int a;
 
-	printf("test_socketpair_banned_raw\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = socketpair (AF_INET, SOCK_RAW, PF_INET, twosocks);
 	if ( a >= 0 )
 	{
@@ -1062,7 +1093,7 @@ START_TEST(test_socketpair_banned_packet)
 	int twosocks[2];
 	int a;
 
-	printf("test_socketpair_banned_packet\n");
+	LHIP_PROLOG_FOR_TEST();
 # ifdef SOCK_PACKET
 	a = socketpair (AF_INET, SOCK_PACKET, PF_INET, twosocks);
 	if ( a >= 0 )
@@ -1081,24 +1112,30 @@ START_TEST(test_socketpair_banned_packet)
 }
 END_TEST
 
-START_TEST(test_getsockopt)
+static void run_getsockopt_on_socket (int sock_fd)
 {
 	int a;
-	int sock;
 	int err = 10;
 	socklen_t sa = sizeof (int);
 
-	printf("test_getsockopt\n");
+	a = getsockopt (sock_fd, SOL_IP, IP_TTL, &err, &sa);
+	err = errno;
+	close (sock_fd);
+	if ( a < 0 )
+	{
+		fail("socket option not read, but should have been: errno=%d\n", err);
+	}
+}
+
+START_TEST(test_getsockopt)
+{
+	int sock;
+
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
-		a = getsockopt (sock, SOL_IP, IP_TTL, &err, &sa);
-		err = errno;
-		close (sock);
-		if ( a < 0 )
-		{
-			fail("test_getsockopt: socket option not read, but should have been: errno=%d\n", err);
-		}
+		run_getsockopt_on_socket (sock);
 	}
 	else
 	{
@@ -1109,22 +1146,13 @@ END_TEST
 
 START_TEST(test_getsockopt6)
 {
-	int a;
 	int sock;
-	int err = 10;
-	socklen_t sa = sizeof (int);
 
-	printf("test_getsockopt6\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
-		a = getsockopt (sock, SOL_IP, IP_TTL, &err, &sa);
-		err = errno;
-		close (sock);
-		if ( a < 0 )
-		{
-			fail("test_getsockopt6: socket option not read, but should have been: errno=%d\n", err);
-		}
+		run_getsockopt_on_socket (sock);
 	}
 	else
 	{
@@ -1139,7 +1167,7 @@ START_TEST(test_getsockopt_banned)
 	int sock;
 	socklen_t sa;
 
-	printf("test_getsockopt_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
@@ -1165,7 +1193,7 @@ START_TEST(test_getsockopt_banned6)
 	int sock;
 	socklen_t sa;
 
-	printf("test_getsockopt_banned6\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
@@ -1184,23 +1212,29 @@ START_TEST(test_getsockopt_banned6)
 }
 END_TEST
 
-START_TEST(test_setsockopt)
+static void run_setsockopt_on_socket (int sock_fd)
 {
 	int a;
-	int sock;
 	int err = 10;
 
-	printf("test_setsockopt\n");
+	a = setsockopt (sock_fd, SOL_IP, IP_TTL, &err, sizeof(int));
+	err = errno;
+	close (sock_fd);
+	if ( a < 0 )
+	{
+		fail("socket option not set, but should have been: errno=%d\n", err);
+	}
+}
+
+START_TEST(test_setsockopt)
+{
+	int sock;
+
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
-		a = setsockopt (sock, SOL_IP, IP_TTL, &err, sizeof(int));
-		err = errno;
-		close (sock);
-		if ( a < 0 )
-		{
-			fail("test_setsockopt: socket option not set, but should have been: errno=%d\n", err);
-		}
+		run_setsockopt_on_socket (sock);
 	}
 	else
 	{
@@ -1211,21 +1245,13 @@ END_TEST
 
 START_TEST(test_setsockopt6)
 {
-	int a;
 	int sock;
-	int err = 10;
 
-	printf("test_setsockopt6\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
-		a = setsockopt (sock, SOL_IP, IP_TTL, &err, sizeof(int));
-		err = errno;
-		close (sock);
-		if ( a < 0 )
-		{
-			fail("test_setsockopt6: socket option not set, but should have been: errno=%d\n", err);
-		}
+		run_setsockopt_on_socket (sock);
 	}
 	else
 	{
@@ -1240,7 +1266,7 @@ START_TEST(test_setsockopt_banned)
 	int sock;
 	socklen_t sa;
 
-	printf("test_setsockopt_banned\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
@@ -1265,7 +1291,7 @@ START_TEST(test_setsockopt_banned6)
 	int sock;
 	socklen_t sa;
 
-	printf("test_setsockopt_banned6\n");
+	LHIP_PROLOG_FOR_TEST();
 	sock = socket (AF_INET6, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
@@ -1291,7 +1317,7 @@ START_TEST(test_gethostname)
 {
 	int a;
 
-	printf("test_gethostname\n");
+	LHIP_PROLOG_FOR_TEST();
 	a = gethostname (buf, sizeof(buf));
 	ck_assert_int_eq(a, 0);
 	if (buf != NULL)
@@ -1307,19 +1333,6 @@ END_TEST
 #endif /* HAVE_UNISTD_H */
 
 /* ======================================================= */
-
-/*
-__attribute__ ((constructor))
-static void setup_global(void) / * unchecked * /
-{
-}
-*/
-
-/*
-static void teardown_global(void)
-{
-}
-*/
 
 static void setup_net_test(void) /* checked */
 {
@@ -1341,12 +1354,11 @@ static void setup_net_test(void) /* checked */
 
 static void teardown_net_test(void)
 {
-
 }
 
 static Suite * lhip_create_suite(void)
 {
-	Suite * s = suite_create("libhideip");
+	Suite * s = suite_create("libhideip_net");
 
 	TCase * tests_net = tcase_create("net");
 

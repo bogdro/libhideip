@@ -25,6 +25,9 @@
 /* Whether RTLD_NEXT is defined */
 #undef HAVE_DECL_RTLD_NEXT
 
+/* Whether you have the dirent.h header. */
+#undef HAVE_DIRENT_H
+
 /* Whether you have the dlfcn.h header */
 #undef HAVE_DLFCN_H
 
@@ -76,6 +79,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if you have the `anl' library (-lanl). */
+#undef HAVE_LIBANL
+
 /* Whether you have the libdl library */
 #undef HAVE_LIBDL
 
@@ -94,8 +100,14 @@
 /* Whether you have the linux/netlink.h header. */
 #undef HAVE_LINUX_NETLINK_H
 
+/* Define to 1 if you have the <linux/random.h> header file. */
+#undef HAVE_LINUX_RANDOM_H
+
 /* Define to 1 if you have the `lstat' function. */
 #undef HAVE_LSTAT
+
+/* Define to 1 if you have the `lstat64' function. */
+#undef HAVE_LSTAT64
 
 /* Whether you have the malloc function. */
 #undef HAVE_MALLOC
@@ -114,6 +126,9 @@
 
 /* Define to 1 if the system has the type `mode_t'. */
 #undef HAVE_MODE_T
+
+/* Whether you have the ndir.h header. */
+#undef HAVE_NDIR_H
 
 /* Define to 1 if you have the <netdb.h> header file. */
 #undef HAVE_NETDB_H
@@ -160,6 +175,12 @@
 /* Define to 1 if the system has the type `ssize_t'. */
 #undef HAVE_SSIZE_T
 
+/* Define to 1 if you have the `stat' function. */
+#undef HAVE_STAT
+
+/* Define to 1 if you have the `stat64' function. */
+#undef HAVE_STAT64
+
 /* Whether you have the stdarg.h header. */
 #undef HAVE_STDARG_H
 
@@ -181,8 +202,14 @@
 /* Define to 1 if you have the `symlink' function. */
 #undef HAVE_SYMLINK
 
+/* Whether you have the sys/dir.h header. */
+#undef HAVE_SYS_DIR_H
+
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
+
+/* Whether you have the sys/ndir.h header. */
+#undef HAVE_SYS_NDIR_H
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #undef HAVE_SYS_SOCKET_H

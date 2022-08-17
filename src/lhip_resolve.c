@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- address resolving functions' replacements.
  *
- * Copyright (C) 2008-2019 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2021 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -25,6 +25,8 @@
  */
 
 #include "lhip_cfg.h"
+
+#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
@@ -104,6 +106,10 @@ extern int res_nmkquery LHIP_PARAMS ((res_state statep,
 
 static char __lhip_name_copy[LHIP_MAXPATHLEN];
 
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
+#endif
+
 /* =============================================================== */
 
 #ifndef LHIP_ANSIC
@@ -159,7 +165,7 @@ static int __lhip_is_forbidden_name (
 	new_name = (char *) malloc ( j + 1 );
 	if ( new_name != NULL )
 	{
-		strncpy (new_name, name, j);
+		strncpy (new_name, name, j+1);
 		new_name[j] = '\0';
 		h.h_name = new_name;
 	}
@@ -532,3 +538,49 @@ res_nmkquery (
 	return (*__lhip_real_res_nmkquery_location ())
 		(statep, op, dname, class, type, data, datalen, newrr, buf, buflen);
 }
+
+/* =============================================================== */
+
+#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
+int
+getaddrinfo_a(
+# ifdef LHIP_ANSIC
+	int mode, struct gaicb *list[], int nitems, struct sigevent *sevp)
+# else
+	mode, list, nitems, sevp)
+	int mode;
+	struct gaicb *list[];
+	int nitems;
+	struct sigevent *sevp;
+# endif
+{
+	int i;
+
+	__lhip_main ();
+# ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: getaddrinfo_a(%d, 0x%x, %d, 0x%x)\n", mode, list, nitems, sevp);
+	fflush (stderr);
+# endif
+	if ( __lhip_real_getaddrinfo_a_location () == NULL )
+	{
+		return EAI_MEMORY;
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED)
+		|| (list == NULL) )
+	{
+		return (*__lhip_real_getaddrinfo_a_location ()) (mode, list, nitems, sevp);
+	}
+
+	for ( i = 0; i < nitems; i++ )
+	{
+		if ( __lhip_is_forbidden_name (list[i]->ar_name) != 0 )
+		{
+			return EAI_MEMORY;
+		}
+	}
+
+	return (*__lhip_real_getaddrinfo_a_location ()) (mode, list, nitems, sevp);
+}
+#endif /* HAVE_GETADDRINFO_A */
