@@ -25,14 +25,14 @@
 
 #include "libhideip.h"
 
-#ifndef PARAMS
+#ifndef LHIP_PARAMS
 # if defined (__STDC__) || defined (_AIX) \
 	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
 	|| defined (WIN32) || defined (__cplusplus)
-#  define PARAMS(protos) protos
+#  define LHIP_PARAMS(protos) protos
 #  define LHIP_ANSIC
 # else
-#  define PARAMS(protos) ()
+#  define LHIP_PARAMS(protos) ()
 #  undef LHIP_ANSIC
 # endif
 #endif

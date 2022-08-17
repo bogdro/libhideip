@@ -1,9 +1,9 @@
 .\"	Process this file with groff -man -Tascii foo.3
 .\"
-.TH libhideip 3 GNU/Linux "User's Manual"
+.TH LibHideIP 3 GNU/Linux "User's Manual"
 
 .SH NAME
-libhideip \- Securing access to local IP addresses.
+LibHideIP \- Securing access to local IP addresses.
 
 .SH SYNOPSIS
 ~/.bash_profile:
@@ -17,7 +17,21 @@ and/or
 .B /usr/local/lib/libhideip.so
 
 .SH DESCRIPTION
-The libhideip library ensures that no program under its control can get the local public IP address.
+The LibHideIP library ensures that no program under its control can get the local public IP address.
+
+Selected programs can be taken out of LibHideIP's control by being put in banning files.
+A banning files consists of program names, one per line. If a text found in a line
+of a banning file is found in the program's name, LibHideIP does
+.B NOT
+prevent the program from doing anything.
+
+.SH FILES
+${sysconfdir}/libhideip.progban (usually /usr/local/etc) - path to primary banning file
+
+$HOME/.libhideip.progban - path to additional user banning file
+
+.SH ENVIRONMENT
+LIBHIDEIP_BANFILE - path to an additional banning file
 
 .SH NOTES
 The file and command given in the synopsis section may be different on shells other than BASH.

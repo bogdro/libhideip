@@ -20,7 +20,7 @@ BuildRequires:	gcc, glibc, glibc-devel, glibc-headers, make
 
 %description
 
-Libhideip is a library which intercepts system calls that may lead to
+LibHideIP is a library which intercepts system calls that may lead to
 getting your local IP address by programs, which is bad for your privacy.
 The potentially-dangerous functions are replaced by safe ones, which return
 neutral data.
@@ -58,7 +58,7 @@ DESTDIR="$RPM_BUILD_ROOT" %{__make} install
 %defattr(-,root,root)
 /usr/local/lib/libhideip.so
 /usr/local/lib/libhideip.so.1
-/usr/local/lib/libhideip.so.1.3.1
+/usr/local/lib/libhideip.so.1.3.2
 /usr/local/lib/libhideip.la
 %doc /usr/share/info/libhideip.info.gz
 %doc /usr/share/man/man3/libhideip.3.gz
@@ -93,8 +93,8 @@ BuildRequires:	gcc, glibc, glibc-devel, glibc-headers, make
 
 %description devel
 
-This is the development package for libhideip.
-Libhideip is a library which intercepts system calls that may lead to
+This is the development package for LibHideIP.
+LibHideIP is a library which intercepts system calls that may lead to
 getting your local IP address by programs, which is bad for your privacy.
 The potentially-dangerous functions are replaced by safe ones, which return
 neutral data.

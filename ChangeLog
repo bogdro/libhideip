@@ -1,3 +1,28 @@
+2012-09-23	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* LibHideIP version 0.7
+	  Banning mechanism fixed and updated with new possibilities.
+	* doc/libhideip.texi.in: added @dircategory and @direntry.
+	* configure.ac: added a summary of enabled options. Added two new
+	  command-line banning-related options: --enable-environment
+	  (enables additional banning files pointed to by environment
+	  variables) and --enable-user-files (enables additional banning
+	  files in users' home directories). Using AS_HELP_STRING to format
+	  help for options. Added the --with-max-host-names option to specify
+	  the maximum number of hostname and aliases of the host LibHideIP
+	  is running on.
+	* src/lhip_priv.h: added missing LHIP_ prefixes
+	* src/lhip_banning.c: support for banning files pointed to by
+	  environment variables and additional banning files in users' home
+	  directories. Fixed checking if a program is banned.
+	* src/libhideip.h.in: added constants for the names of the environment
+	  variable poiting to an additional banning file location and
+	  additional banning files in users' home directories
+	* src/Makefile.am: made libhideip.h not only in PUBLIC_INTERFACE,
+	  since now it is used in lhip_banning.c.
+	* README, INSTALL, doc/libhideip.texi.in, doc/libhideip.3: updated
+	  with new banning information. Minor corrections.
+
 2012-02-12	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* libhideip version 0.6
@@ -7,7 +32,7 @@
 	* libhideip.spec.in: corrected the description of the devel package.
 	* src/libhideip.h.in: SWIG compatibility.
 	* src/lhip_banning.c (__lhip_check_prog_ban): stopping the checking as
-	  soon as a match if found, preserving errno.
+	  soon as a match is found. Preserving errno.
 	* src/lhip_exec.c: moved __lhip_is_forbidden_file() from lhip_opens.c
 	  and made it public. Using a constant for the separator char between
 	  different paths. Added more forbidden programs.

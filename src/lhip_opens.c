@@ -76,25 +76,25 @@
 #ifdef HAVE_FCNTL_H
 # include <fcntl.h>	/* open*() */
 #else
-extern int open PARAMS ((const char * const path, const int flags, ... ));
-extern int open64 PARAMS ((const char * const path, const int flags, ... ));
+extern int open LHIP_PARAMS ((const char * const path, const int flags, ... ));
+extern int open64 LHIP_PARAMS ((const char * const path, const int flags, ... ));
 #endif
 #ifndef HAVE_OPENAT
-extern int openat PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
+extern int openat LHIP_PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
 #endif
 #ifndef HAVE_OPENAT64
-extern int openat64 PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
+extern int openat64 LHIP_PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
 #endif
 
 /*
 #ifndef HAVE_FOPEN64
-extern FILE* fopen64 PARAMS((const char * const name, const char * const mode));
+extern FILE* fopen64 LHIP_PARAMS((const char * const name, const char * const mode));
 #endif
 #ifndef HAVE_FREOPEN64
-extern FILE* freopen64 PARAMS((const char * const path, const char * const mode, FILE * stream));
+extern FILE* freopen64 LHIP_PARAMS((const char * const path, const char * const mode, FILE * stream));
 #endif
 #ifndef HAVE_OPEN64
-extern int open64 PARAMS((const char * const path, const int flags, ... ));
+extern int open64 LHIP_PARAMS((const char * const path, const int flags, ... ));
 #endif
 */
 

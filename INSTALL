@@ -16,9 +16,24 @@ If you want to enable the public interface of LibHideIP, configure the
  The public interface is compatible with SWIG (http://www.swig.org), so
  you can make native bindings to LibHideIP for any supported language.
 
+LibHideIP allows some programs to be banned (not allowed to run under
+ LibHideIP, because they might need accesss to the IP address). One banning
+ file is always supported - ${sysconfdir}/libhideip.progban (${sysconfdir} is
+ /usr/local/etc unless set otherwise during configure).
+
+If you want to disable additional banning files pointed to by environment
+ variables, configure the library with
+	./configure --enable-environment=no
+
+If you want to disable additional banning files in users' home directories,
+ configure the library with
+	./configure --enable-user-files=no
+
 Type 'make' to compile the library. LibHideIP assumes that your host has
  maximum 100 aliases and addresses. If you think this number is not enough,
- compile LibHideIP with:
+ configure LibHideIP with
+	./configure --with-max-host-names=n
+ or compile LibHideIP with:
 	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'
  where 'n' is your desired number (10 is minimum).
 

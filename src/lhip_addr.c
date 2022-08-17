@@ -116,11 +116,11 @@ struct sockaddr_in6
 static struct hostent * __lhip_our_real_name_ipv4 = NULL;
 static struct hostent * __lhip_our_real_name_ipv6 = NULL;
 static struct addrinfo * __lhip_ai_all = NULL;
-static const unsigned char __lhip_localhost_ipv4[4] = {LOCAL_IPV4_ADDR};
-static const unsigned char __lhip_localhost_ipv6[16] = {LOCAL_IPV6_ADDR};
-static char __lhip_our_hostname_v4[4097];
-static char __lhip_our_hostname_v6[4097];
-static char __lhip_our_gethostname[4097];
+static const unsigned char __lhip_localhost_ipv4[4] = {LHIP_LOCAL_IPV4_ADDR};
+static const unsigned char __lhip_localhost_ipv6[16] = {LHIP_LOCAL_IPV6_ADDR};
+static char __lhip_our_hostname_v4[LHIP_MAXHOSTLEN];
+static char __lhip_our_hostname_v6[LHIP_MAXHOSTLEN];
+static char __lhip_our_gethostname[LHIP_MAXHOSTLEN];
 static struct utsname __lhip_uname_res;
 
 static struct hostent __lhip_our_names_addr[LHIP_MAX_HOSTNAMES];
@@ -134,7 +134,7 @@ static unsigned int __lhip_number_of_addresses = 0;
 */
 
 static int GCC_WARN_UNUSED_RESULT
-__lhip_check_hostname_match PARAMS((const char * const host1, const char * const host2));
+__lhip_check_hostname_match LHIP_PARAMS((const char * const host1, const char * const host2));
 
 /* =============================================================== */
 
@@ -1305,9 +1305,12 @@ void __lhip_read_local_addresses (
 					tmp = __lhip_ai_all;
 					do
 					{
-						if ( tmp->ai_next == NULL ) break;
+						if ( tmp->ai_next == NULL )
+						{
+							break;
+						}
 						tmp = tmp->ai_next;
-					} while (1==1);
+					} while ( tmp != NULL );
 					tmp->ai_next = __lhip_ai_all_tmp;
 				}
 			}
@@ -1335,9 +1338,12 @@ void __lhip_read_local_addresses (
 					tmp = __lhip_ai_all;
 					do
 					{
-						if ( tmp->ai_next == NULL ) break;
+						if ( tmp->ai_next == NULL )
+						{
+							break;
+						}
 						tmp = tmp->ai_next;
-					} while (1==1);
+					} while ( tmp != NULL );
 					tmp->ai_next = __lhip_ai_all_tmp;
 				}
 			}
@@ -1467,7 +1473,10 @@ void __lhip_read_local_addresses (
 						}
 					}
 				}
-				if ( localaddr_found != 0 ) continue;
+				if ( localaddr_found != 0 )
+				{
+					continue;
+				}
 				if ( hostent_res->h_aliases != NULL )
 				{
 					j = 0;
@@ -1490,7 +1499,10 @@ void __lhip_read_local_addresses (
 						break;
 					}
 				}
-				if ( localaddr_found != 0 ) continue;
+				if ( localaddr_found != 0 )
+				{
+					continue;
+				}
 				if ( hostent_res->h_name != NULL )
 				{
 					if ( __lhip_check_hostname_match (
@@ -1507,7 +1519,10 @@ void __lhip_read_local_addresses (
 						}
 					}
 				}
-				if ( localaddr_found != 0 ) continue;
+				if ( localaddr_found != 0 )
+				{
+					continue;
+				}
 				if ( hostent_res->h_aliases != NULL )
 				{
 					j = 0;
@@ -1530,7 +1545,10 @@ void __lhip_read_local_addresses (
 						break;
 					}
 				}
-				if ( localaddr_found != 0 ) continue;
+				if ( localaddr_found != 0 )
+				{
+					continue;
+				}
 				if ( hostent_res->h_addr_list != NULL )
 				{
 					i = 0;
@@ -1611,7 +1629,10 @@ void __lhip_read_local_addresses (
 			__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases = NULL;
 			__lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list = NULL;
 			hostent_res = (*__lhip_real_gethostent_location ()) ();
-			if ( hostent_res == NULL ) break;
+			if ( hostent_res == NULL )
+			{
+				break;
+			}
 			i = 0;
 			while ( hostent_res->h_addr_list[i] != NULL )
 			{

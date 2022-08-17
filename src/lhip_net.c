@@ -172,40 +172,40 @@ typedef unsigned short int __u16;
 #include "lhip_priv.h"
 
 #ifndef HAVE_GETIPNODEBYNAME
-extern struct hostent *getipnodebyname PARAMS ((const char *name,
+extern struct hostent *getipnodebyname LHIP_PARAMS ((const char *name,
 	int af, int flags, int *error_num));
 #endif
 #ifndef HAVE_GETIPNODEBYADDR
-extern struct hostent *getipnodebyaddr PARAMS ((const void *addr,
+extern struct hostent *getipnodebyaddr LHIP_PARAMS ((const void *addr,
 	size_t len, int af, int *error_num));
 #endif
 
-static const unsigned char __lhip_localhost_ipv4[4] = {LOCAL_IPV4_ADDR};
-static const unsigned char __lhip_netmask_ipv4[4] = {LOCAL_IPV4_MASK};
-static const unsigned char __lhip_localhost_ipv6[16] = {LOCAL_IPV6_ADDR};
-static const unsigned char __lhip_netmask_ipv6[16] = {LOCAL_IPV6_MASK};
+static const unsigned char __lhip_localhost_ipv4[4] = {LHIP_LOCAL_IPV4_ADDR};
+static const unsigned char __lhip_netmask_ipv4[4] = {LHIP_LOCAL_IPV4_MASK};
+static const unsigned char __lhip_localhost_ipv6[16] = {LHIP_LOCAL_IPV6_ADDR};
+static const unsigned char __lhip_netmask_ipv6[16] = {LHIP_LOCAL_IPV6_MASK};
 
 static const unsigned char __lhip_zeroaddr_ipv4[4] = {0, 0, 0, 0};
 static const unsigned char __lhip_zeroaddr_ipv6[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static const char local_name[] = "localhost";
 
 #ifndef HAVE_GETHOSTBYADDR_R
-extern int gethostbyaddr_r PARAMS ((const void *addr, socklen_t len, int type,
+extern int gethostbyaddr_r LHIP_PARAMS ((const void *addr, socklen_t len, int type,
                struct hostent *ret, char *buf, size_t buflen,
                struct hostent **result, int *h_errnop));
 #endif
 #ifndef HAVE_GETHOSTBYNAME_R
-extern int gethostbyname_r PARAMS ((const char *name,
+extern int gethostbyname_r LHIP_PARAMS ((const char *name,
                struct hostent *ret, char *buf, size_t buflen,
                struct hostent **result, int *h_errnop));
 #endif
 #ifndef HAVE_GETHOSTBYNAME2_R
-extern int gethostbyname2_r PARAMS ((const char *name, int af,
+extern int gethostbyname2_r LHIP_PARAMS ((const char *name, int af,
                struct hostent *ret, char *buf, size_t buflen,
                struct hostent **result, int *h_errnop));
 #endif
 #ifndef HAVE_GETHOSTENT_R
-extern int gethostent_r PARAMS ((
+extern int gethostent_r LHIP_PARAMS ((
                struct hostent *ret, char *buf, size_t buflen,
                struct hostent **result, int *h_errnop));
 #endif

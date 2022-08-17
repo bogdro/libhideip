@@ -1,15 +1,20 @@
 \input texinfo   @c -*-texinfo-*-
 @c %**start of header
 @setfilename libhideip.info
-@settitle libhideip manual @VERSION@
+@settitle LibHideIP manual @VERSION@
 @c %**end of header
 
+@dircategory Libraries
+@direntry
+* LibHideIP: (libhideip).		Hide your IP address from programs.
+@end direntry
+
 @copying
-This manual is for libhideip, version @VERSION@
+This manual is for LibHideIP, version @VERSION@
 @end copying
 
 @titlepage
-@title The libhideip library
+@title The LibHideIP library
 @author Bogdan 'bogdro' Drozdowski
 
 @c  The following two commands
@@ -25,8 +30,8 @@ This manual is for libhideip, version @VERSION@
 @contents
 
 @ifnottex
-@node Top, What is libhideip?, (dir), (dir)
-@top The libhideip library
+@node Top, What is LibHideIP?, (dir), (dir)
+@top The LibHideIP library
 
 @insertcopying
 @end ifnottex
@@ -44,7 +49,7 @@ Free Documentation License" in the "Copying" chapter.
 
 
 @menu
-* What is libhideip?::		About the library.
+* What is LibHideIP?::		About the library.
 * How to compile?::		How to compile the library.
 * Installing::			Installation of the library.
 * Developing::			Programming with the library.
@@ -56,9 +61,9 @@ Free Documentation License" in the "Copying" chapter.
 
 @c ==================================================================
 
-@node What is libhideip?, How to compile?, Top, Top
+@node What is LibHideIP?, How to compile?, Top, Top
 @comment  node-name, next,      previous,  up
-@chapter What is libhideip?
+@chapter What is LibHideIP?
 
 LibHideIP is a set of replacements for those function that could be
 used to find your local public IP address. These functions include:
@@ -95,7 +100,7 @@ LibHideIP. Some Java Runtime Environments seem to do this.
 @c ==================================================================
 
 
-@node How to compile?, Installing, What is libhideip?, Top
+@node How to compile?, Installing, What is LibHideIP?, Top
 @chapter How to compile the library?
 
 Requirements for compiling the library:
@@ -106,10 +111,10 @@ Requirements for compiling the library:
 @item development package for the C library (like glibc-devel and glibc-headers).
 @sp 1
 The sys/stat.h contains functions needed to check an executable's type.
-If it is a symbolic link, libhideip will follow it.
+If it is a symbolic link, LibHideIP will follow it.
 @sp 1
 The dlfcn.h header contains functions needed to call the original functions.
-It has to have RTLD_NEXT defined. Libhideip wouldn't work without this, so it
+It has to have RTLD_NEXT defined. LibHideIP wouldn't work without this, so it
 won't compile without this.
 @sp 1
 The stdarg.h/varargs.h header contains stuff needed to intercept ioctl() and the
@@ -122,16 +127,30 @@ opening functions.
 Type @command{./configure} to configure LibHideIP for your system.
 
 If you want to enable the public interface of LibHideIP, configure the
-library with @command{./configure --enable-public-interface}. See the
-chapter on developing to learn how to use LibHideIP (@ref{Developing}).
+library with@*
+	@command{./configure --enable-public-interface}@*
+See the chapter on developing to learn how to use LibHideIP (@ref{Developing}).
+
+LibHideIP allows some programs to be banned (not allowed to run under
+LibHideIP, because they might need accesss to the IP address). One banning
+file is always supported - $@{sysconfdir@}/libhideip.progban ($@{sysconfdir@} is
+/usr/local/etc unless set otherwise during configure).
+
+If you want to disable additional banning files pointed to by environment
+variables, configure the library with@*
+	@command{./configure --enable-environment=no}@*
+
+If you want to disable additional banning files in users' home directories,
+configure the library with@*
+	@command{./configure --enable-user-files=no}@*
 
 Type @command{make} to compile the library.
 LibHideIP assumes that your host has
 maximum 100 aliases and addresses. If you think this number is not enough,
-compile LibHideIP with:
-
-	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'
-
+configure LibHideIP with@*
+	@command{./configure --with-max-host-names=n}@*
+or compile LibHideIP with:@*
+	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'@*
 where 'n' is your desired number (10 is minimum).
 
 Documentation comes compiled (and can be copied right away), but can be changed
@@ -167,7 +186,7 @@ To create an RPM package (the new way):
 @node Installing, Developing, How to compile?, Top
 @chapter Making the library work
 
-Libhideip has no magic in it, it won't intercept calls to the mentioned functions
+LibHideIP has no magic in it, it won't intercept calls to the mentioned functions
 just because it is compiled. Even installing the library in a system directory
 isn't enough. The library needs to be loaded into memory. More strictly, it needs
 to be PRELOADED (loaded before other libraries). This is achieved easily, if you
@@ -181,9 +200,9 @@ the path to the correct one. If you aren't using BASH, consult your shell
 manual for details on how to export an environment variable.
 
 This will make the
-dynamic linker, ld.so, load libhideip before loading any other libraries, when
+dynamic linker, ld.so, load LibHideIP before loading any other libraries, when
 starting programs. That is, after the line above gets executed, all programs
-from that moment start using libhideip.
+from that moment start using LibHideIP.
 
 You can alternatively put the full path to the library in the /etc/ld.so.preload
 (not recommended, because some good programs may need the local IP address).
@@ -191,7 +210,7 @@ No syntax is required, just the path and filename, like this:
 
 /usr/local/lib/libhideip.so
 
-To load libhideip for just one program, type like this (for BASH):
+To load LibHideIP for just one program, type like this (for BASH):
 
 LD_PRELOAD=/usr/local/lib/libhideip.so some-program-name
 
@@ -240,6 +259,10 @@ that calls this function
 of the library the program is using
 @item LHIP_VERSION is the compile-time preprocessor string constant containing
 the version of the library the program is compiled against
+@item LHIP_BANNING_ENV is the name of the environment variable that can point
+to an additional banning file
+@item LHIP_BANNING_USERFILE is the name of the additional banning file that
+can be located in the users' home directories.
 @end itemize
 
 If you're using C or C++ (or any language that can parse C header files),
@@ -290,9 +313,15 @@ By using SWIG yourself, you can be sure that such problems will not occur.
 @chapter Manual configuration
 
 You can use the configuration file $@{sysconfdir@}/libhideip.progban to
-specify which programs should libhideip not mess with. Put each entry on its own line.
+specify which programs should LibHideIP not mess with. Put each entry on its own line.
 
- $@{sysconfdir@} is /usr/local/etc unless set otherwise during configure.
+$@{sysconfdir@} is /usr/local/etc unless set otherwise during configure.
+
+If additional banning files haven't been disabled (@ref{How to compile?}), they can
+be located in users' home directories (e.g. /home/user1/.libhideip.progban).
+You can also put the file in any location and set the environment variable
+LIBHIDEIP_BANFILE to point at that file, e.g.@*
+	@command{export LIBHIDEIP_BANFILE=/opt/config/libhideip.progban}
 
 The /proc filesystem must be mounted in order for program banning to work right now.
 

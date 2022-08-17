@@ -81,7 +81,7 @@ static char __lhip_name_copy[LHIP_MAXPATHLEN];
 /* =============================================================== */
 
 #ifndef LHIP_ANSIC
-static int __lhip_is_forbidden_name PARAMS ((const char * const name));
+static int __lhip_is_forbidden_name LHIP_PARAMS ((const char * const name));
 #endif
 
 /**
@@ -104,15 +104,24 @@ static int __lhip_is_forbidden_name (
 		"localhost", "localhost6", "localhost.", "localhost6." };
 	char * new_name = NULL;
 
-	if ( name == NULL ) return 0;
+	if ( name == NULL )
+	{
+		return 0;
+	}
 
 	for ( i = 0; i < sizeof (forbidden_names) / sizeof (forbidden_names[0]); i++ )
 	{
-		if ( strcmp (name, forbidden_names[i]) == 0 ) return 1;
+		if ( strcmp (name, forbidden_names[i]) == 0 )
+		{
+			return 1;
+		}
 		j = strlen (forbidden_names[i]);
 		if ( forbidden_names[i][j-1] == '.' )
 		{
-			if ( strncmp (name, forbidden_names[i], j) == 0 ) return 1;
+			if ( strncmp (name, forbidden_names[i], j) == 0 )
+			{
+				return 1;
+			}
 		}
 	}
 
@@ -143,12 +152,18 @@ static int __lhip_is_forbidden_name (
 	if ( __lhip_is_local_addr (&h) != 0 )
 	{
 #ifdef HAVE_MALLOC
-		if ( new_name != NULL ) free (new_name);
+		if ( new_name != NULL )
+		{
+			free (new_name);
+		}
 #endif
 		return 1;
 	}
 #ifdef HAVE_MALLOC
-	if ( new_name != NULL ) free (new_name);
+	if ( new_name != NULL )
+	{
+		free (new_name);
+	}
 #endif
 	return 0;
 }

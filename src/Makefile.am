@@ -10,19 +10,20 @@ EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh \
 # interface changed => C++, R:=0
 # - interface add => A++
 # - interface removed => A:=0
-libhideip_la_LDFLAGS = -version-info 4:1:3
+libhideip_la_LDFLAGS = -version-info 4:2:3
 
 #nobase_include_HEADERS = lhip_priv.h
 
-BUILT_SOURCES = lhip_paths.h
-nodist_libhideip_la_SOURCES = lhip_paths.h
-libhideip_la_DISTCLEANFILES = lhip_paths.h
+nobase_include_HEADERS = libhideip.h
+BUILT_SOURCES = lhip_paths.h libhideip.h
+nodist_libhideip_la_SOURCES = lhip_paths.h libhideip.h
+libhideip_la_DISTCLEANFILES = lhip_paths.h libhideip.h
 lhip_paths.h: Makefile
 	echo '#define SYSCONFDIR "$(sysconfdir)"' > lhip_paths.h
 
 if PUBLIC_INTERFACE
-nobase_include_HEADERS = libhideip.h
-nodist_libhideip_la_SOURCES += lhip_public.c libhideip.h
-libhideip_la_DISTCLEANFILES += lhip_public.c libhideip.h
+BUILT_SOURCES += lhip_public.c
+nodist_libhideip_la_SOURCES += lhip_public.c
+libhideip_la_DISTCLEANFILES += lhip_public.c
 endif
 

@@ -1,12 +1,12 @@
-This is the README file for libhideip, a library which
-hides your local IP address from programs.
+This is the README file for LibHideIP, a library which
+ hides your local IP address from programs.
 
 Author: Bogdan Drozdowski, bogdandr @ op . pl
 License: GPLv3+
 
 ================================================================
 
-The binary version of libhideip is linked with the GNU C Library,
+The binary version of LibHideIP is linked with the GNU C Library,
  licensed under the GNU LGPL:
 
 Copyright (C) 1991,92,93,94,95,96,97,98,99,2000,2001,2002,2003,2004,2005,
@@ -37,10 +37,10 @@ Requirements for compiling:
 - development package for the C library (like glibc-devel and glibc-headers)
 
   The sys/stat.h contains functions needed to check an executable's type.
-  If it is a symbolic link, libhideip will follow it.
+  If it is a symbolic link, LibHideIP will follow it.
 
   The dlfcn.h header contains functions needed to call the original functions.
-  It has to have RTLD_NEXT defined. Libhideip wouldn't work without this, so
+  It has to have RTLD_NEXT defined. LibHideIP wouldn't work without this, so
   it won't compile without this.
 
 - libdl, the dynamic loading library, with its development package
@@ -49,15 +49,31 @@ Requirements for compiling:
 - the 'make' program
 
 Type './configure' to configure the library for your system.
+
 If you want to enable the public interface of LibHideIP, configure the
  library with
 	./configure --enable-public-interface
  The public interface is compatible with SWIG (http://www.swig.org), so
  you can make native bindings to LibHideIP for any supported language.
 
+LibHideIP allows some programs to be banned (not allowed to run under
+ LibHideIP, because they might need accesss to the IP address). One banning
+ file is always supported - ${sysconfdir}/libhideip.progban (${sysconfdir} is
+ /usr/local/etc unless set otherwise during configure).
+
+If you want to disable additional banning files pointed to by environment
+ variables, configure the library with
+	./configure --enable-environment=no
+
+If you want to disable additional banning files in users' home directories,
+ configure the library with
+	./configure --enable-user-files=no
+
 Type 'make' to compile the library. LibHideIP assumes that your host has
  maximum 100 aliases and addresses. If you think this number is not enough,
- compile LibHideIP with:
+ configure LibHideIP with
+	./configure --with-max-host-names=n
+ or compile LibHideIP with:
 	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'
  where 'n' is your desired number (10 is minimum).
 

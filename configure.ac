@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 0.6, bogdandr@op.pl)
+AC_INIT(libhideip, 0.7, bogdandr@op.pl)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
@@ -14,7 +14,9 @@ AC_CONFIG_MACRO_DIR([m4])
 
 # ==================== configure arguments
 
-AC_ARG_ENABLE([public-interface],[[  --enable-public-interface  Enable the library's public interface.]],
+AC_ARG_ENABLE([public-interface],
+	AS_HELP_STRING([--enable-public-interface],
+		[Enable the library's public interface @<:@default=no@:>@.]),
         [if (test "x$enableval" = "xyes"); then
                 public_if=yes
          else
@@ -24,6 +26,49 @@ AC_ARG_ENABLE([public-interface],[[  --enable-public-interface  Enable the libra
         ,[public_if=no])
 
 AM_CONDITIONAL(PUBLIC_INTERFACE, test "x$public_if" = "xyes")
+
+AC_ARG_ENABLE([environment],
+	AS_HELP_STRING([--enable-environment],
+		[Enable additional ban files pointed to by environment variables @<:@default=yes@:>@.]),
+        [if (test "x$enableval" = "xyes"); then
+                environment=yes
+         else
+                environment=no
+         fi
+        ]
+        ,[environment=yes])
+
+if (test "x$environment" = "xyes"); then
+
+	AC_DEFINE([LHIP_ENABLE_ENV], [1],
+		[Whether or not to enable additional ban files pointed to by environment variables.])
+fi
+
+AC_ARG_ENABLE([user-files],
+	AS_HELP_STRING([--enable-user-files],
+		[Enable additional ban files located in users' home directories @<:@default=yes@:>@.]),
+        [if (test "x$enableval" = "xyes"); then
+                user_files=yes
+         else
+                user_files=no
+         fi
+        ]
+        ,[user_files=yes])
+
+if (test "x$user_files" = "xyes"); then
+
+	AC_DEFINE([LHIP_ENABLE_USERBANS], [1],
+		[Whether or not to enable additional ban files located in users' home directories.])
+fi
+
+AC_ARG_WITH([max-host-names],
+	AS_HELP_STRING([--with-max-host-names=n],
+		[Maximum number of addreses and aliases of your host @<:@default=100@:>@.]),
+        [if (test "x$withval" != "x"); then
+		AC_DEFINE_UNQUOTED([LHIP_MAX_HOSTNAMES], [$withval],
+			[Maximum number of addreses and aliases of your host.])
+         fi
+        ])
 
 # ==================== Checks for programs.
 AC_PROG_CC
@@ -249,3 +294,39 @@ fi
 #AC_SUBST([AM_CFLAGS],[$CFLAGS])
 
 AC_OUTPUT
+
+# ===================== Print summary
+
+echo "***********************************"
+
+if (test "x$public_if" = "xyes"); then
+
+	echo " *	Public interface: yes"
+
+else
+
+	echo " *	Public interface: no (disabled by command line)"
+
+fi
+
+if (test "x$environment" = "xyes"); then
+
+	echo " *	Additional ban files pointed to by environment variables: yes"
+
+else
+
+	echo " *	Additional ban files pointed to by environment variables: no (disabled by command line)"
+
+fi
+
+if (test "x$user_files" = "xyes"); then
+
+	echo " *	Additional ban files located in users' home directories: yes"
+
+else
+
+	echo " *	Additional ban files located in users' home directories: no (disabled by command line)"
+
+fi
+
+echo "***********************************"

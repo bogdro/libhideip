@@ -51,20 +51,20 @@ typedef void pcap_if_t;
 typedef unsigned int bpf_u_int32;
 typedef unsigned int intptr_t;
 */
-char * pcap_lookupdev PARAMS ((char *errbuf));
-int pcap_lookupnet PARAMS ((const char * device, bpf_u_int32 * netp,
+char * pcap_lookupdev LHIP_PARAMS ((char *errbuf));
+int pcap_lookupnet LHIP_PARAMS ((const char * device, bpf_u_int32 * netp,
 	bpf_u_int32 * maskp, char * errbuf));
-pcap_t * pcap_create PARAMS ((const char * source, char * errbuf));
-pcap_t * pcap_open_dead PARAMS ((int linktype, int snaplen));
-pcap_t * pcap_open_live PARAMS ((const char * device, int snaplen,
+pcap_t * pcap_create LHIP_PARAMS ((const char * source, char * errbuf));
+pcap_t * pcap_open_dead LHIP_PARAMS ((int linktype, int snaplen));
+pcap_t * pcap_open_live LHIP_PARAMS ((const char * device, int snaplen,
 	int promisc, int to_ms, char * errbuf));
-pcap_t * pcap_open_offline PARAMS ((const char * fname, char * errbuf));
-pcap_t * pcap_fopen_offline PARAMS ((FILE * fp, char * errbuf));
-int pcap_findalldevs PARAMS ((pcap_if_t ** devs, char * errbuf));
+pcap_t * pcap_open_offline LHIP_PARAMS ((const char * fname, char * errbuf));
+pcap_t * pcap_fopen_offline LHIP_PARAMS ((FILE * fp, char * errbuf));
+int pcap_findalldevs LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
 # endif
 #endif
 #if ! defined(WIN32)
-pcap_t * pcap_hopen_offline PARAMS ((intptr_t a, char * errbuf));
+pcap_t * pcap_hopen_offline LHIP_PARAMS ((intptr_t a, char * errbuf));
 #endif
 
 /* =============================================================== */

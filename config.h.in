@@ -178,6 +178,17 @@
 /* Whether you have the varargs.h header. */
 #undef HAVE_VARARGS_H
 
+/* Whether or not to enable additional ban files pointed to by environment
+   variables. */
+#undef LHIP_ENABLE_ENV
+
+/* Whether or not to enable additional ban files located in users' home
+   directories. */
+#undef LHIP_ENABLE_USERBANS
+
+/* Maximum number of addreses and aliases of your host. */
+#undef LHIP_MAX_HOSTNAMES
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
