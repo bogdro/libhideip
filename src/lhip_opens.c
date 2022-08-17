@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- file opening functions' replacements.
  *
- * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -68,25 +68,83 @@
 #ifdef HAVE_FCNTL_H
 # include <fcntl.h>	/* open*() */
 #else
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 extern int open LHIP_PARAMS ((const char * const path, const int flags, ... ));
 extern int open64 LHIP_PARAMS ((const char * const path, const int flags, ... ));
+
+# ifdef __cplusplus
+}
+# endif
+
 #endif
+
 #ifndef HAVE_OPENAT
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 extern int openat LHIP_PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
+
+# ifdef __cplusplus
+}
+# endif
+
 #endif
+
 #ifndef HAVE_OPENAT64
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 extern int openat64 LHIP_PARAMS ((const int dirfd, const char * const pathname, const int flags, ...));
+
+# ifdef __cplusplus
+}
+# endif
+
 #endif
 
 /*
 #ifndef HAVE_FOPEN64
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 extern FILE* fopen64 LHIP_PARAMS ((const char * const name, const char * const mode));
+
+# ifdef __cplusplus
+}
+# endif
+
 #endif
+
 #ifndef HAVE_FREOPEN64
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 extern FILE* freopen64 LHIP_PARAMS ((const char * const path, const char * const mode, FILE * stream));
+
+# ifdef __cplusplus
+}
+# endif
+
 #endif
+
 #ifndef HAVE_OPEN64
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 extern int open64 LHIP_PARAMS ((const char * const path, const int flags, ... ));
+
+# ifdef __cplusplus
+}
+# endif
+
 #endif
 */
 
@@ -109,10 +167,7 @@ fopen64 (
 #if (defined __GNUC__) && (!defined fopen64)
 # pragma GCC poison fopen64
 #endif
-
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 
@@ -124,42 +179,35 @@ fopen64 (
 
 	if ( __lhip_real_fopen64_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return NULL;
 	}
 
 	if ( name == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_fopen64_location ()) (name, mode);
 	}
 
 	if ( name[0] == '\0' /*strlen (name) == 0*/ )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_fopen64_location ()) (name, mode);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_fopen64_location ()) (name, mode);
 	}
 
 	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return NULL;
 	}
-#ifdef HAVE_ERRNO_H
-	errno = err;
-#endif
+	LHIP_SET_ERRNO (err);
 	return (*__lhip_real_fopen64_location ()) (name, mode);
 }
 
@@ -182,10 +230,7 @@ fopen (
 #if (defined __GNUC__) && (!defined fopen)
 # pragma GCC poison fopen
 #endif
-
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 
@@ -197,43 +242,36 @@ fopen (
 
 	if ( __lhip_real_fopen_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return NULL;
 	}
 
 	if ( name == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_fopen_location ()) (name, mode);
 	}
 
 	if ( name[0] == '\0' /*strlen (name) == 0*/ )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_fopen_location ()) (name, mode);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_fopen_location ()) (name, mode);
 	}
 
 	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return NULL;
 	}
 
-#ifdef HAVE_ERRNO_H
-	errno = err;
-#endif
+	LHIP_SET_ERRNO (err);
 	return (*__lhip_real_fopen_location ()) (name, mode);
 }
 /* ======================================================= */
@@ -256,10 +294,7 @@ freopen64 (
 #if (defined __GNUC__) && (!defined freopen64)
 # pragma GCC poison freopen64
 #endif
-
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 
@@ -271,45 +306,36 @@ freopen64 (
 
 	if ( __lhip_real_freopen64_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return NULL;
 	}
 
 	if ( path == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
 	}
 
-	if ( (path[0] == '\0') /*(strlen (path) == 0)*/ || (stream == stdin)
-		|| (stream == stdout) || (stream == stderr)
-	   )
+	if ( path[0] == '\0' /*(strlen (path) == 0)*/ )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
 	}
 
 	if ( __lhip_is_forbidden_file (path) != 0 )
 	{
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return NULL;
 	}
 
-#ifdef HAVE_ERRNO_H
-	errno = err;
-#endif
+	LHIP_SET_ERRNO (err);
 	return (*__lhip_real_freopen64_location ()) ( path, mode, stream );
 }
 
@@ -333,10 +359,7 @@ freopen (
 #if (defined __GNUC__) && (!defined freopen)
 # pragma GCC poison freopen
 #endif
-
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 
@@ -348,45 +371,36 @@ freopen (
 
 	if ( __lhip_real_freopen_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return NULL;
 	}
 
 	if ( name == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_freopen_location ()) ( name, mode, stream );
 	}
 
-	if ( (name[0] == '\0') /*(strlen (name) == 0)*/ || (stream == stdin)
-		|| (stream == stdout) || (stream == stderr)
-	   )
+	if ( name[0] == '\0' /*(strlen (name) == 0)*/ )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_freopen_location ()) ( name, mode, stream );
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_freopen_location ()) ( name, mode, stream );
 	}
 
 	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return NULL;
 	}
 
-#ifdef HAVE_ERRNO_H
-	errno = err;
-#endif
+	LHIP_SET_ERRNO (err);
 	return (*__lhip_real_freopen_location ()) ( name, mode, stream );
 }
 
@@ -429,9 +443,7 @@ open64 (
 #endif
 	int ret_fd;
 	mode_t mode = 0666;
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 
@@ -442,7 +454,7 @@ open64 (
 
 	if ( __lhip_real_open64_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -462,54 +474,37 @@ open64 (
 
 	if ( path == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_open64_location ()) ( path, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
 
 	if ( path[0] == '\0' /*strlen (path) == 0*/ )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_open64_location ()) ( path, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_open64_location ()) ( path, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
@@ -519,22 +514,16 @@ open64 (
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
 #endif
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
 
-#ifdef HAVE_ERRNO_H
-	errno = err;
-#endif
+	LHIP_SET_ERRNO (err);
 	ret_fd = (*__lhip_real_open64_location ()) ( path, flags, mode );
-#ifdef HAVE_ERRNO_H
-	err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+	LHIP_GET_ERRNO (err);
 	va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-	errno = err;
+	LHIP_SET_ERRNO (err);
 #endif
 
 	return ret_fd;
@@ -572,9 +561,7 @@ open (
 #endif
 	int ret_fd;
 	mode_t mode = 0666;
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 
@@ -585,7 +572,7 @@ open (
 
 	if ( __lhip_real_open_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -605,54 +592,37 @@ open (
 
 	if ( name == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_open_location ()) ( name, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
 
 	if ( name[0] == '\0' /*strlen (name) == 0*/ )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_open_location ()) ( name, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_open_location ()) ( name, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
@@ -662,23 +632,17 @@ open (
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
 #endif
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
 
 
-#ifdef HAVE_ERRNO_H
-	errno = err;
-#endif
+	LHIP_SET_ERRNO (err);
 	ret_fd = (*__lhip_real_open_location ()) ( name, flags, mode );
-#ifdef HAVE_ERRNO_H
-	err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+	LHIP_GET_ERRNO (err);
 	va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-	errno = err;
+	LHIP_SET_ERRNO (err);
 #endif
 
 	return ret_fd;
@@ -718,9 +682,7 @@ openat64 (
 	int flags;
 # endif
 #endif
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 
@@ -732,7 +694,7 @@ openat64 (
 
 	if ( __lhip_real_openat64_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -753,54 +715,37 @@ openat64 (
 
 	if ( pathname == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_openat64_location ()) ( dirfd, pathname, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
 
 	if ( pathname[0] == '\0' /*strlen (pathname) == 0*/ )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_openat64_location ()) ( dirfd, pathname, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_openat64_location ()) ( dirfd, pathname, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
@@ -810,22 +755,16 @@ openat64 (
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
 #endif
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
 
-#ifdef HAVE_ERRNO_H
-	errno = err;
-#endif
+	LHIP_SET_ERRNO (err);
 	ret_fd = (*__lhip_real_openat64_location ()) ( dirfd, pathname, flags, mode );
-#ifdef HAVE_ERRNO_H
-	err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+	LHIP_GET_ERRNO (err);
 	va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-	errno = err;
+	LHIP_SET_ERRNO (err);
 #endif
 
 	return ret_fd;
@@ -871,9 +810,7 @@ openat (
 	int flags;
 # endif
 #endif
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 
@@ -885,7 +822,7 @@ openat (
 
 	if ( __lhip_real_openat_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -906,54 +843,37 @@ openat (
 
 	if ( pathname == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_openat_location ()) ( dirfd, pathname, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
 
 	if ( pathname[0] == '\0' /*strlen (pathname) == 0*/ )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_openat_location ()) ( dirfd, pathname, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		ret_fd = (*__lhip_real_openat_location ()) ( dirfd, pathname, flags, mode );
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO (err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO (err);
 #endif
 		return ret_fd;
 	}
@@ -963,23 +883,17 @@ openat (
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
 #endif
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
 
 
-#ifdef HAVE_ERRNO_H
-	errno = err;
-#endif
+	LHIP_SET_ERRNO (err);
 	ret_fd = (*__lhip_real_openat_location ()) ( dirfd, pathname, flags, mode );
-#ifdef HAVE_ERRNO_H
-	err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+	LHIP_GET_ERRNO (err);
 	va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-	errno = err;
+	LHIP_SET_ERRNO (err);
 #endif
 
 	return ret_fd;

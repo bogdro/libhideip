@@ -191,6 +191,9 @@
    variables. */
 #undef LHIP_ENABLE_ENV
 
+/* Whether or not to enable X-based applications to work. */
+#undef LHIP_ENABLE_GUI_APPS
+
 /* Whether or not to enable additional ban files located in users' home
    directories. */
 #undef LHIP_ENABLE_USERBANS

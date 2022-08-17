@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- ioctl function replacement.
  *
- * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -252,9 +252,7 @@ ioctl (
 	unsigned long int request;*/
 #endif
 {
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
 # ifndef LHIP_ANSIC
@@ -275,9 +273,6 @@ ioctl (
 	struct lifreq * laddrs;
 	struct lifconf * lcfg;
 #endif
-#ifndef HAVE_MEMCPY
-	size_t i;
-#endif
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -287,7 +282,7 @@ ioctl (
 
 	if ( __lhip_real_ioctl_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -303,20 +298,15 @@ ioctl (
 	data2 = va_arg (args, void *);
 #endif
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO(err);
 		ret = (*__lhip_real_ioctl_location ()) (d, request, data1, data2);
-#ifdef HAVE_ERRNO_H
-		err = errno;
-#endif
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+		LHIP_GET_ERRNO(err);
 		va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-		errno = err;
+		LHIP_SET_ERRNO(err);
 #endif
 		return ret;
 	}
@@ -458,15 +448,11 @@ ioctl (
 		}
 #endif /* SIOCGIFHWADDR */
 	}
-#ifdef HAVE_ERRNO_H
-	err = errno;
-#endif
+
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+	LHIP_GET_ERRNO(err);
 	va_end (args);
-#endif
-#ifdef HAVE_ERRNO_H
-	errno = err;
+	LHIP_SET_ERRNO(err);
 #endif
 	return ret;
 }
-

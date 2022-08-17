@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- execution functions' replacements.
  *
- * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -180,8 +180,8 @@ static const char * __lhip_valuable_files[] =
 };
 
 #ifndef HAVE_MALLOC
-static char __lhip_linkpath[LHIP_MAXPATHLEN];
-static char __lhip_newlinkpath[LHIP_MAXPATHLEN];
+static char __lhip_linkpath[LHIP_MAXPATHLEN + 1];
+static char __lhip_newlinkpath[LHIP_MAXPATHLEN + 1];
 #endif
 
 /* ======================================================= */
@@ -236,7 +236,7 @@ static const char * __lhip_get_target_link_path (
 				break;
 			}
 # else /* ! HAVE_MALLOC */
-			lsize = sizeof (__lhip_newlinkpath)
+			lsize = sizeof (__lhip_newlinkpath);
 # endif /* HAVE_MALLOC */
 			res = readlink (current_name, __lhip_newlinkpath, (size_t)lsize);
 			if ( (res < 0) || (res > lsize) )
@@ -330,6 +330,8 @@ static void __lhip_append_path (
 #endif
 {
 	size_t path_len;
+	size_t sep_len;
+	size_t name_len;
 
 	if ( (path == NULL) || (name == NULL) || (path_size == 0) )
 	{
@@ -337,11 +339,14 @@ static void __lhip_append_path (
 	}
 
 	path_len = strlen (path);
+	sep_len = strlen (LHIP_PATH_SEP);
+	name_len = strlen (name);
+
 	strncat (path, LHIP_PATH_SEP,
-		LHIP_MIN (path_size - path_len - 1, strlen (LHIP_PATH_SEP)));
+		LHIP_MIN (path_size - path_len - 1, sep_len));
 	strncat (path, name,
-		LHIP_MIN (path_size - path_len - 1, strlen (name)));
-	path[path_size] = '\0';
+		LHIP_MIN (path_size - path_len - 1, name_len));
+	path[path_size - 1] = '\0';
 }
 
 /* =============================================================== */
@@ -354,7 +359,7 @@ static int __lhip_is_forbidden_program
 #if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
 # define LHIP_ONLY_WITH_STAT_AND_READLINK
 #else
-# define LHIP_ONLY_WITH_STAT_AND_READLINK LNB_ATTR ((unused))
+# define LHIP_ONLY_WITH_STAT_AND_READLINK LHIP_ATTR ((unused))
 #endif
 
 /**
@@ -390,9 +395,6 @@ static int __lhip_is_forbidden_program (
 #  endif
 # endif
 #endif
-#ifndef HAVE_MEMSET
-	size_t l;
-#endif
 	unsigned int i, j, k;
 	int ret = 0;
 
@@ -406,6 +408,11 @@ static int __lhip_is_forbidden_program (
 	if ( __lhip_linkpath != NULL )
 #endif
 	{
+		for ( i = 0; i < LHIP_MAXPATHLEN + 1; i++ )
+		{
+			__lhip_linkpath[i] = '\0';
+		}
+
 		strncpy (__lhip_linkpath, name, LHIP_MAXPATHLEN);
 		__lhip_linkpath[LHIP_MAXPATHLEN] = '\0';
 #if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
@@ -438,6 +445,11 @@ static int __lhip_is_forbidden_program (
 						path_dir = (char *) malloc (LHIP_MAXPATHLEN + 1);
 						if ( path_dir != NULL )
 						{
+							for ( i = 0; i < LHIP_MAXPATHLEN + 1; i++ )
+							{
+								path_dir[i] = '\0';
+							}
+
 							do
 							{
 								strncpy (path_dir, path,
@@ -463,13 +475,14 @@ static int __lhip_is_forbidden_program (
 						{
 							strncpy (path_dir, path, strlen (path) + 1);
 							__lhip_append_path (path_dir, __lhip_linkpath, LHIP_MAXPATHLEN);
-							path_dir[LHIP_MAXPATHLEN] = '\0';
+							path_dir[strlen (path) + 1 + strlen (__lhip_linkpath)] = '\0';
 						}
 					}
 					/* path_dir, if not NULL, contains "PATH/name" */
 					if ( path_dir != NULL )
 					{
 						strncpy (__lhip_linkpath, path_dir, LHIP_MAXPATHLEN - 1);
+						__lhip_linkpath[LHIP_MAXPATHLEN] = '\0';
 						free (path_dir);
 					}
 #  else
@@ -484,6 +497,7 @@ static int __lhip_is_forbidden_program (
 						strncpy (__lhip_newlinkpath, path,
 							sizeof (__lhip_newlinkpath) - 1);
 					}
+					__lhip_newlinkpath[sizeof (__lhip_newlinkpath) - 1] = '\0';
 					__lhip_append_path (__lhip_newlinkpath,
 						__lhip_linkpath, sizeof (__lhip_newlinkpath));
 					__lhip_newlinkpath[sizeof (__lhip_newlinkpath) - 1] = '\0';
@@ -567,9 +581,7 @@ execve (
 	char *const envp[];
 #endif
 {
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -579,29 +591,26 @@ execve (
 
 	if ( __lhip_real_execve_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return -1;
 	}
 
 	if ( filename == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_execve_location ()) (filename, argv, envp);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_execve_location ()) (filename, argv, envp);
 	}
 
 	if ( __lhip_is_forbidden_program (filename, argv, 0) != 0 )
 	{
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
 	return (*__lhip_real_execve_location ()) (filename, argv, envp);
@@ -618,9 +627,7 @@ system (
 	const char *command;
 #endif
 {
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -630,29 +637,26 @@ system (
 
 	if ( __lhip_real_system_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return -1;
 	}
 
 	if ( command == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_system_location ()) (command);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_system_location ()) (command);
 	}
 
 	if ( __lhip_is_forbidden_program (command, NULL, 1) != 0 )
 	{
-		SET_ERRNO_PERM();
+		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
 	return (*__lhip_real_system_location ()) (command);

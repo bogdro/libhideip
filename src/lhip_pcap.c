@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- libpcap functions' replacements.
  *
- * Copyright (C) 2011-2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2011-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -51,20 +51,29 @@ typedef void pcap_if_t;
 typedef unsigned int bpf_u_int32;
 typedef unsigned int intptr_t;
 */
-char * pcap_lookupdev LHIP_PARAMS ((char *errbuf));
-int pcap_lookupnet LHIP_PARAMS ((const char * device, bpf_u_int32 * netp,
+#  ifdef __cplusplus
+extern "C" {
+#  endif
+
+extern char * pcap_lookupdev LHIP_PARAMS ((char *errbuf));
+extern int pcap_lookupnet LHIP_PARAMS ((const char * device, bpf_u_int32 * netp,
 	bpf_u_int32 * maskp, char * errbuf));
-pcap_t * pcap_create LHIP_PARAMS ((const char * source, char * errbuf));
-pcap_t * pcap_open_dead LHIP_PARAMS ((int linktype, int snaplen));
-pcap_t * pcap_open_live LHIP_PARAMS ((const char * device, int snaplen,
+extern pcap_t * pcap_create LHIP_PARAMS ((const char * source, char * errbuf));
+extern pcap_t * pcap_open_dead LHIP_PARAMS ((int linktype, int snaplen));
+extern pcap_t * pcap_open_live LHIP_PARAMS ((const char * device, int snaplen,
 	int promisc, int to_ms, char * errbuf));
-pcap_t * pcap_open_offline LHIP_PARAMS ((const char * fname, char * errbuf));
-pcap_t * pcap_fopen_offline LHIP_PARAMS ((FILE * fp, char * errbuf));
-int pcap_findalldevs LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
+extern pcap_t * pcap_open_offline LHIP_PARAMS ((const char * fname, char * errbuf));
+extern pcap_t * pcap_fopen_offline LHIP_PARAMS ((FILE * fp, char * errbuf));
+extern int pcap_findalldevs LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
+#  ifdef __cplusplus
+}
+#  endif
+
 # endif
 #endif
+
 #if !defined(WIN32)
-pcap_t * pcap_hopen_offline LHIP_PARAMS ((intptr_t a, char * errbuf));
+extern pcap_t * pcap_hopen_offline LHIP_PARAMS ((intptr_t a, char * errbuf));
 #endif
 
 /* =============================================================== */
@@ -90,7 +99,8 @@ pcap_lookupdev (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_lookupdev_location ()) (errbuf);
 	}
@@ -125,7 +135,8 @@ pcap_lookupnet (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_lookupnet_location ()) (device, netp, maskp, errbuf);
 	}
@@ -157,7 +168,8 @@ pcap_create (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_create_location ()) (source, errbuf);
 	}
@@ -189,7 +201,8 @@ pcap_open_dead (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_open_dead_location ()) (linktype, snaplen);
 	}
@@ -225,7 +238,8 @@ pcap_open_live (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_open_live_location ()) (device, snaplen, promisc, to_ms, errbuf);
 	}
@@ -257,7 +271,8 @@ pcap_open_offline (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_open_offline_location ()) (fname, errbuf);
 	}
@@ -289,7 +304,8 @@ pcap_fopen_offline (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_fopen_offline_location ()) (fp, errbuf);
 	}
@@ -321,7 +337,8 @@ pcap_hopen_offline (
 		return NULL;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_hopen_offline_location ()) (a, errbuf);
 	}
@@ -353,7 +370,8 @@ pcap_findalldevs (
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		return (*__lhip_real_pcap_findalldevs_location ()) (devs, errbuf);
 	}

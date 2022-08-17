@@ -75,7 +75,7 @@ be used to launch bad programs), ioctl, uname, bind, getsockname,
 getsockopt+setsockopt, a bunch of file opening functions
 (fopen, fopen64, open, open64, freopen, freopen64, openat, openat64)
 which can be used to read IP addresses from files under /proc and
-some of the function from the libpcap library, to prevent raw opening
+some of the functions from the libpcap library, to prevent raw opening
 of network devices.
 
 Intercepting the raw syscall() function is impossible, because the
@@ -97,6 +97,12 @@ variables used by the dynamic linker, so the dynamic linker doesn't preload
 LibHideIP. Some Java Runtime Environments seem to do this.
 @end itemize
 
+Additionally, GUI applications may show errors similar to
+@command{cannot connect to X server} when starting if the
+@command{$HOME/.xauth*} file contains the real hostname instead of
+just @command{localhost}. Check the compiling options (@ref{How to compile?})
+for a work-around.
+
 @c ==================================================================
 
 
@@ -107,8 +113,20 @@ Requirements for compiling the library:
 
 @itemize
 @item a non-root account. Please, @strong{NEVER} compile or @command{make} anything as root.
-@item a working C compiler
-@item development package for the C library (like glibc-devel and glibc-headers).
+@item a working C compiler (C++ compilers won't work due to variable casts)
+@item development package for the C library (like glibc-devel and glibc-headers).@*@*
+@strong{NOTE} Some glibc versions (2.11 is known of this) have a bug in their
+dl(v)sym implementation, which may cause LibHideIP to hang during searching
+for the original versions of the substituted C functions. If you observe
+this, it is best to upgrade glibc. If not possible, you can start deleting
+substituted functions from open() and check each time it your current
+version started to work (yes, this decreases security).
+
+@strong{NOTE} Also, some glibc versions have a bug in their gethostbyaddr_r and related
+functions' implementations, causing overflows (probably stack) which impact
+the environment variables' usage and thus may disable banning files except
+the global file. Probably fixed in version 2.22.
+
 @sp 1
 The sys/stat.h contains functions needed to check an executable's type.
 If it is a symbolic link, LibHideIP will follow it.
@@ -151,6 +169,15 @@ If you want to disable additional banning files in users' home directories,
 configure the library with
 
 	@command{./configure --enable-user-files=no}
+
+If you want to allow X-based (GUI) applications to run under LibHideIP,
+configure the library with
+
+	@command{./configure --enable-gui-applications=yes}
+
+Note, however, that this disables one of the functions (gethostname). In
+other words, this function will not be intercepted by LibHideIP, so programs
+using it will be able to get its real result.
 
 Type
 

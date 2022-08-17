@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- private header file.
  *
- * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -390,6 +390,24 @@ extern int							__lhip_check_ipv4_value
 extern int							__lhip_check_ipv6_value
 									LHIP_PARAMS ((const struct in6_addr * const addr6));
 
+# ifdef HAVE_MEMCPY
+#  define LHIP_MEMCOPY memcpy
+# else
+extern void __lhip_memcopy LHIP_PARAMS ((void * const dest,
+	const void * const src, const size_t len));
+#  define LHIP_MEMCOPY __lhip_memcopy
+# endif
+
+# ifdef HAVE_MEMSET
+#  define LHIP_MEMSET memset
+# else
+extern void __lhip_mem_set LHIP_PARAMS ((void * const dest,
+	const char value, const size_t len));
+#  define LHIP_MEMSET __lhip_mem_set
+# endif
+
+extern char * __lhip_duplicate_string LHIP_PARAMS ((const char src[]));
+
 
 # ifdef __cplusplus
 }
@@ -412,19 +430,35 @@ extern int							__lhip_check_ipv6_value
 # define LHIP_MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
 
 # define LHIP_MAXPATHLEN 4097
-# define LHIP_MAXHOSTLEN 4097
 
 # define LHIP_INIT_STAGE_NOT_INITIALIZED 0
 # define LHIP_INIT_STAGE_AFTER_DLSYM 1
 # define LHIP_INIT_STAGE_FULLY_INITIALIZED 2
 
 # ifdef HAVE_ERRNO_H
-#  define SET_ERRNO_MISSING() {errno = ENOSYS;}
-#  define SET_ERRNO_PERM() {errno = EPERM;}
+#  ifdef ENOSYS
+#   define LHIP_SET_ERRNO_MISSING() {errno = ENOSYS;}
+#  else
+#   define LHIP_SET_ERRNO_MISSING() {errno = 38;}
+#  endif
+#  define LHIP_SET_ERRNO_PERM() {errno = EPERM;}
+#  define LHIP_SET_ERRNO(value) {errno = value;}
+#  define LHIP_GET_ERRNO(variable) {variable = errno;}
+#  define LHIP_MAKE_ERRNO_VAR(name) int name = errno
 # else
-#  define SET_ERRNO_MISSING()
-#  define SET_ERRNO_PERM()
+#  define LHIP_SET_ERRNO_MISSING()
+#  define LHIP_SET_ERRNO_PERM()
+#  define LHIP_SET_ERRNO(value)
+#  define LHIP_GET_ERRNO(variable)
+#  define LHIP_MAKE_ERRNO_VAR(name)
+# endif
+
+# if (defined __GNUC__) && (defined __GLIBC__) && (defined __GLIBC_MINOR__)
+#  if (__GLIBC__ == 2) && (__GLIBC_MINOR__ == 11)
+#   warning x
+#   warning x Glibc version 2.11 has a bug in dl(v)sym. Read the documentation.
+#   warning x
+#  endif
 # endif
 
 #endif /* _LHIP_HEADER */
-

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 0.9, bogdandr@op.pl)
+AC_INIT(libhideip, 1.5, bogdandr@op.pl)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
@@ -69,6 +69,23 @@ AC_ARG_WITH([max-host-names],
 			[Maximum number of addreses and aliases of your host.])
          fi
         ])
+
+AC_ARG_ENABLE([gui-applications],
+	AS_HELP_STRING([--enable-gui-applications],
+		[Enable X-based applications to work @<:@default=no@:>@. This disables one of the functions.]),
+        [if (test "x$enableval" = "xyes"); then
+                gui_applications=yes
+         else
+                gui_applications=no
+         fi
+        ]
+        ,[gui_applications=no])
+
+if (test "x$gui_applications" = "xyes"); then
+
+	AC_DEFINE([LHIP_ENABLE_GUI_APPS], [1],
+		[Whether or not to enable X-based applications to work.])
+fi
 
 # ==================== Checks for programs.
 AC_PROG_CC
@@ -235,6 +252,7 @@ AC_CHECK_FUNCS([memcpy memset readlink getipnodebyname \
 	getipnodebyaddr getenv gethostbyaddr_r gethostbyname_r gethostbyname2_r\
 	gethostent_r openat openat64 realloc symlink lstat])
 
+AC_LANG(C)
 AH_TEMPLATE([GETNAMEINFO_ARG4TYPE])
 AH_TEMPLATE([GETNAMEINFO_ARG6TYPE])
 AH_TEMPLATE([GETNAMEINFO_ARG7TYPE])

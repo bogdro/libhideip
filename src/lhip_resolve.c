@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- address resolving functions' replacements.
  *
- * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -35,10 +35,6 @@
 #  include <memory.h>
 # endif
 # include <string.h>
-#endif
-
-#ifdef HAVE_ERRNO_H
-# include <errno.h>
 #endif
 
 #ifdef HAVE_NETINET_IN_H
@@ -102,7 +98,10 @@ static int __lhip_is_forbidden_name (
 	const char * forbidden_names[] =
 		{ "127.0.0.1", "::1", "0.0.0.0", "::0",
 		"localhost", "localhost6", "localhost.", "localhost6." };
+#ifdef HAVE_MALLOC
 	char * new_name = NULL;
+#endif
+	int res;
 
 	if ( name == NULL )
 	{
@@ -118,7 +117,7 @@ static int __lhip_is_forbidden_name (
 		j = strlen (forbidden_names[i]);
 		if ( forbidden_names[i][j-1] == '.' )
 		{
-			if ( strncmp (name, forbidden_names[i], j) == 0 )
+			if ( strncmp (name, forbidden_names[i], j-1) == 0 )
 			{
 				return 1;
 			}
@@ -149,22 +148,17 @@ static int __lhip_is_forbidden_name (
 	h.h_addrtype = 0;
 	h.h_length = 0;
 	h.h_addr_list = NULL;
-	if ( __lhip_is_local_addr (&h) != 0 )
-	{
-#ifdef HAVE_MALLOC
-		if ( new_name != NULL )
-		{
-			free (new_name);
-		}
-#endif
-		return 1;
-	}
+	res = __lhip_is_local_addr (&h);
 #ifdef HAVE_MALLOC
 	if ( new_name != NULL )
 	{
 		free (new_name);
 	}
 #endif
+	if ( res != 0 )
+	{
+		return 1;
+	}
 	return 0;
 }
 
@@ -191,21 +185,17 @@ res_query (
 
 	if ( __lhip_real_res_query_location () == NULL )
 	{
-		/*SET_ERRNO_MISSING();*/
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = 0;*/
-#endif
 		return (*__lhip_real_res_query_location ()) (dname, class, type, answer, anslen);
 	}
 
 	if ( __lhip_is_forbidden_name (dname) != 0 )
 	{
-		/*SET_ERRNO_PERM();*/
 		return -1;
 	}
 	return (*__lhip_real_res_query_location ()) (dname, class, type, answer, anslen);
@@ -234,21 +224,17 @@ res_search (
 
 	if ( __lhip_real_res_search_location () == NULL )
 	{
-		/*SET_ERRNO_MISSING();*/
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = 0;*/
-#endif
 		return (*__lhip_real_res_search_location ()) (dname, class, type, answer, anslen);
 	}
 
 	if ( __lhip_is_forbidden_name (dname) != 0 )
 	{
-		/*SET_ERRNO_PERM();*/
 		return -1;
 	}
 
@@ -280,21 +266,17 @@ res_querydomain (
 
 	if ( __lhip_real_res_querydomain_location () == NULL )
 	{
-		/*SET_ERRNO_MISSING();*/
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = 0;*/
-#endif
 		return (*__lhip_real_res_querydomain_location ()) (name, domain, class, type, answer, anslen);
 	}
 
 	if ( __lhip_is_forbidden_name (name) != 0 )
 	{
-		/*SET_ERRNO_PERM();*/
 		return -1;
 	}
 
@@ -328,22 +310,18 @@ res_mkquery (
 
 	if ( __lhip_real_res_mkquery_location () == NULL )
 	{
-		/*SET_ERRNO_MISSING();*/
 		return -1;
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = 0;*/
-#endif
 		return (*__lhip_real_res_mkquery_location ())
 			(op, dname, class, type, data, datalen, newrr, buf, buflen);
 	}
 
 	if ( __lhip_is_forbidden_name (dname) != 0 )
 	{
-		/*SET_ERRNO_PERM();*/
 		return -1;
 	}
 

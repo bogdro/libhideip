@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- unit test.
  *
- * Copyright (C) 2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2015-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@
 #  define RTLD_NEXT ((void *) -1l)
 # endif
 #else
-# ifdef LSR_ANSIC
+# ifdef LHIP_ANSIC
 #  error Dynamic loading functions missing.
 # endif
 #endif
@@ -198,7 +198,18 @@ struct msghdr
 # include <sys/ioctl.h>
 #endif
 
-/* ====================== File functions */
+#if (defined LHIP_ENABLE_USERBANS) && (defined HAVE_GETENV) \
+	&& (defined HAVE_STDLIB_H) && (defined HAVE_MALLOC)
+# define LHIP_CAN_USE_BANS 1
+#else
+# undef LHIP_CAN_USE_BANS
+#endif
+
+#if (defined LHIP_ENABLE_ENV) && (defined HAVE_STDLIB_H) && (defined HAVE_GETENV)
+# define LHIP_CAN_USE_ENV 1
+#else
+# undef LHIP_CAN_USE_ENV
+#endif
 
 #define LHIP_TEST_FILENAME "zz1"
 #define LHIP_TEST_FILE_LENGTH 3
@@ -207,9 +218,13 @@ struct msghdr
 #define LHIP_TEST_BANNED_FILENAME_SHORT "hosts"
 #define LHIP_TEST_BANNED_LINKNAME "banlink"
 
+/* ====================== File functions */
+
 #ifdef HAVE_SYS_SOCKET_H
 static in_addr_t addr;
+static struct in6_addr addr6;
 static struct sockaddr_in sa_in;
+static struct sockaddr_in6 sa_in6;
 #endif
 
 #ifdef HAVE_OPENAT
@@ -234,6 +249,7 @@ START_TEST(test_openat_banned)
 {
 	int fd;
 	int dirfd;
+	int r;
 
 	printf("test_openat_banned\n");
 	fd = openat(AT_FDCWD, LHIP_TEST_BANNED_FILENAME, O_RDONLY);
@@ -249,6 +265,7 @@ START_TEST(test_openat_banned)
 	if (dirfd >= 0)
 	{
 		fd = openat(dirfd, LHIP_TEST_BANNED_FILENAME_SHORT, O_RDONLY);
+		r = errno;
 		if (fd >= 0)
 		{
 			close(fd);
@@ -257,9 +274,9 @@ START_TEST(test_openat_banned)
 		}
 		close(dirfd);
 # ifdef HAVE_ERRNO_H
-		if (errno != EPERM)
+		if (r != EPERM)
 		{
-			fail("test_openat_banned: file not opened, but errno invalid: errno=%d\n", errno);
+			fail("test_openat_banned: file not opened, but errno invalid: errno=%d\n", r);
 		}
 # endif
 	}
@@ -410,7 +427,7 @@ START_TEST(test_fopen_link_banned)
 	r = errno;
 	unlink (LHIP_TEST_BANNED_LINKNAME);
 # ifdef HAVE_ERRNO_H
-	ck_assert_int_eq(errno, EPERM);
+	ck_assert_int_eq(r, EPERM);
 # endif
 }
 END_TEST
@@ -441,6 +458,23 @@ START_TEST(test_freopen)
 }
 END_TEST
 
+START_TEST(test_freopen_stdout)
+{
+	FILE * f;
+
+	printf("test_freopen_stdout\n");
+	f = freopen(LHIP_TEST_FILENAME, "r", stdout);
+	if (f != NULL)
+	{
+		fclose(f);
+	}
+	else
+	{
+		fail("test_freopen_stdout: file not re-opened: errno=%d\n", errno);
+	}
+}
+END_TEST
+
 START_TEST(test_freopen_banned)
 {
 	FILE * f;
@@ -463,6 +497,23 @@ START_TEST(test_freopen_banned)
 	{
 		fail("test_freopen_banned: file not opened: errno=%d\n", errno);
 	}
+}
+END_TEST
+
+START_TEST(test_freopen_stdout_banned)
+{
+	FILE * f;
+
+	printf("test_freopen_stdout_banned\n");
+	f = freopen(LHIP_TEST_BANNED_FILENAME, "r", stdout);
+	if (f != NULL)
+	{
+		fclose(f);
+		fail("test_freopen_stdout_banned: file opened, but shouldn't be\n");
+	}
+#ifdef HAVE_ERRNO_H
+	ck_assert_int_eq(errno, EPERM);
+#endif
 }
 END_TEST
 
@@ -496,8 +547,9 @@ START_TEST(test_freopen_link)
 	}
 	else
 	{
+		r = errno;
 		unlink (LHIP_LINK_FILENAME);
-		fail("test_freopen_link: file not opened: errno=%d\n", errno);
+		fail("test_freopen_link: file not opened: errno=%d\n", r);
 	}
 }
 END_TEST
@@ -531,9 +583,36 @@ START_TEST(test_freopen_link_banned)
 	}
 	else
 	{
+		r = errno;
 		unlink (LHIP_TEST_BANNED_LINKNAME);
-		fail("test_freopen_link_banned: file not opened: errno=%d\n", errno);
+		fail("test_freopen_link_banned: file not opened: errno=%d\n", r);
 	}
+}
+END_TEST
+
+START_TEST(test_freopen_link_banned_stdout)
+{
+	FILE * f;
+	int r;
+
+	printf("test_freopen_link_banned_stdout\n");
+	r = symlink (LHIP_TEST_BANNED_FILENAME, LHIP_TEST_BANNED_LINKNAME);
+	if (r != 0)
+	{
+		fail("test_freopen_link_banned_stdout: link could not be created: errno=%d, r=%d\n", errno, r);
+	}
+	f = freopen(LHIP_TEST_BANNED_LINKNAME, "r", stdout);
+	if (f != NULL)
+	{
+		fclose(f);
+		unlink (LHIP_TEST_BANNED_LINKNAME);
+		fail("test_freopen_link_banned_stdout: file opened, but shouldn't be\n");
+	}
+	r = errno;
+	unlink (LHIP_TEST_BANNED_LINKNAME);
+# ifdef HAVE_ERRNO_H
+	ck_assert_int_eq(r, EPERM);
+# endif
 }
 END_TEST
 #endif /* HAVE_SYMLINK */
@@ -608,7 +687,7 @@ START_TEST(test_open_link_banned)
 	r = symlink (LHIP_TEST_BANNED_FILENAME, LHIP_TEST_BANNED_LINKNAME);
 	if (r != 0)
 	{
-		fail("test_freopen_link: link could not be created: errno=%d, r=%d\n", errno, r);
+		fail("test_open_link_banned: link could not be created: errno=%d, r=%d\n", errno, r);
 	}
 	fd = open(LHIP_TEST_BANNED_LINKNAME, O_RDONLY);
 	if (fd >= 0)
@@ -626,11 +705,128 @@ START_TEST(test_open_link_banned)
 END_TEST
 #endif /* HAVE_SYMLINK */
 
+#ifdef LHIP_CAN_USE_BANS
+START_TEST(test_banned_in_userfile_prog)
+{
+	int fd;
+	FILE * user_ban_file;
+	char * user_ban_file_name;
+	const char * home_env;
+	int err;
+	long file_len;
+
+	printf("test_banned_in_userfile_prog\n");
+
+	home_env = getenv("HOME");
+	user_ban_file_name = (char *) malloc (strlen (home_env) + 1
+		+ strlen (LHIP_BANNING_USERFILE) + 1);
+	if ( user_ban_file_name == NULL )
+	{
+		fail("test_banned_in_userfile_prog: cannot allocate memory: errno=%d\n", errno);
+	}
+	strcpy (user_ban_file_name, home_env);
+	strcat (user_ban_file_name, "/");
+	strcat (user_ban_file_name, LHIP_BANNING_USERFILE);
+
+	user_ban_file = fopen (user_ban_file_name, "a+");
+	if ( user_ban_file == NULL )
+	{
+		err = errno;
+		free (user_ban_file_name);
+		fail("test_banned_in_userfile_prog: cannot open user file: errno=%d\n", err);
+	}
+
+	fseek (user_ban_file, 0, SEEK_END);
+	file_len = ftell (user_ban_file);
+	fwrite ("\nlhiptest\n", 1, strlen("\nlhiptest\n"), user_ban_file);
+	fclose (user_ban_file);
+
+	fd = open(LHIP_TEST_BANNED_FILENAME, O_RDONLY);
+	err = errno;
+	if ( file_len == 0 )
+	{
+		unlink (user_ban_file_name);
+	}
+	else
+	{
+		truncate (user_ban_file_name, file_len);
+	}
+	if (fd >= 0)
+	{
+		close(fd);
+	}
+	else
+	{
+		free (user_ban_file_name);
+		fail("test_banned_in_userfile_prog: file not opened: errno=%d\n", err);
+	}
+	free (user_ban_file_name);
+}
+END_TEST
+#endif
+
+#ifdef LHIP_CAN_USE_ENV
+START_TEST(test_banned_in_env_prog)
+{
+	int fd;
+	FILE * env_ban_file;
+	char env_ban_file_name[] = "libhideip.env";
+	int err;
+	long file_len;
+	int res;
+
+	printf("test_banned_in_env_prog\n");
+
+	res = setenv(LHIP_BANNING_ENV, env_ban_file_name, 1);
+	if ( res != 0 )
+	{
+		fail("test_banned_in_env_prog: cannot set environment: errno=%d\n", errno);
+	}
+
+	env_ban_file = fopen (env_ban_file_name, "a+");
+	if ( env_ban_file == NULL )
+	{
+		fail("test_banned_in_env_prog: cannot open user file: errno=%d\n", errno);
+	}
+
+	fseek (env_ban_file, 0, SEEK_END);
+	file_len = ftell (env_ban_file);
+	fwrite ("\nlhiptest\n", 1, strlen("\nlhiptest\n"), env_ban_file);
+	fclose (env_ban_file);
+
+	fd = open(LHIP_TEST_BANNED_FILENAME, O_RDONLY);
+	err = errno;
+	if ( file_len == 0 )
+	{
+		unlink (env_ban_file_name);
+	}
+	else
+	{
+		truncate (env_ban_file_name, file_len);
+	}
+	if (fd >= 0)
+	{
+		close(fd);
+	}
+	else
+	{
+		fail("test_banned_in_env_prog: file not opened: errno=%d\n", err);
+	}
+}
+END_TEST
+#endif
+
 /* ====================== Network functions */
 static const unsigned char __lhip_localhost_ipv4[4] = {127, 0, 0, 1};
 static const unsigned char __lhip_localhost_ipv6[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 static const unsigned char __lhip_fake_mac[6] = {1, 2, 3, 4, 5, 6};
-static char buf[5000];
+#define LHIP_MAXHOSTLEN 16384
+#if defined(__GNUC__) && __GNUC__ >= 3
+# define LHIP_ALIGN(x) __attribute__((aligned(x)))
+#else
+# define LHIP_ALIGN(x)
+#endif
+static char buf[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
 
 /**
  * Checks if the given IPv4 address is anonymized (contains 127.0.0.1)
@@ -653,17 +849,17 @@ static void verify_ipv4(void * addr4)
  * Checks if the given IPv6 address is anonymized (contains ::1)
  * @return 1 if OK
  */
-static void verify_ipv6(void * addr6)
+static void verify_ipv6(void * addr_ip6)
 {
-	if ( addr6 == NULL )
+	if ( addr_ip6 == NULL )
 	{
 		return;
 	}
-	if ( memcmp (addr6, __lhip_localhost_ipv6, sizeof (__lhip_localhost_ipv6)) == 0 )
+	if ( memcmp (addr_ip6, __lhip_localhost_ipv6, sizeof (__lhip_localhost_ipv6)) == 0 )
 	{
 		return;
 	}
-	fail("IPv6 address contains something else than '::1': '0x%x'\n", *((int *)addr6));
+	fail("IPv6 address contains something else than '::1': '0x%x'\n", *((int *)addr_ip6));
 }
 
 /**
@@ -702,9 +898,12 @@ static void verify_addrinfo (struct addrinfo * ai)
 			if ((strncmp (tmpa->ai_canonname, "localhost",
 					canonname_len) != 0)
 				&& (strncmp (tmpa->ai_canonname, "127.0.0.1",
-					     canonname_len) != 0))
+					     canonname_len) != 0)
+				&& (strncmp (tmpa->ai_canonname, "::1",
+					     canonname_len) != 0)
+			)
 			{
-				fail("tmpa->ai_canonname contains something else than 'localhost' and '127.0.0.1': '%s'\n",
+				fail("tmpa->ai_canonname contains something else than 'localhost', '127.0.0.1' and '::1': '%s'\n",
 					tmpa->ai_canonname);
 			}
 		}
@@ -786,6 +985,17 @@ START_TEST(test_gethostbyaddr)
 }
 END_TEST
 
+START_TEST(test_gethostbyaddr6)
+{
+	struct hostent * h;
+
+	printf("test_gethostbyaddr6\n");
+	h = gethostbyaddr (&addr6, 16, AF_INET6);
+	fail_if(h == NULL);
+	verify_hostent(h);
+}
+END_TEST
+
 # ifdef HAVE_GETHOSTBYADDR_R
 START_TEST(test_gethostbyaddr_r)
 {
@@ -797,6 +1007,22 @@ START_TEST(test_gethostbyaddr_r)
 	printf("test_gethostbyaddr_r\n");
 	buf[0] = '\0';
 	a = gethostbyaddr_r (&addr, 4, AF_INET,
+		&res, buf, sizeof (buf), &tmp, &err);
+	ck_assert_int_eq(a, 0);
+	verify_hostent(&res);
+}
+END_TEST
+
+START_TEST(test_gethostbyaddr_r6)
+{
+	int err;
+	int a;
+	struct hostent * tmp;
+	struct hostent res;
+
+	printf("test_gethostbyaddr_r6\n");
+	buf[0] = '\0';
+	a = gethostbyaddr_r (&addr6, 16, AF_INET6,
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
 	verify_hostent(&res);
@@ -879,6 +1105,17 @@ START_TEST(test_gethostbyname2_banned)
 }
 END_TEST
 
+START_TEST(test_gethostbyname2_banned6)
+{
+	struct hostent * h;
+
+	printf("test_gethostbyname2_banned6\n");
+	h = gethostbyname2 ("::1", AF_INET6);
+	fail_if(h == NULL);
+	verify_hostent(h);
+}
+END_TEST
+
 # ifdef HAVE_GETHOSTBYNAME2_R
 START_TEST(test_gethostbyname2_r)
 {
@@ -905,6 +1142,22 @@ START_TEST(test_gethostbyname2_r_banned)
 	printf("test_gethostbyname2_r_banned\n");
 	buf[0] = '\0';
 	a = gethostbyname2_r ("127.0.0.1", AF_INET,
+		&res, buf, sizeof (buf), &tmp, &err);
+	ck_assert_int_eq(a, 0);
+	verify_hostent(&res);
+}
+END_TEST
+
+START_TEST(test_gethostbyname2_r_banned6)
+{
+	int err;
+	int a;
+	struct hostent * tmp;
+	struct hostent res;
+
+	printf("test_gethostbyname2_r_banned6\n");
+	buf[0] = '\0';
+	a = gethostbyname2_r ("::1", AF_INET6,
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
 	verify_hostent(&res);
@@ -956,6 +1209,18 @@ START_TEST(test_getipnodebyaddr)
 	verify_hostent(h);
 }
 END_TEST
+
+START_TEST(test_getipnodebyaddr6)
+{
+	struct hostent * h;
+	int err;
+
+	printf("test_getipnodebyaddr6\n");
+	h = getipnodebyaddr (&addr6, 16, AF_INET6, &err);
+	fail_if(h == NULL);
+	verify_hostent(h);
+}
+END_TEST
 # endif /* HAVE_GETIPNODEBYADDR */
 
 # ifdef HAVE_GETIPNODEBYNAME
@@ -966,6 +1231,18 @@ START_TEST(test_getipnodebyname)
 
 	printf("test_getipnodebyname\n");
 	h = getipnodebyname ("127.0.0.1", AF_INET, 0, &err);
+	fail_if(h == NULL);
+	verify_hostent(h);
+}
+END_TEST
+
+START_TEST(test_getipnodebyname6)
+{
+	struct hostent * h;
+	int err;
+
+	printf("test_getipnodebyname6\n");
+	h = getipnodebyname ("::1", AF_INET6, 0, &err);
 	fail_if(h == NULL);
 	verify_hostent(h);
 }
@@ -1035,6 +1312,31 @@ START_TEST(test_getaddrinfo_banned)
 	}
 }
 END_TEST
+
+START_TEST(test_getaddrinfo_banned6)
+{
+	int a;
+	struct addrinfo * addrinfo_all = NULL;
+	struct addrinfo ai_hints;
+
+	printf("test_getaddrinfo_banned6\n");
+	memset (&ai_hints, 0, sizeof (struct addrinfo));
+	ai_hints.ai_flags = /*AI_NUMERICHOST |*/ AI_CANONNAME;
+	ai_hints.ai_family = AF_UNSPEC;
+	ai_hints.ai_socktype = 0;
+	ai_hints.ai_protocol = 0;
+	ai_hints.ai_addr = NULL;
+	ai_hints.ai_canonname = NULL;
+	ai_hints.ai_next = NULL;
+	a = getaddrinfo ("::1", NULL /* service */,
+		&ai_hints, &addrinfo_all);
+	ck_assert_int_eq(a, 0);
+	if ( addrinfo_all != NULL )
+	{
+		verify_addrinfo (addrinfo_all);
+	}
+}
+END_TEST
 #endif /* HAVE_SYS_SOCKET_H */
 
 #endif /* HAVE_NETDB_H */
@@ -1072,11 +1374,11 @@ END_TEST
 #endif /* HAVE_IFADDRS_H */
 
 #ifdef HAVE_SYS_SOCKET_H
-START_TEST(test_socket1)
+START_TEST(test_socket_inet)
 {
 	int a;
 
-	printf("test_socket1\n");
+	printf("test_socket_inet\n");
 	a = socket (AF_INET, SOCK_STREAM, 0);
 	if ( a >= 0 )
 	{
@@ -1084,16 +1386,16 @@ START_TEST(test_socket1)
 	}
 	else
 	{
-		fail("test_socket1: socket not opened, but should be: errno=%d\n", errno);
+		fail("test_socket_inet: socket not opened, but should be: errno=%d\n", errno);
 	}
 }
 END_TEST
 
-START_TEST(test_socket2)
+START_TEST(test_socket_unix)
 {
 	int a;
 
-	printf("test_socket2\n");
+	printf("test_socket_unix\n");
 	a = socket (AF_UNIX, SOCK_STREAM, 0);
 	if ( a >= 0 )
 	{
@@ -1101,21 +1403,38 @@ START_TEST(test_socket2)
 	}
 	else
 	{
-		fail("test_socket2: socket not opened, but should be: errno=%d\n", errno);
+		fail("test_socket_unix: socket not opened, but should be: errno=%d\n", errno);
 	}
 }
 END_TEST
 
-START_TEST(test_socket_banned1)
+START_TEST(test_socket_inet6)
 {
 	int a;
 
-	printf("test_socket_banned1\n");
+	printf("test_socket_inet6\n");
+	a = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( a >= 0 )
+	{
+		close (a);
+	}
+	else
+	{
+		fail("test_socket_inet6: socket not opened, but should be: errno=%d\n", errno);
+	}
+}
+END_TEST
+
+START_TEST(test_socket_banned_netlink)
+{
+	int a;
+
+	printf("test_socket_banned_netlink\n");
 	a = socket (AF_NETLINK, SOCK_STREAM, PF_INET);
 	if ( a >= 0 )
 	{
 		close (a);
-		fail("test_socket_banned1: socket opened, but shouldn't be\n");
+		fail("test_socket_banned_netlink: socket opened, but shouldn't be\n");
 	}
 # ifdef HAVE_ERRNO_H
 	ck_assert_int_eq(errno, EPERM);
@@ -1123,16 +1442,33 @@ START_TEST(test_socket_banned1)
 }
 END_TEST
 
-START_TEST(test_socket_banned2)
+START_TEST(test_socket_banned_raw)
 {
 	int a;
 
-	printf("test_socket_banned2\n");
+	printf("test_socket_banned_raw\n");
 	a = socket (AF_INET, SOCK_RAW, PF_INET);
 	if ( a >= 0 )
 	{
 		close (a);
-		fail("test_socket_banned2: socket opened, but shouldn't be\n");
+		fail("test_socket_banned_raw: socket opened, but shouldn't be\n");
+	}
+# ifdef HAVE_ERRNO_H
+	ck_assert_int_eq(errno, EPERM);
+# endif
+}
+END_TEST
+
+START_TEST(test_socket_banned_raw6)
+{
+	int a;
+
+	printf("test_socket_banned_raw6\n");
+	a = socket (AF_INET6, SOCK_RAW, PF_INET);
+	if ( a >= 0 )
+	{
+		close (a);
+		fail("test_socket_banned_raw6: socket opened, but shouldn't be\n");
 	}
 # ifdef HAVE_ERRNO_H
 	ck_assert_int_eq(errno, EPERM);
@@ -1208,6 +1544,42 @@ START_TEST(test_getsockname)
 }
 END_TEST
 
+START_TEST(test_getsockname6)
+{
+	int a;
+	int sock;
+	socklen_t sa;
+
+	printf("test_getsockname6\n");
+	sock = socket (AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+	if ( sock >= 0 )
+	{
+		sa = sizeof (sa_in);
+		a = getsockname (sock, (struct sockaddr*)&sa_in, &sa);
+		close (sock);
+		if ( a >= 0 )
+		{
+			if ( sa_in.sin_family == AF_INET )
+			{
+				verify_ipv4 (&(((struct sockaddr_in *)(&sa_in))->sin_addr));
+			}
+			else if ( sa_in.sin_family == AF_INET6 )
+			{
+				verify_ipv6 (&(((struct sockaddr_in6 *)(&sa_in))->sin6_addr));
+			}
+		}
+		else
+		{
+			fail("test_getsockname6: socket name not read\n");
+		}
+	}
+	else
+	{
+		fail("test_getsockname6: socket not opened, but should be: errno=%d\n", errno);
+	}
+}
+END_TEST
+
 START_TEST(test_bind)
 {
 	int a;
@@ -1236,6 +1608,38 @@ START_TEST(test_bind)
 }
 END_TEST
 
+START_TEST(test_bind6)
+{
+	int a;
+	int sock;
+	int err;
+	const unsigned char zero_ipv6[16]
+		= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	printf("test_bind6\n");
+	sock = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		sa_in6.sin6_family = AF_INET6;
+		memcpy (&(sa_in6.sin6_addr.s6_addr), zero_ipv6,
+			sizeof (zero_ipv6));
+		sa_in6.sin6_port = 5553;
+		a = bind (sock, (struct sockaddr*)&sa_in6,
+			sizeof (struct sockaddr_in6));
+		err = errno;
+		close (sock);
+		if ( a < 0 )
+		{
+			fail("test_bind6: socket not bound, but should be: errno=%d\n", err);
+		}
+	}
+	else
+	{
+		fail("test_bind6: socket not opened, but should be: errno=%d\n", errno);
+	}
+}
+END_TEST
+
 START_TEST(test_bind_banned)
 {
 	int a;
@@ -1246,7 +1650,7 @@ START_TEST(test_bind_banned)
 	if ( sock >= 0 )
 	{
 		sa_in.sin_family = AF_INET;
-		sa_in.sin_addr.s_addr = inet_addr ("192.168.0.250");
+		sa_in.sin_addr.s_addr = inet_addr ("192.168.1.250");
 		sa_in.sin_port = 5553;
 		a = bind (sock, (struct sockaddr*)&sa_in, sizeof (struct sockaddr_in));
 		close (sock);
@@ -1258,6 +1662,37 @@ START_TEST(test_bind_banned)
 	else
 	{
 		fail("test_bind_banned: socket not opened, but should be: errno=%d\n", errno);
+	}
+}
+END_TEST
+
+START_TEST(test_bind_banned6)
+{
+	int a;
+	int sock;
+	const unsigned char addr_ipv6[16]
+		= {0x20, 0x02, 0xc0, 0xa8, 0xc0, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	printf("test_bind_banned6\n");
+	sock = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		sa_in6.sin6_family = AF_INET6;
+		memcpy (&(sa_in6.sin6_addr.s6_addr), addr_ipv6,
+			sizeof (addr_ipv6));
+		sa_in6.sin6_port = 5553;
+		a = bind (sock, (struct sockaddr*)&sa_in6,
+			sizeof (struct sockaddr_in6));
+
+		close (sock);
+		if ( a >= 0 )
+		{
+			fail("test_bind_banned6: socket bound, but shouldn't be\n");
+		}
+	}
+	else
+	{
+		fail("test_bind_banned6: socket not opened, but should be: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1281,68 +1716,68 @@ START_TEST(test_socketpair)
 }
 END_TEST
 
-START_TEST(test_socketpair_banned1)
+START_TEST(test_socketpair_banned_netlink)
 {
 	int twosocks[2];
 	int a;
 
-	printf("test_socketpair_banned1\n");
+	printf("test_socketpair_banned_netlink\n");
 	a = socketpair (AF_NETLINK, SOCK_STREAM, PF_INET, twosocks);
 	if ( a >= 0 )
 	{
 		close (twosocks[0]);
 		close (twosocks[1]);
-		fail("test_socketpair_banned1: socketpair opened, but shouldn't be\n");
+		fail("test_socketpair_banned_netlink: socketpair opened, but shouldn't be\n");
 	}
 # ifdef HAVE_ERRNO_H
 	if (errno != EPERM)
 	{
-		fail("test_socketpair_banned1: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
+		fail("test_socketpair_banned_netlink: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
 	}
 # endif
 }
 END_TEST
 
-START_TEST(test_socketpair_banned2)
+START_TEST(test_socketpair_banned_raw)
 {
 	int twosocks[2];
 	int a;
 
-	printf("test_socketpair_banned2\n");
+	printf("test_socketpair_banned_raw\n");
 	a = socketpair (AF_INET, SOCK_RAW, PF_INET, twosocks);
 	if ( a >= 0 )
 	{
 		close (twosocks[0]);
 		close (twosocks[1]);
-		fail("test_socketpair_banned2: socketpair opened, but shouldn't be\n");
+		fail("test_socketpair_banned_raw: socketpair opened, but shouldn't be\n");
 	}
 # ifdef HAVE_ERRNO_H
 	if (errno != EPERM)
 	{
-		fail("test_socketpair_banned2: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
+		fail("test_socketpair_banned_raw: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
 	}
 # endif
 }
 END_TEST
 
-START_TEST(test_socketpair_banned3)
+START_TEST(test_socketpair_banned_packet)
 {
 	int twosocks[2];
 	int a;
 
-	printf("test_socketpair_banned3\n");
+	printf("test_socketpair_banned_packet\n");
 # ifdef SOCK_PACKET
 	a = socketpair (AF_INET, SOCK_PACKET, PF_INET, twosocks);
 	if ( a >= 0 )
 	{
 		close (twosocks[0]);
 		close (twosocks[1]);
-		fail("test_socketpair_banned3: socketpair opened, but shouldn't be\n");
+		fail("test_socketpair_banned_packet: socketpair opened, but shouldn't be\n");
 	}
 #  ifdef HAVE_ERRNO_H
 	if (errno != EPERM)
 	{
-		fail("test_socketpair_banned3: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
+		fail("test_socketpair_banned_packet: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
 	}
 #  endif
 # endif /* SOCK_PACKET */
@@ -1353,15 +1788,14 @@ START_TEST(test_getsockopt)
 {
 	int a;
 	int sock;
-	socklen_t sa;
-	int err;
+	int err = 10;
+	socklen_t sa = sizeof (int);
 
 	printf("test_getsockopt\n");
 	sock = socket (AF_INET, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
-		sa = sizeof (addr);
-		a = getsockopt (sock, SOL_IP, IP_TTL, &addr, &sa);
+		a = getsockopt (sock, SOL_IP, IP_TTL, &err, &sa);
 		err = errno;
 		close (sock);
 		if ( a < 0 )
@@ -1376,6 +1810,32 @@ START_TEST(test_getsockopt)
 }
 END_TEST
 
+START_TEST(test_getsockopt6)
+{
+	int a;
+	int sock;
+	int err = 10;
+	socklen_t sa = sizeof (int);
+
+	printf("test_getsockopt6\n");
+	sock = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		a = getsockopt (sock, SOL_IP, IP_TTL, &err, &sa);
+		err = errno;
+		close (sock);
+		if ( a < 0 )
+		{
+			fail("test_getsockopt6: socket option not read, but should be: errno=%d\n", err);
+		}
+	}
+	else
+	{
+		fail("test_getsockopt6: socket not opened, but should be: errno=%d\n", errno);
+	}
+}
+END_TEST
+
 START_TEST(test_getsockopt_banned)
 {
 	int a;
@@ -1386,7 +1846,8 @@ START_TEST(test_getsockopt_banned)
 	sock = socket (AF_INET, SOCK_STREAM, 0);
 	if ( sock >= 0 )
 	{
-		sa_in.sin_addr.s_addr = inet_addr ("127.0.0.1");
+		/*sa_in.sin_addr.s_addr = inet_addr ("127.0.0.1");*/
+		sa = sizeof (addr);
 		a = getsockopt (sock, SOL_IP, IP_PKTINFO, &addr, &sa);
 		close (sock);
 		if ( a >= 0 )
@@ -1397,6 +1858,31 @@ START_TEST(test_getsockopt_banned)
 	else
 	{
 		fail("test_getsockopt_banned: socket not opened, but should be: errno=%d\n", errno);
+	}
+}
+END_TEST
+
+START_TEST(test_getsockopt_banned6)
+{
+	int a;
+	int sock;
+	socklen_t sa;
+
+	printf("test_getsockopt_banned6\n");
+	sock = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		sa = sizeof (addr6);
+		a = getsockopt (sock, SOL_IP, IP_PKTINFO, &addr6, &sa);
+		close (sock);
+		if ( a >= 0 )
+		{
+			fail("test_getsockopt_banned6: socket option read, but shouldn't be\n");
+		}
+	}
+	else
+	{
+		fail("test_getsockopt_banned6: socket not opened, but should be: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1426,6 +1912,31 @@ START_TEST(test_setsockopt)
 }
 END_TEST
 
+START_TEST(test_setsockopt6)
+{
+	int a;
+	int sock;
+	int err = 10;
+
+	printf("test_setsockopt6\n");
+	sock = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		a = setsockopt (sock, SOL_IP, IP_TTL, &err, sizeof(int));
+		err = errno;
+		close (sock);
+		if ( a < 0 )
+		{
+			fail("test_setsockopt6: socket option not set, but should be: errno=%d\n", err);
+		}
+	}
+	else
+	{
+		fail("test_setsockopt6: socket not opened, but should be: errno=%d\n", errno);
+	}
+}
+END_TEST
+
 START_TEST(test_setsockopt_banned)
 {
 	int a;
@@ -1450,9 +1961,35 @@ START_TEST(test_setsockopt_banned)
 	}
 }
 END_TEST
+
+START_TEST(test_setsockopt_banned6)
+{
+	int a;
+	int sock;
+	socklen_t sa;
+
+	printf("test_setsockopt_banned6\n");
+	sock = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		sa = sizeof (addr6);
+		a = setsockopt (sock, SOL_IP, IP_PKTINFO, &addr6, sa);
+		close (sock);
+		if ( a >= 0 )
+		{
+			fail("test_setsockopt_banned6: socket option set, but shouldn't be\n");
+		}
+	}
+	else
+	{
+		fail("test_setsockopt_banned6: socket not opened, but should be: errno=%d\n", errno);
+	}
+}
+END_TEST
 #endif /* HAVE_SYS_SOCKET_H */
 
 #ifdef HAVE_UNISTD_H
+# ifndef LHIP_ENABLE_GUI_APPS
 START_TEST(test_gethostname)
 {
 	int a;
@@ -1469,6 +2006,7 @@ START_TEST(test_gethostname)
 	}
 }
 END_TEST
+# endif /* ! LHIP_ENABLE_GUI_APPS */
 #endif /* HAVE_UNISTD_H */
 
 /* ====================== Execution functions */
@@ -1589,6 +2127,52 @@ START_TEST(test_ioctl_banned1)
 	}
 }
 END_TEST
+
+/*
+Many sources say that SIOCGIFADDR is only for IPv4
+START_TEST(test_ioctl_banned1_ipv6)
+{
+	int fd;
+	int a;
+	int err;
+	struct ifreq reqs;
+
+	printf("test_ioctl_banned1_ipv6: SIOCGIFADDR\n");
+	fd = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( fd >= 0 )
+	{
+		strncpy(reqs.ifr_name, "eth0", sizeof(reqs.ifr_name));
+		reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
+/ * doesn't help:
+err = 1;
+a = setsockopt(fd, IPPROTO_IPV6, IPV6_RECVPKTINFO, &err, sizeof(err));
+* /
+		a = ioctl(fd, SIOCGIFADDR, &reqs);
+		if ( a < 0 )
+		{
+			err = errno;
+			close(fd);
+			fail("test_ioctl_banned1_ipv6: SIOCGIFADDR: ioctl not performed, but should be: errno=%d\n", err);
+		}
+		if ( reqs.ifr_ifru.ifru_addr.sa_family == AF_INET )
+		{
+			verify_ipv4 (&(((struct sockaddr_in *)
+				&(reqs.ifr_addr))->sin_addr));
+		}
+		else if ( reqs.ifr_ifru.ifru_addr.sa_family == AF_INET6 )
+		{
+			verify_ipv6 (&(((struct sockaddr_in6 *)
+				&(reqs.ifr_addr))->sin6_addr));
+		}
+		close(fd);
+	}
+	else
+	{
+		fail("test_ioctl_banned1_ipv6: SIOCGIFADDR: socket not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
+*/
 # endif
 
 # if (defined SIOCGIFCONF) && (defined HAVE_MALLOC)
@@ -1610,6 +2194,7 @@ START_TEST(test_ioctl_banned2)
 		cfg.ifc_req = (struct ifreq *) malloc ((size_t) cfg.ifc_len);
 		if ( cfg.ifc_req != NULL )
 		{
+			memset (cfg.ifc_req, 0, (size_t) cfg.ifc_len);
 			a = ioctl(fd, SIOCGIFCONF, &cfg);
 			if ( a < 0 )
 			{
@@ -1660,6 +2245,76 @@ START_TEST(test_ioctl_banned2)
 	}
 }
 END_TEST
+
+START_TEST(test_ioctl_banned2_ipv6)
+{
+	int fd;
+	int a;
+	int err;
+	struct ifconf cfg;
+	unsigned int buf_index;
+	unsigned int req_index;
+	struct ifreq * addrs;
+
+	printf("test_ioctl_banned2_ipv6: SIOCGIFCONF\n");
+	fd = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( fd >= 0 )
+	{
+		cfg.ifc_len = 100 * sizeof (struct ifreq);
+		cfg.ifc_req = (struct ifreq *) malloc ((size_t) cfg.ifc_len);
+		if ( cfg.ifc_req != NULL )
+		{
+			memset (cfg.ifc_req, 0, (size_t) cfg.ifc_len);
+			a = ioctl(fd, SIOCGIFCONF, &cfg);
+			if ( a < 0 )
+			{
+				err = errno;
+				close(fd);
+				free (cfg.ifc_req);
+				fail("test_ioctl_banned2_ipv6: SIOCGIFCONF: ioctl not performed, but should be: errno=%d\n", err);
+			}
+			if ( cfg.ifc_len > 0 )
+			{
+				buf_index = 0;
+				req_index = 0;
+				while ( buf_index <= (unsigned int)cfg.ifc_len )
+				{
+					addrs = (struct ifreq *) &(cfg.ifc_req[req_index]);
+					if ( addrs != NULL )
+					{
+						if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET )
+						{
+							verify_ipv4 (&(((struct sockaddr_in *)
+								&(addrs->ifr_addr))->sin_addr));
+						}
+						else if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET6 )
+						{
+							verify_ipv6 (&(((struct sockaddr_in6 *)
+								&(addrs->ifr_addr))->sin6_addr));
+						}
+						buf_index += sizeof (struct ifreq);
+					}
+					else
+					{
+						break;
+					}
+					req_index++;
+				}
+			}
+			free (cfg.ifc_req);
+		}
+		else
+		{
+			fail("test_ioctl_banned2_ipv6: SIOCGIFCONF: memory NOT allocated\n");
+		}
+		close(fd);
+	}
+	else
+	{
+		fail("test_ioctl_banned2_ipv6: SIOCGIFCONF: socket not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
 # endif /* (defined SIOCGIFCONF) && (defined HAVE_MALLOC) */
 
 # ifdef SIOCGIFHWADDR
@@ -1689,6 +2344,36 @@ START_TEST(test_ioctl_banned3)
 	else
 	{
 		fail("test_ioctl_banned3: SIOCGIFHWADDR: socket not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
+
+START_TEST(test_ioctl_banned3_ipv6)
+{
+	int fd;
+	int a;
+	int err;
+	struct ifreq reqs;
+
+	printf("test_ioctl_banned3_ipv6: SIOCGIFHWADDR\n");
+	fd = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( fd >= 0 )
+	{
+		strncpy(reqs.ifr_name, "eth0", sizeof(reqs.ifr_name));
+		reqs.ifr_name[sizeof(reqs.ifr_name)-1] = '\0';
+		a = ioctl(fd, SIOCGIFHWADDR, &reqs);
+		if ( a < 0 )
+		{
+			err = errno;
+			close(fd);
+			fail("test_ioctl_banned3_ipv6: SIOCGIFHWADDR: ioctl not performed, but should be: errno=%d\n", err);
+		}
+		verify_mac (&(reqs.ifr_addr.sa_data));
+		close(fd);
+	}
+	else
+	{
+		fail("test_ioctl_banned3_ipv6: SIOCGIFHWADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1783,6 +2468,45 @@ START_TEST(test_ioctl_banned4)
 	}
 }
 END_TEST
+
+START_TEST(test_ioctl_banned4_ipv6)
+{
+	int fd;
+	int a;
+	int err;
+	struct lifreq lreqs;
+
+	printf("test_ioctl_banned4_ipv6: SIOCGLIFADDR\n");
+	fd = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( fd >= 0 )
+	{
+		strncpy(lreqs.lifr_name, "eth0", sizeof(lreqs.lifr_name));
+		lreqs.lifr_name[sizeof(lreqs.lifr_name)-1] = '\0';
+		a = ioctl(fd, SIOCGLIFADDR, &lreqs);
+		if ( a < 0 )
+		{
+			err = errno;
+			close(fd);
+			fail("test_ioctl_banned4_ipv6: SIOCGLIFADDR: ioctl not performed, but should be: errno=%d\n", err);
+		}
+		if ( lreqs.lifr_addr.sa_family == AF_INET )
+		{
+			verify_ipv4 (&(((struct sockaddr_in *)
+				&(lreqs.lifr_addr))->sin_addr));
+		}
+		else if ( lreqs.lifr_addr.sa_family == AF_INET6 )
+		{
+			verify_ipv6 (&(((struct sockaddr_in6 *)
+				&(lreqs.lifr_addr))->sin6_addr));
+		}
+		close(fd);
+	}
+	else
+	{
+		fail("test_ioctl_banned4_ipv6: SIOCGLIFADDR: socket not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
 # endif /* #if (defined SIOCGLIFADDR) && (defined __solaris__) && (defined AF_INET6) */
 
 # if (defined SIOCGLIFCONF) && (defined __solaris__) && (defined AF_INET6)
@@ -1854,6 +2578,75 @@ START_TEST(test_ioctl_banned5)
 	}
 }
 END_TEST
+
+START_TEST(test_ioctl_banned5_ipv6)
+{
+	int fd;
+	int a;
+	int err;
+	struct lifconf lcfg;
+	struct lifreq * laddrs;
+	unsigned int buf_index;
+	unsigned int req_index;
+
+	printf("test_ioctl_banned5_ipv6: SIOCGLIFCONF\n");
+	fd = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( fd >= 0 )
+	{
+		memset (&lcfg, 0, sizeof (struct lifconf));
+		lcfg.lifc_len = 100 * sizeof (struct lifreq);
+		lcfg.lifc_req = (struct lifreq *) malloc ((size_t) lcfg.lifc_len);
+		if ( lcfg.lifc_req != NULL )
+		{
+			a = ioctl(fd, SIOCGLIFCONF, &lcfg);
+			if ( a < 0 )
+			{
+				err = errno;
+				close(fd);
+				fail("test_ioctl_banned5_ipv6: SIOCGLIFCONF: ioctl not performed, but should be: errno=%d\n", err);
+			}
+			if ( lcfg.lifc_len > 0 )
+			{
+				buf_index = 0;
+				req_index = 0;
+				while ( buf_index <= (unsigned int)lcfg.lifc_len )
+				{
+					laddrs = (struct lifreq *) &(lcfg.lifc_req[req_index]);
+					if ( laddrs != NULL )
+					{
+						if ( laddrs->lifr_addr.sa_family == AF_INET )
+						{
+							verify_ipv4 (&(((struct sockaddr_in *)
+								&(laddrs->lifr_addr))->sin_addr));
+						}
+						else if ( laddrs->lifr_addr.sa_family == AF_INET6 )
+						{
+							verify_ipv6 (&(((struct sockaddr_in6 *)
+								&(laddrs->lifr_addr))->sin6_addr));
+						}
+						buf_index += sizeof (struct lifreq);
+					}
+					else
+					{
+						break;
+					}
+					req_index++;
+				}
+			}
+			free (lcfg.lifc_req);
+		}
+		else
+		{
+			fail("test_ioctl_banned5_ipv6: SIOCGIFCONF: memory NOT allocated\n");
+		}
+		close(fd);
+	}
+	else
+	{
+		fail("test_ioctl_banned5_ipv6: SIOCGLIFCONF: socket not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
 # endif /* (defined SIOCGLIFCONF) && (defined __solaris__) && (defined AF_INET6) */
 
 # if (defined SIOCGLIFHWADDR) && (defined __solaris__) && (defined AF_INET6)
@@ -1883,6 +2676,36 @@ START_TEST(test_ioctl_banned6)
 	else
 	{
 		fail("test_ioctl_banned6: SIOCGLIFHWADDR: socket not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
+
+START_TEST(test_ioctl_banned6_ipv6)
+{
+	int fd;
+	int a;
+	int err;
+	struct lifreq lreqs;
+
+	printf("test_ioctl_banned6_ipv6: SIOCGLIFHWADDR\n");
+	fd = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( fd >= 0 )
+	{
+		strncpy(lreqs.lifr_name, "eth0", sizeof(lreqs.lifr_name));
+		lreqs.lifr_name[sizeof(lreqs.lifr_name)-1] = '\0';
+		a = ioctl(fd, SIOCGLIFHWADDR, &lreqs);
+		if ( a < 0 )
+		{
+			err = errno;
+			close(fd);
+			fail("test_ioctl_banned6_ipv6: SIOCGLIFHWADDR: ioctl not performed, but should be: errno=%d\n", err);
+		}
+		verify_mac (&(lreqs.lifr_addr.sa_data));
+		close(fd);
+	}
+	else
+	{
+		fail("test_ioctl_banned6_ipv6: SIOCGLIFHWADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -2010,11 +2833,11 @@ START_TEST(test_res_mkquery_banned)
 {
 	int a;
 
-	printf("test_res_mkquery\n");
+	printf("test_res_mkquery_banned\n");
 	a = res_mkquery(QUERY, "localhost", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
-		fail("test_res_mkquery: query succeeded, but shouldn't have\n");
+		fail("test_res_mkquery_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -2163,6 +2986,8 @@ END_TEST
 #endif /* (defined HAVE_PCAP_H) || (defined HAVE_PCAP_PCAP_H) */
 
 
+/* ======================================================= */
+
 /*
 __attribute__ ((constructor))
 static void setup_global(void) / * unchecked * /
@@ -2196,10 +3021,18 @@ static void teardown_file_test(void)
 static void setup_net_test(void) /* checked */
 {
 #ifdef HAVE_SYS_SOCKET_H
+	const unsigned char localhost_ipv6[16]
+		= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+
 	addr = inet_addr ("127.0.0.1");
 	sa_in.sin_addr.s_addr = inet_addr ("127.0.0.1");
 	sa_in.sin_family = AF_INET;
 	sa_in.sin_port = 53;
+
+	memcpy (&(addr6.s6_addr), localhost_ipv6, sizeof (localhost_ipv6));
+	memcpy (&(sa_in6.sin6_addr.s6_addr), localhost_ipv6, sizeof (localhost_ipv6));
+	sa_in6.sin6_family = AF_INET6;
+	sa_in6.sin6_port = 53;
 #endif
 }
 
@@ -2251,20 +3084,30 @@ static Suite * lhip_create_suite(void)
 	tcase_add_test(tests_open, test_fopen_link_banned);
 #endif
 	tcase_add_test(tests_open, test_freopen);
+	tcase_add_test(tests_open, test_freopen_stdout);
 	tcase_add_test(tests_open, test_freopen_banned);
+	tcase_add_test(tests_open, test_freopen_stdout_banned);
 
 #ifdef HAVE_SYMLINK
 	tcase_add_test(tests_open, test_freopen_link);
 	tcase_add_test(tests_open, test_freopen_link_banned);
+	tcase_add_test(tests_open, test_freopen_link_banned_stdout);
 #endif
-
+#ifdef LHIP_CAN_USE_BANS
+	tcase_add_test(tests_open, test_banned_in_userfile_prog);
+#endif
+#ifdef LHIP_CAN_USE_ENV
+	tcase_add_test(tests_open, test_banned_in_env_prog);
+#endif
 
 /* ====================== Network functions */
 
 #ifdef HAVE_NETDB_H
 	tcase_add_test(tests_net, test_gethostbyaddr);
+	tcase_add_test(tests_net, test_gethostbyaddr6);
 # ifdef HAVE_GETHOSTBYADDR_R
 	tcase_add_test(tests_net, test_gethostbyaddr_r);
+	tcase_add_test(tests_net, test_gethostbyaddr_r6);
 # endif
 	tcase_add_test(tests_net, test_gethostbyname);
 	tcase_add_test(tests_net, test_gethostbyname_banned);
@@ -2274,9 +3117,11 @@ static Suite * lhip_create_suite(void)
 # endif
 	tcase_add_test(tests_net, test_gethostbyname2);
 	tcase_add_test(tests_net, test_gethostbyname2_banned);
+	tcase_add_test(tests_net, test_gethostbyname2_banned6);
 # ifdef HAVE_GETHOSTBYNAME2_R
 	tcase_add_test(tests_net, test_gethostbyname2_r);
 	tcase_add_test(tests_net, test_gethostbyname2_r_banned);
+	tcase_add_test(tests_net, test_gethostbyname2_r_banned6);
 # endif
 	tcase_add_test(tests_net, test_gethostent);
 # ifdef HAVE_GETHOSTENT_R
@@ -2284,40 +3129,54 @@ static Suite * lhip_create_suite(void)
 # endif
 # ifdef HAVE_GETIPNODEBYADDR
 	tcase_add_test(tests_net, test_getipnodebyaddr);
+	tcase_add_test(tests_net, test_getipnodebyaddr6);
 # endif
 # ifdef HAVE_GETIPNODEBYNAME
 	tcase_add_test(tests_net, test_getipnodebyname);
+	tcase_add_test(tests_net, test_getipnodebyname6);
 # endif
 # ifdef HAVE_SYS_SOCKET_H
 	tcase_add_test(tests_net, test_getnameinfo);
 	tcase_add_test(tests_net, test_getaddrinfo);
 	tcase_add_test(tests_net, test_getaddrinfo_banned);
+	tcase_add_test(tests_net, test_getaddrinfo_banned6);
 # endif
 #endif /* HAVE_NETDB_H */
 #ifdef HAVE_IFADDRS_H
 	tcase_add_test(tests_net, test_getifaddrs);
 #endif
 #ifdef HAVE_SYS_SOCKET_H
-	tcase_add_test(tests_net, test_socket1);
-	tcase_add_test(tests_net, test_socket2);
-	tcase_add_test(tests_net, test_socket_banned1);
-	tcase_add_test(tests_net, test_socket_banned2);
+	tcase_add_test(tests_net, test_socket_inet);
+	tcase_add_test(tests_net, test_socket_unix);
+	tcase_add_test(tests_net, test_socket_inet6);
+	tcase_add_test(tests_net, test_socket_banned_netlink);
+	tcase_add_test(tests_net, test_socket_banned_raw);
+	tcase_add_test(tests_net, test_socket_banned_raw6);
 	tcase_add_test(tests_net, test_recvmsg);
 	tcase_add_test(tests_net, test_sendmsg);
 	tcase_add_test(tests_net, test_getsockname);
+	tcase_add_test(tests_net, test_getsockname6);
 	tcase_add_test(tests_net, test_bind);
+	tcase_add_test(tests_net, test_bind6);
 	tcase_add_test(tests_net, test_bind_banned);
+	tcase_add_test(tests_net, test_bind_banned6);
 	tcase_add_test(tests_net, test_socketpair);
-	tcase_add_test(tests_net, test_socketpair_banned1);
-	tcase_add_test(tests_net, test_socketpair_banned2);
-	tcase_add_test(tests_net, test_socketpair_banned3);
+	tcase_add_test(tests_net, test_socketpair_banned_netlink);
+	tcase_add_test(tests_net, test_socketpair_banned_raw);
+	tcase_add_test(tests_net, test_socketpair_banned_packet);
 	tcase_add_test(tests_net, test_getsockopt);
+	tcase_add_test(tests_net, test_getsockopt6);
 	tcase_add_test(tests_net, test_getsockopt_banned);
+	tcase_add_test(tests_net, test_getsockopt_banned6);
 	tcase_add_test(tests_net, test_setsockopt);
+	tcase_add_test(tests_net, test_setsockopt6);
 	tcase_add_test(tests_net, test_setsockopt_banned);
+	tcase_add_test(tests_net, test_setsockopt_banned6);
 #endif
 #ifdef HAVE_UNISTD_H
+# ifndef LHIP_ENABLE_GUI_APPS
 	tcase_add_test(tests_net, test_gethostname);
+# endif
 #endif
 
 
@@ -2338,21 +3197,27 @@ static Suite * lhip_create_suite(void)
 	tcase_add_test(tests_ioctl, test_ioctl);
 # ifdef SIOCGIFADDR
 	tcase_add_test(tests_ioctl, test_ioctl_banned1);
+	/*tcase_add_test(tests_ioctl, test_ioctl_banned1_ipv6); SIOCGIFADDR is for IPv4 */
 # endif
 # if (defined SIOCGIFCONF) && (defined HAVE_MALLOC)
 	tcase_add_test(tests_ioctl, test_ioctl_banned2);
+	tcase_add_test(tests_ioctl, test_ioctl_banned2_ipv6);
 # endif
 # ifdef SIOCGIFHWADDR
 	tcase_add_test(tests_ioctl, test_ioctl_banned3);
+	tcase_add_test(tests_ioctl, test_ioctl_banned3_ipv6);
 # endif
 # if (defined SIOCGLIFADDR) && (defined __solaris__) && (defined AF_INET6)
 	tcase_add_test(tests_ioctl, test_ioctl_banned4);
+	tcase_add_test(tests_ioctl, test_ioctl_banned4_ipv6);
 # endif
 # if (defined SIOCGLIFCONF) && (defined __solaris__) && (defined AF_INET6)
 	tcase_add_test(tests_ioctl, test_ioctl_banned5);
+	tcase_add_test(tests_ioctl, test_ioctl_banned5_ipv6);
 # endif
 # if (defined SIOCGLIFHWADDR) && (defined __solaris__) && (defined AF_INET6)
 	tcase_add_test(tests_ioctl, test_ioctl_banned6);
+	tcase_add_test(tests_ioctl, test_ioctl_banned6_ipv6);
 # endif
 #endif
 

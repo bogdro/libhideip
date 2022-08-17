@@ -1,3 +1,90 @@
+2017-04-25	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* LibHideIP version 1.5
+	  Fixes and improvements to code related with banning the library from
+	  interfering with fragile programs. Many code improvements and
+	  simplifications in readability and maintenance. Fixed freopen*
+	  functions. More unit tests.
+	* README, INSTALL, doc/libhideip.texi.in: added a note that compiling
+	  with a C++ compiler won't work right now due to some variable
+	  casting constructs that are forbidden in C++. Added a note saying
+	  that glibc 2.11 (and potentially other versions) has a bug which may
+	  cause LibHideIP to hang during initialization in dl(v)sym. Describe
+	  the new configuration option: --enable-gui-applications.
+	* doc/libhideip.texi.in: added a note saying that GUI applications may
+	  have problems when starting.
+	* src/lhip_priv.h: added LHIP_SET_ERRNO and LHIP_GET_ERRNO macros to
+	  simplify code in many places. Added LHIP_MEMCOPY, LHIP_MEMSET and
+	  the respective replacement functions' declarations. Added
+	  LHIP_MAKE_ERRNO_VAR for declaring and initializing a variable that
+	  holds the temporary errno value. Renamed SET_ERRNO_PERM to
+	  LHIP_SET_ERRNO_PERM and SET_ERRNO_MISSING to LHIP_SET_ERRNO_MISSING.
+	  Added a warning when glibc 2.11 is used.
+	* src/banning-generic.c: a generic file with functions related to
+	  banning programs and files from being interfered with by the library.
+	  Improved code deduplication and maintenance. The file will be used
+	  in LibSecRm, LibHideIP and LibNetBlock.
+	* src/lhip_banning.c: include and use banning-generic.c.
+	* src/lhip_net.c (recvmsg, sendmsg, socketpair): preserving errno when
+	  calling the original function.
+	* src/*.c: simplified errno usage - not setting where not checked
+	  after or when not in a user-called function. Use macros to set and
+	  get errno where required. Simplify memcpy/memset usage to macros and
+	  conditionally-defined functions. Changed checking for the library
+	  initialization status.
+	* src/lhip_opens.c (freopen, freopen64): ban also the standard streams.
+	* src/lhip_resolve.c (__lhip_is_forbidden_name): skip the trailing dot
+	  when comparing hostnames/addresses. Simplify exit statements.
+	* test/lhiptest.c (test_openat_banned, test_fopen_link_banned,
+	  test_freopen_link, test_freopen_link_banned): corrected checking the
+	  errno value, just in case.
+	* src/lhip_addr.c (__lhip_read_local_addresses): moved restoring errno
+	  after the loggers, just in case it could get modified. Align the
+	  temporary global buffers, if available.
+	* src/lhip_addr.c (__lhip_is_local_addr): simplified checking for
+	  matches with local addresses.
+	* src/lhip_net.c (getifaddrs): simplified duplicated code
+	* test/lhiptest.c (test_freopen_stdout, test_freopen_stdout_banned,
+	  test_freopen_link_banned_stdout): added unit tests for the freopen()
+	  function with standard streams.
+	* src/lhip_net.c (getnameinfo, getaddrinfo): zero-terminating the
+	  resulting hostname.
+	* src/lhip_exec.c (__lhip_append_path, __lhip_is_forbidden_program):
+	  fixed potential buffer overflows
+	* src/lhip_exec.c (__lhip_append_path): calculate string lengths once
+	* src/lhip_exec.c (__lhip_is_forbidden_program): fixed potential use
+	  of uninitialized values
+	* src/lhip_exec.c (__lhip_get_target_link_path): fixed compile error
+	  in case malloc() is missing (which should never happen).
+	* src/lhip_exec.c: fixed LNB_ATTR to LHIP_ATTR
+	* src/lhip_main.c, src/lhip_priv.h: added __lhip_duplicate_string()
+	* src/lhip_addr.c (__lhip_add_local_address): using the new
+	  __lhip_duplicate_string() function to add new addresses
+	* src/lhip_addr.c (__lhip_change_data): makeing sure that name is
+	  zero-terminated, small speed improvement
+	* src/lhip_net.c (gethostname): wipe the real hostname if the option
+	  --enable-gui-applications=yes was not provided.
+	* src/lhip_net.c, src/lhip_opens.c, src/lhip_pcap.c: surrounded
+	  external definitions with >extern "C"<.
+	* test/lhiptest.c (test_gethostbyaddr6, test_gethostbyaddr_r6,
+	  test_gethostbyname2_banned6, test_gethostbyname2_r_banned6,
+	  test_getipnodebyaddr6, test_getipnodebyname6,
+	  test_getaddrinfo_banned6, test_socket_inet6, test_socket_banned_raw6,
+	  test_getsockname6, test_bind6, test_bind_banned6, test_getsockopt6,
+	  test_getsockopt_banned6, test_setsockopt6, test_setsockopt_banned6,
+	  test_ioctl_banned1_ipv6, test_ioctl_banned2_ipv6,
+	  test_ioctl_banned3_ipv6, test_ioctl_banned4_ipv6,
+	  test_ioctl_banned5_ipv6, test_ioctl_banned6_ipv6): added tests
+	  related to IPv6.
+	* test/lhiptest.c (test_socket_inet, test_socket_unix,
+	  test_socket_banned_netlink, test_socket_banned_raw): tests renamed
+	  to better match what they test.
+	* test/lhiptest.c (test_getsockopt_banned): fixed setting parameter
+	* test/lhiptest.c (test_res_mkquery_banned): fixed logger
+	* test/lhiptest.c: fixed LSR_ANSIC to LHIP_ANSIC (shouldn't be used
+	  anyway).
+	* test/lhiptest.c (test_open_link_banned): fixed logger
+
 2015-09-06	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* LibHideIP version 0.9

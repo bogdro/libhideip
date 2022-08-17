@@ -3,14 +3,14 @@ libhideip_la_SOURCES = lhip_exec.c lhip_main.c lhip_net.c lhip_banning.c \
 	lhip_ioctl.c lhip_opens.c lhip_uname.c lhip_resolve.c lhip_priv.h \
 	lhip_pcap.c lhip_addr.c
 EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh \
-	libhideip.h.in lhip_public.c.in
+	libhideip.h.in lhip_public.c.in banning-generic.c
 
 # VERSION = C:R:A     (current, revision, age)
 # only code changed => R++
 # interface changed => C++, R:=0
 # - interface add => A++
 # - interface removed => A:=0
-libhideip_la_LDFLAGS = -version-info 5:0:4
+libhideip_la_LDFLAGS = -version-info 5:1:4
 
 #nobase_include_HEADERS = lhip_priv.h
 

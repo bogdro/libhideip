@@ -1,7 +1,7 @@
 /*
  * A library for hiding local IP address.
  *
- * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -43,6 +43,13 @@
 #endif
 
 #include <stdio.h>
+
+#ifdef HAVE_STRING_H
+# if (!defined STDC_HEADERS) && (defined HAVE_MEMORY_H)
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
 
 #include "lhip_priv.h"
 
@@ -107,10 +114,91 @@ static i_ifpp_cp			__lhip_real_pcap_findalldevs	= NULL;
 #if ((defined HAVE_DLSYM) || (defined HAVE_LIBDL_DLSYM))		\
 	&& (!defined HAVE_DLVSYM) && (!defined HAVE_LIBDL_DLVSYM)	\
 	|| (defined __GLIBC__ && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)))
-# define LSR_CANT_USE_VERSIONED_FOPEN 1
-/*# warning Versioned fopen is unavailable, so LibSecRm may crash on some glibc versions.*/
+# define LHIP_CANT_USE_VERSIONED_FOPEN 1
+/*# warning Versioned fopen is unavailable, so LibHideIP may crash on some glibc versions.*/
 #else
-# undef LSR_CANT_USE_VERSIONED_FOPEN
+# undef LHIP_CANT_USE_VERSIONED_FOPEN
+#endif
+
+/* =============================================================== */
+
+char * __lhip_duplicate_string (
+#ifdef LSR_ANSIC
+	const char src[])
+#else
+	src)
+	const char src[];
+#endif
+{
+	size_t len;
+	char * dest;
+
+	if ( src == NULL )
+	{
+		return NULL;
+	}
+	len = strlen (src);
+	if ( len == 0 )
+	{
+		return NULL;
+	}
+	dest = (char *) malloc (len + 1);
+	if ( dest == NULL )
+	{
+		return NULL;
+	}
+#ifdef HAVE_STRING_H
+	strncpy (dest, src, len);
+#else
+	LHIP_MEMCOPY (dest, src, len);
+#endif
+	dest[len] = '\0';
+	return dest;
+}
+
+/* =============================================================== */
+
+#ifndef HAVE_MEMCPY
+void __lhip_memcopy (
+# ifdef LHIP_ANSIC
+	void * const dest, const void * const src, const size_t len)
+# else
+	dest, src, len)
+	void * const dest;
+	const void * const src;
+	const size_t len;
+# endif
+{
+	size_t i;
+	char * const d = (char *)dest;
+	const char * const s = (const char *)src;
+
+	for ( i = 0; i < len; i++ )
+	{
+		d[i] = s[i];
+	}
+}
+#endif
+
+/* =============================================================== */
+
+#ifndef HAVE_MEMSET
+void __lhip_mem_set (
+# ifdef LHIP_ANSIC
+	void * const dest, const char value, const size_t len)
+# else
+	dest, value, len)
+	void * const dest;
+	const char value;
+	const size_t len;
+# endif
+{
+	size_t i;
+	for ( i = 0; i < len; i++ )
+	{
+		((char *)dest)[i] = value;
+	}
+}
 #endif
 
 /* =============================================================== */
@@ -153,7 +241,7 @@ __lhip_main (
 		*(void **) (&__lhip_real_bind)             = dlsym (RTLD_NEXT, "bind");
 		*(void **) (&__lhip_real_socketpair)       = dlsym (RTLD_NEXT, "socketpair");
 		/* file-related functions: */
-#ifdef LSR_CANT_USE_VERSIONED_FOPEN
+#ifdef LHIP_CANT_USE_VERSIONED_FOPEN
 		*(void **) (&__lhip_real_fopen64)          = dlsym  (RTLD_NEXT, "fopen64");
 #else
 		*(void **) (&__lhip_real_fopen64)          = dlvsym (RTLD_NEXT, "fopen64", "GLIBC_2.1");
@@ -162,7 +250,7 @@ __lhip_main (
 		*(void **) (&__lhip_real_open64)           = dlsym  (RTLD_NEXT, "open64");
 		*(void **) (&__lhip_real_openat64)         = dlsym  (RTLD_NEXT, "openat64");
 
-#ifdef LSR_CANT_USE_VERSIONED_FOPEN
+#ifdef LHIP_CANT_USE_VERSIONED_FOPEN
 		*(void **) (&__lhip_real_fopen)            = dlsym  (RTLD_NEXT, "fopen");
 #else
 		*(void **) (&__lhip_real_fopen)            = dlvsym (RTLD_NEXT, "fopen", "GLIBC_2.1");

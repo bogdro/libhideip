@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- uname function replacement.
  *
- * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -64,12 +64,7 @@ uname (
 	struct utsname *buf;
 #endif
 {
-#ifdef HAVE_ERRNO_H
-	int err = 0;
-#endif
-#ifndef HAVE_MEMSET
-	size_t i;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 	int ret;
 
 	__lhip_main ();
@@ -80,39 +75,28 @@ uname (
 
 	if ( __lhip_real_uname_location () == NULL )
 	{
-		SET_ERRNO_MISSING();
+		LHIP_SET_ERRNO_MISSING();
 		return -1;
 	}
 
 	if ( buf == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_uname_location ()) (buf);
 	}
 
-	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = err;
-#endif
+		LHIP_SET_ERRNO (err);
 		return (*__lhip_real_uname_location ()) (buf);
 	}
 
 	ret = (*__lhip_real_uname_location ()) (buf);
 	if ( ret >= 0 )
 	{
-# ifdef HAVE_MEMSET
-		memset (&(buf->nodename), 0, sizeof (buf->nodename));
-# else
-		for ( i = 0; i < sizeof (buf->nodename); i++ )
-		{
-			buf->nodename[i] = '\0';
-		}
-# endif
+		LHIP_MEMSET (&(buf->nodename), 0, sizeof (buf->nodename));
 		strncpy (buf->nodename, "localhost", LHIP_MIN (sizeof (buf->nodename), 9)+1);
 	}
 	return ret;
 }
-

@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- getting the local address, checking for matches and anonymizing.
  *
- * Copyright (C) 2011-2015 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2011-2017 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -122,9 +122,15 @@ static const unsigned char __lhip_netmask_ipv4[4] = {LHIP_LOCAL_IPV4_MASK};
 static const unsigned char __lhip_localhost_ipv6[16] = {LHIP_LOCAL_IPV6_ADDR};
 static const unsigned char __lhip_netmask_ipv6[16] = {LHIP_LOCAL_IPV6_MASK};
 static const unsigned char __lhip_fake_mac[6] = {1, 2, 3, 4, 5, 6};
-static char __lhip_our_hostname_v4[LHIP_MAXHOSTLEN];
-static char __lhip_our_hostname_v6[LHIP_MAXHOSTLEN];
-static char __lhip_our_gethostname[LHIP_MAXHOSTLEN];
+#define LHIP_MAXHOSTLEN 16384
+#if defined(__GNUC__) && __GNUC__ >= 3
+# define LHIP_ALIGN(x) __attribute__((aligned(x)))
+#else
+# define LHIP_ALIGN(x)
+#endif
+static char __lhip_our_hostname_v4[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
+static char __lhip_our_hostname_v6[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
+static char __lhip_our_gethostname[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
 static struct utsname __lhip_uname_res;
 
 #undef LHIP_HOST_INCREMENT
@@ -156,6 +162,10 @@ __lhip_add_local_address LHIP_PARAMS ((const struct hostent * const host));
 static void
 __lhip_get_address_info LHIP_PARAMS ((const char host[]));
 
+static int GCC_WARN_UNUSED_RESULT
+__lhip_check_hostent_match LHIP_PARAMS ((
+	const struct hostent * const host1, const struct hostent * const host2));
+
 /* =============================================================== */
 
 void __lhip_read_local_addresses (
@@ -164,21 +174,19 @@ void __lhip_read_local_addresses (
 #endif
 )
 {
-#ifdef HAVE_ERRNO_H
-	int err = errno;
-#endif
+	LHIP_MAKE_ERRNO_VAR(err);
 #ifdef HAVE_ARPA_INET_H
 	struct in_addr lhip_addr;
 	struct in6_addr lhip_addr6;
 #endif
-	int ai_res;
+	int ai_res = 0;
 	struct sockaddr_in addr_ipv4;
 	struct sockaddr_in6 addr_ipv6;
-	struct hostent * hostent_res;
-	int lhip_errno;
+	struct hostent * hostent_res = NULL;
+	int lhip_errno = 0;
 	size_t i;
 #ifndef HAVE_MALLOC
-	int localaddr_found;
+	int localaddr_found = 0;
 #endif
 
 	__lhip_number_of_hostnames = 0;
@@ -190,14 +198,7 @@ void __lhip_read_local_addresses (
 			sizeof (__lhip_our_gethostname) );
 		if ( ai_res != 0 )
 		{
-#ifdef HAVE_MEMSET
-			memset (__lhip_our_gethostname, 0, sizeof (__lhip_our_gethostname));
-#else
-			for ( i = 0; i < sizeof (__lhip_our_gethostname); i++ )
-			{
-				__lhip_our_gethostname[i] = '\0';
-			}
-#endif
+			LHIP_MEMSET (__lhip_our_gethostname, 0, sizeof (__lhip_our_gethostname));
 		}
 	}
 	if ( __lhip_real_uname_location () != NULL )
@@ -205,17 +206,9 @@ void __lhip_read_local_addresses (
 		ai_res = (*__lhip_real_uname_location ()) (&__lhip_uname_res);
 		if ( ai_res != 0 )
 		{
-#ifdef HAVE_MEMSET
-			memset (&__lhip_uname_res, 0, sizeof (struct utsname));
-#else
-			for ( i = 0; i < sizeof (struct utsname); i++ )
-			{
-				((char *)&__lhip_uname_res)[i] = '\0';
-			}
-#endif
+			LHIP_MEMSET (&__lhip_uname_res, 0, sizeof (struct utsname));
 		}
 	}
-
 #ifdef HAVE_ARPA_INET_H
 	if ( __lhip_real_gethostbyaddr_r_location () != NULL )
 	{
@@ -270,7 +263,6 @@ void __lhip_read_local_addresses (
 	}
 
 #endif	/* HAVE_ARPA_INET_H */
-
 	if ( __lhip_real_gethostbyname_r_location () != NULL )
 	{
 		if (__lhip_our_gethostname[0] != '\0')
@@ -311,6 +303,7 @@ void __lhip_read_local_addresses (
 				(*__lhip_real_gethostbyname_location ()) (__lhip_uname_res.nodename));
 		}
 	}
+
 	if ( __lhip_real_getaddrinfo_location () != NULL )
 	{
 		__lhip_ai_all = NULL;
@@ -391,14 +384,7 @@ void __lhip_read_local_addresses (
 			sizeof (__lhip_our_hostname_v4), NULL, 0, 0);
 		if ( ai_res != 0 )
 		{
-#ifdef HAVE_MEMSET
-			memset (__lhip_our_hostname_v4, 0, sizeof (__lhip_our_hostname_v4));
-#else
-			for ( i = 0; i < sizeof (__lhip_our_hostname_v4); i++ )
-			{
-				__lhip_our_hostname_v4[i] = '\0';
-			}
-#endif
+			LHIP_MEMSET (__lhip_our_hostname_v4, 0, sizeof (__lhip_our_hostname_v4));
 		}
 		addr_ipv6.sin6_family = AF_INET6;
 		__lhip_set_ipv6_value (&(addr_ipv6.sin6_addr));
@@ -407,20 +393,9 @@ void __lhip_read_local_addresses (
 			sizeof (__lhip_our_hostname_v6), NULL, 0, 0);
 		if ( ai_res != 0 )
 		{
-#ifdef HAVE_MEMSET
-			memset (__lhip_our_hostname_v6, 0, sizeof (__lhip_our_hostname_v6));
-#else
-			for ( i = 0; i < sizeof (__lhip_our_hostname_v6); i++ )
-			{
-				__lhip_our_hostname_v6[i] = '\0';
-			}
-#endif
+			LHIP_MEMSET (__lhip_our_hostname_v6, 0, sizeof (__lhip_our_hostname_v6));
 		}
 	}
-
-#ifdef HAVE_ERRNO_H
-	errno = err;
-#endif
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "LibHideIP: Got addresses and aliases:\n");
 	fflush (stderr);
@@ -514,6 +489,8 @@ void __lhip_read_local_addresses (
 	fprintf (stderr, "LibHideIP: 8: name=%s\n", __lhip_our_gethostname);
 	fflush (stderr);
 #endif	/* LHIP_DEBUG */
+
+	LHIP_SET_ERRNO(err);
 }
 
 /* =============================================================== */
@@ -543,6 +520,98 @@ __lhip_get_our_name_ipv6 (
 /* =============================================================== */
 
 /**
+ * Checks if the given hostent structures point to the same host
+ *	(at least one address matches).
+ * @param host1 the first host entry.
+ * @param host2 the second host entry.
+ * @return non-zero if the given hostent structures point to the same host.
+ */
+int
+__lhip_check_hostent_match (
+#ifdef LHIP_ANSIC
+	const struct hostent * const host1, const struct hostent * const host2)
+#else
+	host1, host2)
+	const struct hostent * const host1;
+	const struct hostent * const host2;
+#endif
+{
+	int i, j;
+
+	if ( (host1 == NULL) && (host2 == NULL) )
+	{
+		return 1;
+	}
+	if ( ((host1 == NULL) && (host2 != NULL))
+		|| ((host1 != NULL) && (host2 == NULL)) )
+	{
+		return 0;
+	}
+	if ( host1->h_name != NULL )
+	{
+		if ( host2->h_name != NULL )
+		{
+			if ( __lhip_check_hostname_match (
+				host1->h_name,
+				host2->h_name) == 1 )
+			{
+				return 1;
+			}
+		}
+		if ( host2->h_aliases != NULL )
+		{
+			i = 0;
+			while ( host2->h_aliases[i] != NULL )
+			{
+				if ( __lhip_check_hostname_match (
+					host1->h_name,
+					host2->h_aliases[i]) == 1 )
+				{
+					return 1;
+				}
+				i++;
+			}
+		}
+	}
+
+	if ( host1->h_aliases != NULL )
+	{
+		i = 0;
+		while ( host1->h_aliases[i] != NULL )
+		{
+			if ( host2->h_name != NULL )
+			{
+				if ( __lhip_check_hostname_match (
+					host1->h_aliases[i],
+					host2->h_name) == 1 )
+				{
+					return 1;
+				}
+			}
+			if ( host2->h_aliases != NULL )
+			{
+				j = 0;
+				while ( host2->h_aliases[j] != NULL )
+				{
+					if ( __lhip_check_hostname_match (
+						host1->h_aliases[i],
+						host2->h_aliases[j]) == 1 )
+					{
+						return 1;
+					}
+					j++;
+				}
+			}
+			i++;
+		}
+	}
+	return 0;
+}
+
+
+/* =============================================================== */
+
+/**
  * Checks if the given address is one of the known local addresses.
  * @param h the address to check.
  * @return non-zero if the given address is one of the known local addresses.
@@ -565,130 +634,18 @@ __lhip_is_local_addr (
 		return 0;
 	}
 
-	if ( __lhip_our_real_name_ipv4 != NULL )
+	if ( __lhip_check_hostent_match (__lhip_our_real_name_ipv4, h) == 1 )
 	{
-		if ( __lhip_our_real_name_ipv4->h_name != NULL )
-		{
-			if ( h->h_name != NULL )
-			{
-				if ( __lhip_check_hostname_match (
-					__lhip_our_real_name_ipv4->h_name,
-					h->h_name) == 1 )
-				{
-					return 1;
-				}
-			}
-			if ( h->h_aliases != NULL )
-			{
-				i = 0;
-				while ( h->h_aliases[i] != NULL )
-				{
-					if ( __lhip_check_hostname_match (
-						__lhip_our_real_name_ipv4->h_name,
-						h->h_aliases[i]) == 1 )
-					{
-						return 1;
-					}
-					i++;
-				}
-			}
-		}
-
-		if ( __lhip_our_real_name_ipv4->h_aliases != NULL )
-		{
-			i = 0;
-			while ( __lhip_our_real_name_ipv4->h_aliases[i] != NULL )
-			{
-				if ( h->h_name != NULL )
-				{
-					if ( __lhip_check_hostname_match (
-						__lhip_our_real_name_ipv4->h_aliases[i],
-						h->h_name) == 1 )
-					{
-						return 1;
-					}
-				}
-				if ( h->h_aliases != NULL )
-				{
-					j = 0;
-					while ( h->h_aliases[j] != NULL )
-					{
-						if ( __lhip_check_hostname_match (
-							__lhip_our_real_name_ipv4->h_aliases[i],
-							h->h_aliases[j]) == 1 )
-						{
-							return 1;
-						}
-						j++;
-					}
-				}
-				i++;
-			}
-		}
+		return 1;
 	}
-	if ( __lhip_our_real_name_ipv6 != NULL )
+	if ( __lhip_check_hostent_match (__lhip_our_real_name_ipv6, h) == 1 )
 	{
-		if ( __lhip_our_real_name_ipv6->h_name != NULL )
-		{
-			if ( h->h_name != NULL )
-			{
-				if ( __lhip_check_hostname_match (
-					__lhip_our_real_name_ipv6->h_name,
-					h->h_name) == 1 )
-				{
-					return 1;
-				}
-			}
-			if ( h->h_aliases != NULL )
-			{
-				i = 0;
-				while ( h->h_aliases[i] != NULL )
-				{
-					if ( __lhip_check_hostname_match (
-						__lhip_our_real_name_ipv6->h_name,
-						h->h_aliases[i]) == 1 )
-					{
-						return 1;
-					}
-					i++;
-				}
-			}
-		}
-
-		if ( __lhip_our_real_name_ipv6->h_aliases != NULL )
-		{
-			i = 0;
-			while ( __lhip_our_real_name_ipv6->h_aliases[i] != NULL )
-			{
-				if ( h->h_name != NULL )
-				{
-					if ( __lhip_check_hostname_match (
-						__lhip_our_real_name_ipv6->h_aliases[i],
-						h->h_name) == 1 )
-					{
-						return 1;
-					}
-				}
-				if ( h->h_aliases != NULL )
-				{
-					j = 0;
-					while (h->h_aliases[j] != NULL)
-					{
-						if ( __lhip_check_hostname_match (
-							__lhip_our_real_name_ipv6->h_aliases[i],
-							h->h_aliases[j]) == 1 )
-						{
-							return 1;
-						}
-						j++;
-					}
-				}
-				i++;
-			}
-		}
+		return 1;
 	}
 
-	if ( (h->h_addrtype == AF_INET) && (h->h_addr_list != NULL) && (__lhip_our_real_name_ipv4 != NULL) )
+	if ( (h->h_addrtype == AF_INET)
+		&& (h->h_addr_list != NULL)
+		&& (__lhip_our_real_name_ipv4 != NULL) )
 	{
 		if ( __lhip_our_real_name_ipv4->h_addr_list != NULL )
 		{
@@ -699,7 +656,8 @@ __lhip_is_local_addr (
 				while ( h->h_addr_list[j] != NULL )
 				{
 					if ( memcmp (__lhip_our_real_name_ipv4->h_addr_list[i],
-						h->h_addr_list[j], sizeof (struct in_addr)) == 0 )
+						h->h_addr_list[j],
+						sizeof (struct in_addr)) == 0 )
 					{
 						return 1;
 					}
@@ -710,7 +668,9 @@ __lhip_is_local_addr (
 		}
 	}
 
-	if ( (h->h_addrtype == AF_INET6) && (h->h_addr_list != NULL) && (__lhip_our_real_name_ipv6 != NULL) )
+	if ( (h->h_addrtype == AF_INET6)
+		&& (h->h_addr_list != NULL)
+		&& (__lhip_our_real_name_ipv6 != NULL) )
 	{
 		if ( __lhip_our_real_name_ipv6->h_addr_list != NULL )
 		{
@@ -721,7 +681,8 @@ __lhip_is_local_addr (
 				while ( h->h_addr_list[j] != NULL )
 				{
 					if ( memcmp (__lhip_our_real_name_ipv6->h_addr_list[i],
-						h->h_addr_list[j], sizeof (struct in_addr)) == 0 )
+						h->h_addr_list[j],
+						sizeof (struct in_addr)) == 0 )
 					{
 						return 1;
 					}
@@ -741,7 +702,8 @@ __lhip_is_local_addr (
 			{
 				if ( h->h_name != NULL )
 				{
-					if ( __lhip_check_hostname_match (tmp->ai_canonname,
+					if ( __lhip_check_hostname_match (
+						tmp->ai_canonname,
 						h->h_name) == 1 )
 					{
 						return 1;
@@ -752,7 +714,8 @@ __lhip_is_local_addr (
 					i = 0;
 					while ( h->h_aliases[i] != NULL )
 					{
-						if ( __lhip_check_hostname_match (tmp->ai_canonname,
+						if ( __lhip_check_hostname_match (
+							tmp->ai_canonname,
 							h->h_aliases[i]) == 1 )
 						{
 							return 1;
@@ -770,7 +733,8 @@ __lhip_is_local_addr (
 					{
 						if ( memcmp (
 							&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr),
-							h->h_addr_list[j], sizeof (struct in_addr)) == 0 )
+							h->h_addr_list[j],
+							sizeof (struct in_addr)) == 0 )
 						{
 							return 1;
 						}
@@ -787,7 +751,8 @@ __lhip_is_local_addr (
 					{
 						if ( memcmp (
 							&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr),
-							h->h_addr_list[j], sizeof (struct in6_addr)) == 0 )
+							h->h_addr_list[j],
+							sizeof (struct in6_addr)) == 0 )
 						{
 							return 1;
 						}
@@ -802,49 +767,33 @@ __lhip_is_local_addr (
 	{
 		for ( hi = 0; hi < __lhip_number_of_hostnames; hi++ )
 		{
-			if ( __lhip_our_names_addr[hi].h_name == NULL )
+			if ( __lhip_check_hostent_match (
+				&__lhip_our_names_addr[hi], h) == 1 )
 			{
-				continue;
-			}
-			if ( h->h_name != NULL )
-			{
-				if ( __lhip_check_hostname_match (__lhip_our_names_addr[hi].h_name,
-					h->h_name) == 1 )
-				{
-					return 1;
-				}
-			}
-			if ( h->h_aliases != NULL )
-			{
-				i = 0;
-				while ( h->h_aliases[i] != NULL )
-				{
-					if ( __lhip_check_hostname_match (__lhip_our_names_addr[hi].h_name,
-						h->h_aliases[i]) == 1 )
-					{
-						return 1;
-					}
-					i++;
-				}
+				return 1;
 			}
 		}
 	}
 
 	if ( h->h_name != NULL )
 	{
-		if ( __lhip_check_hostname_match (__lhip_our_hostname_v4, h->h_name) == 1 )
+		if ( __lhip_check_hostname_match (__lhip_our_hostname_v4,
+			h->h_name) == 1 )
 		{
 			return 1;
 		}
-		if ( __lhip_check_hostname_match (__lhip_our_hostname_v6, h->h_name) == 1 )
+		if ( __lhip_check_hostname_match (__lhip_our_hostname_v6,
+			h->h_name) == 1 )
 		{
 			return 1;
 		}
-		if ( __lhip_check_hostname_match (__lhip_uname_res.nodename, h->h_name) == 1 )
+		if ( __lhip_check_hostname_match (__lhip_uname_res.nodename,
+			h->h_name) == 1 )
 		{
 			return 1;
 		}
-		if ( __lhip_check_hostname_match (__lhip_our_gethostname, h->h_name) == 1 )
+		if ( __lhip_check_hostname_match (__lhip_our_gethostname,
+			h->h_name) == 1 )
 		{
 			return 1;
 		}
@@ -854,34 +803,23 @@ __lhip_is_local_addr (
 		i = 0;
 		while ( h->h_aliases[i] != NULL )
 		{
-			if ( __lhip_check_hostname_match (__lhip_our_hostname_v4, h->h_aliases[i]) == 1 )
+			if ( __lhip_check_hostname_match (__lhip_our_hostname_v4,
+				h->h_aliases[i]) == 1 )
 			{
 				return 1;
 			}
-			i++;
-		}
-		i = 0;
-		while ( h->h_aliases[i] != NULL )
-		{
-			if ( __lhip_check_hostname_match (__lhip_our_hostname_v6, h->h_aliases[i]) == 1 )
+			if ( __lhip_check_hostname_match (__lhip_our_hostname_v6,
+				h->h_aliases[i]) == 1 )
 			{
 				return 1;
 			}
-			i++;
-		}
-		i = 0;
-		while ( h->h_aliases[i] != NULL )
-		{
-			if ( __lhip_check_hostname_match (__lhip_uname_res.nodename, h->h_aliases[i]) == 1 )
+			if ( __lhip_check_hostname_match (__lhip_uname_res.nodename,
+				h->h_aliases[i]) == 1 )
 			{
 				return 1;
 			}
-			i++;
-		}
-		i = 0;
-		while ( h->h_aliases[i] != NULL )
-		{
-			if ( __lhip_check_hostname_match (__lhip_our_gethostname, h->h_aliases[i]) == 1 )
+			if ( __lhip_check_hostname_match (__lhip_our_gethostname,
+				h->h_aliases[i]) == 1 )
 			{
 				return 1;
 			}
@@ -909,9 +847,7 @@ __lhip_change_data (
 #endif
 {
 	int i;
-#ifndef HAVE_MEMCPY
-	size_t j;
-#endif
+	size_t len;
 
 	if ( ret == NULL )
 	{
@@ -922,24 +858,31 @@ __lhip_change_data (
 		/* change the data here */
 		if ( ret->h_name != NULL )
 		{
-			strncpy (ret->h_name, "localhost", LHIP_MIN (strlen (ret->h_name)+1, 10));
+			len = strlen (ret->h_name);
+			strncpy (ret->h_name, "localhost",
+				LHIP_MIN (len+1, 10));
+			ret->h_name[len] = '\0';
 		}
 		ret->h_aliases = NULL;
-		if ( (ret->h_addrtype == AF_INET) && (ret->h_addr_list != NULL) )
+		if ( (ret->h_addrtype == AF_INET)
+			&& (ret->h_addr_list != NULL) )
 		{
 			i = 0;
 			while ( ret->h_addr_list[i] != NULL )
 			{
-				__lhip_set_ipv4_value ((struct in_addr *)(ret->h_addr_list[i]));
+				__lhip_set_ipv4_value (
+					(struct in_addr *)(ret->h_addr_list[i]));
 				i++;
 			}
 		}
-		else if ( (ret->h_addrtype == AF_INET6) && (ret->h_addr_list != NULL) )
+		else if ( (ret->h_addrtype == AF_INET6)
+			&& (ret->h_addr_list != NULL) )
 		{
 			i = 0;
 			while ( ret->h_addr_list[i] != NULL )
 			{
-				__lhip_set_ipv6_value ((struct in6_addr *)(ret->h_addr_list[i]));
+				__lhip_set_ipv6_value (
+					(struct in6_addr *)(ret->h_addr_list[i]));
 				i++;
 			}
 		}
@@ -980,14 +923,16 @@ __lhip_check_hostname_match (
 	first_dot_2 = strchr (host2, '.');
 	if ( first_dot_1 != NULL )
 	{
-		if ( strncmp (host1, host2, (size_t)(first_dot_1 - host1)) == 0 )
+		if ( strncmp (host1, host2,
+			(size_t)(first_dot_1 - host1)) == 0 )
 		{
 			return 1;
 		}
 		if ( first_dot_2 != NULL )
 		{
 			if ( strncmp (host1, host2, (size_t)
-				LHIP_MIN (first_dot_2 - host2, first_dot_1 - host1)) == 0 )
+				LHIP_MIN (first_dot_2 - host2,
+					first_dot_1 - host1)) == 0 )
 			{
 				return 1;
 			}
@@ -995,7 +940,8 @@ __lhip_check_hostname_match (
 	}
 	if ( first_dot_2 != NULL )
 	{
-		if ( strncmp (host1, host2, (size_t)(first_dot_2 - host2)) == 0 )
+		if ( strncmp (host1, host2,
+			(size_t)(first_dot_2 - host2)) == 0 )
 		{
 			return 1;
 		}
@@ -1034,10 +980,6 @@ __lhip_add_local_address (
 # ifdef HAVE_REALLOC
 	struct hostent * lhip_new_array;
 # endif
-# ifndef HAVE_MEMCPY
-	size_t k;
-# endif
-	size_t len;
 #endif
 
 #ifdef HAVE_MALLOC
@@ -1076,14 +1018,8 @@ __lhip_add_local_address (
 #ifdef HAVE_MALLOC
 		if ( host->h_name != NULL )
 		{
-			len = strlen (host->h_name);
 			__lhip_our_names_addr[__lhip_number_of_hostnames].h_name
-				= (char *) malloc (len + 1);
-			if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name != NULL )
-			{
-				strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_name,
-					host->h_name, len + 1 );
-			}
+				= __lhip_duplicate_string (host->h_name);
 		}
 		j = 0;
 		if ( host->h_aliases != NULL )
@@ -1095,19 +1031,13 @@ __lhip_add_local_address (
 		}
 		/* "+1" for the NULL pointer */
 		__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases
-			= (char **) malloc ( (j+1) * sizeof (char *) + 1);
+			= (char **) malloc ( (j+1) * sizeof (char *));
 		if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases != NULL )
 		{
 			for ( i = 0; i < j; i++ )
 			{
-				len = strlen (host->h_aliases[i]);
 				__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] =
-					(char *) malloc (len + 1);
-				if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] != NULL )
-				{
-					strncpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i],
-						host->h_aliases[i], len + 1 );
-				}
+					__lhip_duplicate_string (host->h_aliases[i]);
 			}
 			/* end-of-list marker */
 			__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[j] = NULL;
@@ -1124,7 +1054,7 @@ __lhip_add_local_address (
 		{
 			/* "+1" for the NULL pointer */
 			__lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list
-				= (char **) malloc ( (j+1) * sizeof (char *) + 1);
+				= (char **) malloc ( (j+1) * sizeof (char *));
 			if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list != NULL )
 			{
 				for ( i = 0; i < j; i++ )
@@ -1137,17 +1067,9 @@ __lhip_add_local_address (
 						(char *) malloc ( (size_t) host->h_length );
 					if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list[i] != NULL )
 					{
-# ifdef HAVE_MEMCPY
-						memcpy ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list[i],
+						LHIP_MEMCOPY ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list[i],
 							host->h_addr_list[i],
 							(size_t) host->h_length );
-# else
-						for ( k = 0; k < (size_t) host->h_length; k++ )
-						{
-							__lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list[i][k]
-								= host->h_addr_list[i][k];
-						}
-# endif
 					}
 				}
 				/* end-of-list marker */
@@ -1191,7 +1113,8 @@ __lhip_is_local_address (
 
 	if ( host->h_name != NULL )
 	{
-		if ( __lhip_check_hostname_match (__lhip_our_gethostname,
+		if ( __lhip_check_hostname_match (
+			__lhip_our_gethostname,
 			host->h_name) == 1 )
 		{
 			return 1;
@@ -1202,7 +1125,8 @@ __lhip_is_local_address (
 		i = 0;
 		while ( host->h_aliases[i] != NULL )
 		{
-			if ( __lhip_check_hostname_match (__lhip_our_gethostname,
+			if ( __lhip_check_hostname_match (
+				__lhip_our_gethostname,
 				host->h_aliases[i]) == 1 )
 			{
 				return 1;
@@ -1212,7 +1136,8 @@ __lhip_is_local_address (
 	}
 	if ( host->h_name != NULL )
 	{
-		if ( __lhip_check_hostname_match (__lhip_uname_res.nodename,
+		if ( __lhip_check_hostname_match (
+			__lhip_uname_res.nodename,
 			host->h_name) == 1 )
 		{
 			return 1;
@@ -1275,9 +1200,6 @@ __lhip_get_address_info (
 	struct addrinfo * __lhip_ai_all_tmp;
 	struct addrinfo * tmp;
 	int ai_res;
-#ifndef HAVE_MEMSET
-	size_t i;
-#endif
 
 	if ( (host == NULL) || (__lhip_real_getaddrinfo_location () == NULL) )
 	{
@@ -1288,14 +1210,8 @@ __lhip_get_address_info (
 		return;
 	}
 
-#ifdef HAVE_MEMSET
-	memset (&ai_hints, 0, sizeof (struct addrinfo));
-#else
-	for ( i = 0; i < sizeof (struct addrinfo); i++ )
-	{
-		((char *)&ai_hints)[i] = '\0';
-	}
-#endif
+	LHIP_MEMSET (&ai_hints, 0, sizeof (struct addrinfo));
+
 	ai_hints.ai_flags = /*AI_NUMERICHOST |*/ AI_CANONNAME;
 	ai_hints.ai_family = AF_UNSPEC;
 	ai_hints.ai_socktype = 0;
@@ -1340,24 +1256,13 @@ __lhip_set_ipv4_value (
 	struct in_addr * const addr4;
 #endif
 {
-#ifndef HAVE_MEMCPY
-	size_t i;
-#endif
-
 	if ( addr4 == NULL )
 	{
 		return;
 	}
-#ifdef HAVE_MEMCPY
-	memcpy ( addr4,
+	LHIP_MEMCOPY ( addr4,
 		__lhip_localhost_ipv4,
 		sizeof (__lhip_localhost_ipv4) );
-#else
-	for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-	{
-		((char *)addr4)[i] = __lhip_localhost_ipv4[i];
-	}
-#endif
 }
 
 /* =============================================================== */
@@ -1376,24 +1281,13 @@ __lhip_set_ipv4_mask_value (
 	struct in_addr * const mask4;
 #endif
 {
-#ifndef HAVE_MEMCPY
-	size_t i;
-#endif
-
 	if ( mask4 == NULL )
 	{
 		return;
 	}
-#ifdef HAVE_MEMCPY
-	memcpy ( mask4,
+	LHIP_MEMCOPY ( mask4,
 		__lhip_netmask_ipv4,
 		sizeof (__lhip_netmask_ipv4) );
-#else
-	for ( i = 0; i < sizeof (__lhip_netmask_ipv4); i++ )
-	{
-		((char *)mask4)[i] = __lhip_netmask_ipv4[i];
-	}
-#endif
 }
 
 /* =============================================================== */
@@ -1412,24 +1306,13 @@ __lhip_set_ipv6_value (
 	struct in6_addr * const addr6;
 #endif
 {
-#ifndef HAVE_MEMCPY
-	size_t i;
-#endif
-
 	if ( addr6 == NULL )
 	{
 		return;
 	}
-#ifdef HAVE_MEMCPY
-	memcpy ( addr6,
+	LHIP_MEMCOPY ( addr6,
 		__lhip_localhost_ipv6,
 		sizeof (__lhip_localhost_ipv6) );
-#else
-	for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-	{
-		((char *)addr6)[i] = __lhip_localhost_ipv6[i];
-	}
-#endif
 }
 
 /* =============================================================== */
@@ -1448,24 +1331,13 @@ __lhip_set_ipv6_mask_value (
 	struct in6_addr * const mask6;
 #endif
 {
-#ifndef HAVE_MEMCPY
-	size_t i;
-#endif
-
 	if ( mask6 == NULL )
 	{
 		return;
 	}
-#ifdef HAVE_MEMCPY
-	memcpy ( mask6,
+	LHIP_MEMCOPY ( mask6,
 		__lhip_netmask_ipv6,
 		sizeof (__lhip_netmask_ipv6) );
-#else
-	for ( i = 0; i < sizeof (__lhip_netmask_ipv6); i++ )
-	{
-		((char *)mask6)[i] = __lhip_netmask_ipv6[i];
-	}
-#endif
 }
 
 /* =============================================================== */
@@ -1484,24 +1356,13 @@ __lhip_set_mac_value (
 	void * const macaddr;
 #endif
 {
-#ifndef HAVE_MEMCPY
-	size_t i;
-#endif
-
 	if ( macaddr == NULL )
 	{
 		return;
 	}
-#ifdef HAVE_MEMCPY
-	memcpy ( macaddr,
+	LHIP_MEMCOPY ( macaddr,
 		__lhip_fake_mac,
 		sizeof (__lhip_fake_mac) );
-#else
-	for ( i = 0; i < sizeof (__lhip_fake_mac); i++ )
-	{
-		((char *)macaddr)[i] = __lhip_fake_mac[i];
-	}
-#endif
 }
 
 /* =============================================================== */
@@ -1521,10 +1382,6 @@ __lhip_check_ipv4_value (
 	const struct in_addr * const addr4;
 #endif
 {
-#ifndef HAVE_MEMCPY
-	size_t i;
-#endif
-
 	if ( addr4 == NULL )
 	{
 		return 0;
@@ -1555,10 +1412,6 @@ __lhip_check_ipv6_value (
 	const struct in6_addr * const addr6;
 #endif
 {
-#ifndef HAVE_MEMCPY
-	size_t i;
-#endif
-
 	if ( addr6 == NULL )
 	{
 		return 0;
@@ -1571,4 +1424,3 @@ __lhip_check_ipv6_value (
 	}
 	return 0;
 }
-
