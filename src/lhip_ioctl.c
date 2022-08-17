@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- ioctl function replacement.
  *
- * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -168,12 +168,65 @@ struct lifconf
 	int	lifc_len;			/* Size of buffer.  */
 	union
 	{
-		__caddr_t ifcu_buf;
-		struct ifreq *ifcu_req;
-	} ifc_ifcu;
+		__caddr_t lifc_buf;
+		struct lifreq *lifc_req;
+	} lifc_ifcu;
 };
+#  define lifc_buf lifc_ifcu.lifc_buf               /* buffer address       */
+#  define lifc_req lifc_ifcu.lifc_req               /* array of structures  */
 # endif
 #endif
+
+/*#define LHIP_COMPILE_TEST*/
+
+#ifdef LHIP_COMPILE_TEST
+# define SIOCGLIFADDR 1
+# define SIOCGLIFHWADDR 1
+# define SIOCGLIFCONF 1
+# define __solaris__ 1
+struct lifreq
+{
+# define IFHWADDRLEN	6
+# define IFNAMSIZ	IF_NAMESIZE
+	union
+	{
+		char lifr_name[IFNAMSIZ];	/* Interface name, e.g. "en0".  */
+	} lifr_ifrn;
+
+	union
+	{
+		struct sockaddr lifr_addr;
+		struct sockaddr lifr_dstaddr;
+		struct sockaddr lifr_broadaddr;
+		struct sockaddr lifr_netmask;
+		struct sockaddr lifr_hwaddr;
+		short int lifr_flags;
+		int lifr_ivalue;
+		int lifr_mtu;
+		struct ifmap lifr_map;
+		char lifr_slave[IFNAMSIZ];	/* Just fits the size */
+		char lifr_newname[IFNAMSIZ];
+		__caddr_t lifr_data;
+	} lifr_ifru;
+};
+
+# define lifr_name        lifr_ifrn.lifr_name      /* interface name       */
+# define lifr_addr        lifr_ifru.lifr_addr      /* address              */
+
+struct lifconf
+{
+	int	lifc_len;			/* Size of buffer.  */
+	union
+	{
+		__caddr_t lifc_buf;
+		struct lifreq *lifc_req;
+	} lifc_ifcu;
+};
+# define lifc_buf lifc_ifcu.lifc_buf               /* buffer address       */
+# define lifc_req lifc_ifcu.lifc_req               /* array of structures  */
+
+#endif /* LHIP_COMPILE_TEST */
+
 
 #ifdef HAVE_STRING_H
 # if (!defined STDC_HEADERS) && (defined HAVE_MEMORY_H)
@@ -183,10 +236,6 @@ struct lifconf
 #endif
 
 #include "lhip_priv.h"
-
-static const unsigned char __lhip_localhost_ipv4[4] = {LHIP_LOCAL_IPV4_ADDR};
-static const unsigned char __lhip_localhost_ipv6[16] = {LHIP_LOCAL_IPV6_ADDR};
-static const unsigned char __lhip_fake_mac[6] = {1, 2, 3, 4, 5, 6};
 
 /* =============================================================== */
 
@@ -238,9 +287,7 @@ ioctl (
 
 	if ( __lhip_real_ioctl_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -285,31 +332,13 @@ ioctl (
 			{
 				if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET )
 				{
-# ifdef HAVE_MEMCPY
-					memcpy (&(((struct sockaddr_in *)&(addrs->ifr_addr))->sin_addr),
-						__lhip_localhost_ipv4,
-						sizeof (__lhip_localhost_ipv4) );
-# else
-					for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-					{
-						((char *)&(((struct sockaddr_in *)&(addrs->ifr_addr))->sin_addr))[i]
-							= __lhip_localhost_ipv4[i];
-					}
-# endif
+					__lhip_set_ipv4_value (
+						&(((struct sockaddr_in *)&(addrs->ifr_addr))->sin_addr));
 				}
 				else if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET6 )
 				{
-# ifdef HAVE_MEMCPY
-					memcpy (&(((struct sockaddr_in6 *)&(addrs->ifr_addr))->sin6_addr),
-						__lhip_localhost_ipv6,
-						sizeof (__lhip_localhost_ipv6) );
-# else
-					for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-					{
-						((char *)&(((struct sockaddr_in6 *)&(addrs->ifr_addr))->sin6_addr))[i]
-							= __lhip_localhost_ipv6[i];
-					}
-# endif
+					__lhip_set_ipv6_value (
+						&(((struct sockaddr_in6 *)&(addrs->ifr_addr))->sin6_addr));
 				}
 			}
 		}
@@ -331,31 +360,13 @@ ioctl (
 						{
 							if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET )
 							{
-# ifdef HAVE_MEMCPY
-								memcpy (&(((struct sockaddr_in *)&(addrs->ifr_addr))->sin_addr),
-									__lhip_localhost_ipv4,
-									sizeof (__lhip_localhost_ipv4) );
-# else
-								for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-								{
-									((char *)&(((struct sockaddr_in *)&(addrs->ifr_addr))->sin_addr))[i]
-										= __lhip_localhost_ipv4[i];
-								}
-# endif
+								__lhip_set_ipv4_value (
+									&(((struct sockaddr_in *)&(addrs->ifr_addr))->sin_addr));
 							}
 							else if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET6 )
 							{
-# ifdef HAVE_MEMCPY
-								memcpy (&(((struct sockaddr_in6 *)&(addrs->ifr_ifru.ifru_addr))->sin6_addr),
-									__lhip_localhost_ipv6,
-									sizeof (__lhip_localhost_ipv6) );
-# else
-								for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-								{
-									((char *)&(((struct sockaddr_in6 *)&(addrs->ifr_addr))->sin6_addr))[i]
-										= __lhip_localhost_ipv6[i];
-								}
-# endif
+								__lhip_set_ipv6_value (
+									&(((struct sockaddr_in6 *)&(addrs->ifr_addr))->sin6_addr));
 							}
 							buf_index += sizeof (struct ifreq);
 						}
@@ -375,17 +386,7 @@ ioctl (
 			addrs = (struct ifreq *) data1;
 			if ( addrs != NULL )
 			{
-# ifdef HAVE_MEMCPY
-				memcpy (&(addrs->ifr_addr.sa_data),
-					__lhip_fake_mac,
-					sizeof (__lhip_fake_mac) );
-# else
-				for ( i = 0; i < sizeof (__lhip_fake_mac); i++ )
-				{
-					((char *)&(addrs->ifr_addr.sa_data))[i]
-						= __lhip_fake_mac[i];
-				}
-# endif
+				__lhip_set_mac_value (&(addrs->ifr_addr.sa_data));
 			}
 		}
 #endif /* SIOCGIFHWADDR */
@@ -395,33 +396,15 @@ ioctl (
 			laddrs = (struct lifreq *) data1;
 			if ( laddrs != NULL )
 			{
-				if ( laddrs->lifr_ifru.lifru_addr.sa_family == AF_INET )
+				if ( laddrs->lifr_addr.sa_family == AF_INET )
 				{
-# ifdef HAVE_MEMCPY
-					memcpy (&(((struct sockaddr_in *)&(laddrs->lifr_addr))->sin_addr),
-						__lhip_localhost_ipv4,
-						sizeof (__lhip_localhost_ipv4) );
-# else
-					for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-					{
-						((char *)&(((struct sockaddr_in *)&(laddrs->lifr_addr))->sin_addr))[i]
-							= __lhip_localhost_ipv4[i];
-					}
-# endif
+					__lhip_set_ipv4_value (
+						&(((struct sockaddr_in *)&(laddrs->lifr_addr))->sin_addr));
 				}
-				else if ( laddrs->lifr_ifru.lifru_addr.sa_family == AF_INET6 )
+				else if ( laddrs->lifr_addr.sa_family == AF_INET6 )
 				{
-# ifdef HAVE_MEMCPY
-					memcpy (&(((struct sockaddr_in6 *)&(laddrs->lifr_addr))->sin6_addr),
-						__lhip_localhost_ipv6,
-						sizeof (__lhip_localhost_ipv6) );
-# else
-					for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-					{
-						((char *)&(((struct sockaddr_in6 *)&(laddrs->lifr_addr))->sin6_addr))[i]
-							= __lhip_localhost_ipv6[i];
-					}
-# endif
+					__lhip_set_ipv6_value (
+						&(((struct sockaddr_in6 *)&(laddrs->lifr_addr))->sin6_addr));
 				}
 			}
 		}
@@ -441,33 +424,15 @@ ioctl (
 						laddrs = (struct lifreq *) &(lcfg->lifc_req[req_index]);
 						if ( laddrs != NULL )
 						{
-							if ( laddrs->lifr_ifru.lifru_addr.sa_family == AF_INET )
+							if ( laddrs->lifr_addr.sa_family == AF_INET )
 							{
-# ifdef HAVE_MEMCPY
-								memcpy (&(((struct sockaddr_in *)&(laddrs->lifr_addr))->sin_addr),
-									__lhip_localhost_ipv4,
-									sizeof (__lhip_localhost_ipv4) );
-# else
-								for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-								{
-									((char *)&(((struct sockaddr_in *)&(laddrs->lifr_addr))->sin_addr))[i]
-										= __lhip_localhost_ipv4[i];
-								}
-# endif
+								__lhip_set_ipv4_value (
+									&(((struct sockaddr_in *)&(laddrs->lifr_addr))->sin_addr));
 							}
-							else if ( laddrs->lifr_ifru.lifru_addr.sa_family == AF_INET6 )
+							else if ( laddrs->lifr_addr.sa_family == AF_INET6 )
 							{
-# ifdef HAVE_MEMCPY
-								memcpy (&(((struct sockaddr_in6 *)&(laddrs->lifr_addr))->sin6_addr),
-									__lhip_localhost_ipv6,
-									sizeof (__lhip_localhost_ipv6) );
-# else
-								for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-								{
-									((char *)&(((struct sockaddr_in6 *)&(laddrs->lifr_addr))->sin6_addr))[i]
-										= __lhip_localhost_ipv6[i];
-								}
-# endif
+								__lhip_set_ipv6_value (
+									&(((struct sockaddr_in6 *)&(laddrs->lifr_addr))->sin6_addr));
 							}
 							buf_index += sizeof (struct lifreq);
 						}
@@ -487,16 +452,8 @@ ioctl (
 			laddrs = (struct lifreq *) data1;
 			if ( laddrs != NULL )
 			{
-# ifdef HAVE_MEMCPY
-				memcpy (&(laddrs->lifr_addr.sa_data), __lhip_fake_mac,
-					sizeof (__lhip_fake_mac) );
-# else
-				for ( i = 0; i < sizeof (__lhip_fake_mac); i++ )
-				{
-					((char *)&(laddrs->lifr_addr.sa_data))[i]
-						= __lhip_fake_mac[i];
-				}
-# endif
+				__lhip_set_mac_value (
+					&(laddrs->lifr_addr.sa_data));
 			}
 		}
 #endif /* SIOCGIFHWADDR */

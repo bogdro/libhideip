@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- uname function replacement.
  *
- * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -80,9 +80,7 @@ uname (
 
 	if ( __lhip_real_uname_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 

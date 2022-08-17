@@ -1,7 +1,7 @@
 /*
  * A library for hiding local IP address.
  *
- * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -104,6 +104,15 @@ static pp_Fp_cp				__lhip_real_pcap_fopen_offline	= NULL;
 static pp_ipt_cp			__lhip_real_pcap_hopen_offline	= NULL;
 static i_ifpp_cp			__lhip_real_pcap_findalldevs	= NULL;
 
+#if ((defined HAVE_DLSYM) || (defined HAVE_LIBDL_DLSYM))		\
+	&& (!defined HAVE_DLVSYM) && (!defined HAVE_LIBDL_DLVSYM)	\
+	|| (defined __GLIBC__ && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)))
+# define LSR_CANT_USE_VERSIONED_FOPEN 1
+/*# warning Versioned fopen is unavailable, so LibSecRm may crash on some glibc versions.*/
+#else
+# undef LSR_CANT_USE_VERSIONED_FOPEN
+#endif
+
 /* =============================================================== */
 
 int LHIP_ATTR ((constructor))
@@ -144,9 +153,7 @@ __lhip_main (
 		*(void **) (&__lhip_real_bind)             = dlsym (RTLD_NEXT, "bind");
 		*(void **) (&__lhip_real_socketpair)       = dlsym (RTLD_NEXT, "socketpair");
 		/* file-related functions: */
-#if (defined HAVE_DLSYM || defined HAVE_LIBDL_DLSYM)			\
-	&& (!defined HAVE_DLVSYM) && (!defined HAVE_LIBDL_DLVSYM)	\
-	|| ( defined __GLIBC__ && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1) ) )
+#ifdef LSR_CANT_USE_VERSIONED_FOPEN
 		*(void **) (&__lhip_real_fopen64)          = dlsym  (RTLD_NEXT, "fopen64");
 #else
 		*(void **) (&__lhip_real_fopen64)          = dlvsym (RTLD_NEXT, "fopen64", "GLIBC_2.1");
@@ -155,9 +162,7 @@ __lhip_main (
 		*(void **) (&__lhip_real_open64)           = dlsym  (RTLD_NEXT, "open64");
 		*(void **) (&__lhip_real_openat64)         = dlsym  (RTLD_NEXT, "openat64");
 
-#if (defined HAVE_DLSYM || defined HAVE_LIBDL_DLSYM)			\
-	&& (!defined HAVE_DLVSYM) && (!defined HAVE_LIBDL_DLVSYM)	\
-	|| ( defined __GLIBC__ && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1) ) )
+#ifdef LSR_CANT_USE_VERSIONED_FOPEN
 		*(void **) (&__lhip_real_fopen)            = dlsym  (RTLD_NEXT, "fopen");
 #else
 		*(void **) (&__lhip_real_fopen)            = dlvsym (RTLD_NEXT, "fopen", "GLIBC_2.1");

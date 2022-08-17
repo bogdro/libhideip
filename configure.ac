@@ -2,11 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libhideip, 0.8, bogdandr@op.pl)
+AC_INIT(libhideip, 0.9, bogdandr@op.pl)
 AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
-	libhideip.pc])
+	libhideip.pc test/Makefile])
 AC_CONFIG_SRCDIR([src/lhip_net.c])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -72,17 +72,21 @@ AC_ARG_WITH([max-host-names],
 
 # ==================== Checks for programs.
 AC_PROG_CC
+AM_PROG_CC_C_O
 AM_CONDITIONAL(ISGCC, test "x$GCC" = "xyes")
 AC_PROG_LIBTOOL
 
 # ==================== Checks for libraries.
 libdl=yes
-AC_CHECK_LIB([dl],[dlsym],
-	[AC_DEFINE([HAVE_LIBDL], [1], [Whether you have the libdl library])
+AC_CHECK_LIB([dl],[dlsym],,[libdl=no])
+if (test "x$libdl" = "xyes"); then
+	AC_DEFINE([HAVE_LIBDL], [1], [Whether you have the libdl library])
 	AC_DEFINE([HAVE_LIBDL_DLSYM], [1], [Whether you have the dlsym() function in the libdl library])
 	AC_CHECK_LIB([dl],[dlvsym],[AC_DEFINE([HAVE_LIBDL_DLVSYM], [1],
 		[Whether you have the dlvsym() function in the libdl library])])
-	],[libdl=no])
+
+fi
+
 dlsym=yes
 AC_CHECK_FUNC([dlsym],
 	[AC_DEFINE([HAVE_DLSYM], [1], [Whether you have the dlsym function])],[dlsym=no])
@@ -98,6 +102,15 @@ if (test "x$libdl" != "xyes"); then
 		AC_MSG_ERROR([[I need the dlsym() and optionally dlvsym() function to work.]])
 	fi
 fi
+
+# Adding additional libraries actually makes LibHideIP "see" the functions
+# contained in them, via dlsym/dlvsym, so the original functions can be called.
+# This adds a runtime dependency, but otherwise it could make the program
+# bypass LibHideIP or make normally-working functions not available anymore.
+
+AC_CHECK_LIB([pcap],[pcap_lookupdev])
+
+AC_CHECK_LIB([resolv],[res_query])
 
 # ==================== Checks for header files.
 AC_CHECK_HEADER([dlfcn.h],[AC_DEFINE([HAVE_DLFCN_H], [1], [Whether you have the dlfcn.h header])],
@@ -220,7 +233,7 @@ AC_CHECK_FUNC([malloc],
 
 AC_CHECK_FUNCS([memcpy memset readlink getipnodebyname \
 	getipnodebyaddr getenv gethostbyaddr_r gethostbyname_r gethostbyname2_r\
-	gethostent_r openat openat64 realloc])
+	gethostent_r openat openat64 realloc symlink lstat])
 
 AH_TEMPLATE([GETNAMEINFO_ARG4TYPE])
 AH_TEMPLATE([GETNAMEINFO_ARG6TYPE])
@@ -247,6 +260,13 @@ AC_CHECK_FUNC([getnameinfo], [AC_DEFINE(HAVE_GETNAMEINFO, [1], [Whether you have
 	ARG6TYPE, [socklen_t, size_t],
 	ARG7TYPE, [unsigned int, int])
 	])
+
+have_check=no
+#ACTION-IF-NOT-FOUND is required, otherwise 'configure' fails
+PKG_CHECK_MODULES([CHECK], [check >= 0.9.8], [have_check=yes], [have_check=no])
+#AM_PATH_CHECK([], [have_check=yes])
+
+AM_CONDITIONAL([LHIP_TESTS_ENABLED], [test "x$have_check" = "xyes"])
 
 # ==================== Checks for compiler options.
 
@@ -287,6 +307,10 @@ if (test "x$GCC" = "xyes" ); then
 	AX_C_CHECK_FLAG([-O3], [CFLAGS="$CFLAGS -O3"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Waggregate-return], [CFLAGS="$CFLAGS -Waggregate-return"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wwrite-strings], [CFLAGS="$CFLAGS -Wwrite-strings"], [CFLAGS="$CFLAGS"])
+	# required for the compiler, which is used by libtool instead of the linker
+	AX_C_CHECK_FLAG([-Wl,-z -Wl,noexecstack], [CFLAGS="$CFLAGS -Wl,-z -Wl,noexecstack"], [CFLAGS="$CFLAGS"])
+	# and just in case the linker was used
+	AX_CHECK_LINK_FLAG([-z noexecstack])
 
 fi
 

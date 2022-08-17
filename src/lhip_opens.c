@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- file opening functions' replacements.
  *
- * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -124,9 +124,7 @@ fopen64 (
 
 	if ( __lhip_real_fopen64_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -156,9 +154,7 @@ fopen64 (
 
 	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return NULL;
 	}
 #ifdef HAVE_ERRNO_H
@@ -201,9 +197,7 @@ fopen (
 
 	if ( __lhip_real_fopen_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -233,9 +227,7 @@ fopen (
 
 	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return NULL;
 	}
 
@@ -279,9 +271,7 @@ freopen64 (
 
 	if ( __lhip_real_freopen64_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -313,9 +303,7 @@ freopen64 (
 
 	if ( __lhip_is_forbidden_file (path) != 0 )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return NULL;
 	}
 
@@ -360,9 +348,7 @@ freopen (
 
 	if ( __lhip_real_freopen_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -394,9 +380,7 @@ freopen (
 
 	if ( __lhip_is_forbidden_file (name) != 0 )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return NULL;
 	}
 
@@ -458,9 +442,7 @@ open64 (
 
 	if ( __lhip_real_open64_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -537,9 +519,7 @@ open64 (
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
 #endif
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return -1;
 	}
 
@@ -605,9 +585,7 @@ open (
 
 	if ( __lhip_real_open_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -684,9 +662,7 @@ open (
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
 #endif
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return -1;
 	}
 
@@ -756,9 +732,7 @@ openat64 (
 
 	if ( __lhip_real_openat64_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -836,9 +810,7 @@ openat64 (
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
 #endif
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return -1;
 	}
 
@@ -913,9 +885,7 @@ openat (
 
 	if ( __lhip_real_openat_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -993,9 +963,7 @@ openat (
 #if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
 #endif
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return -1;
 	}
 

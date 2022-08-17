@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- network functions' replacements.
  *
- * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -180,11 +180,6 @@ extern struct hostent *getipnodebyaddr LHIP_PARAMS ((const void *addr,
 	size_t len, int af, int *error_num));
 #endif
 
-static const unsigned char __lhip_localhost_ipv4[4] = {LHIP_LOCAL_IPV4_ADDR};
-static const unsigned char __lhip_netmask_ipv4[4] = {LHIP_LOCAL_IPV4_MASK};
-static const unsigned char __lhip_localhost_ipv6[16] = {LHIP_LOCAL_IPV6_ADDR};
-static const unsigned char __lhip_netmask_ipv6[16] = {LHIP_LOCAL_IPV6_MASK};
-
 static const unsigned char __lhip_zeroaddr_ipv4[4] = {0, 0, 0, 0};
 static const unsigned char __lhip_zeroaddr_ipv6[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static const char local_name[] = "localhost";
@@ -248,9 +243,7 @@ gethostbyaddr (
 
 	if ( __lhip_real_gethostbyaddr_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -311,9 +304,7 @@ gethostbyaddr_r (
 
 	if ( __lhip_real_gethostbyaddr_r_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -367,9 +358,7 @@ gethostbyname (
 
 	if ( __lhip_real_gethostbyname_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -428,9 +417,7 @@ gethostbyname_r (
 
 	if ( __lhip_real_gethostbyname_r_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -485,9 +472,7 @@ gethostbyname2 (
 
 	if ( __lhip_real_gethostbyname2_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -547,9 +532,7 @@ gethostbyname2_r (
 
 	if ( __lhip_real_gethostbyname2_r_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -603,9 +586,7 @@ gethostent (
 
 	if ( __lhip_real_gethostent_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -654,9 +635,7 @@ gethostent_r (
 
 	if ( __lhip_real_gethostent_r_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -665,7 +644,7 @@ gethostent_r (
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
-		return (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen,result, h_errnop);
+		return (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen, result, h_errnop);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < LHIP_INIT_STAGE_FULLY_INITIALIZED) )
@@ -673,10 +652,10 @@ gethostent_r (
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
-		return (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen,result, h_errnop);
+		return (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen, result, h_errnop);
 	}
 
-	my_ret = (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen,result, h_errnop);
+	my_ret = (*__lhip_real_gethostent_r_location ()) (ret, buf, buflen, result, h_errnop);
 	if ( my_ret == 0 )
 	{
 		__lhip_change_data (ret);
@@ -711,9 +690,7 @@ getipnodebyaddr (
 
 	if ( __lhip_real_getipnodebyaddr_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -768,9 +745,7 @@ getipnodebyname (
 
 	if ( __lhip_real_getipnodebyname_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return NULL;
 	}
 
@@ -826,9 +801,7 @@ getifaddrs (
 
 	if ( __lhip_real_getifaddrs_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -860,46 +833,18 @@ getifaddrs (
 			}
 			if ( tmp->ifa_addr->sa_family == AF_INET )
 			{
-#ifdef HAVE_MEMCPY
-				memcpy ( &(((struct sockaddr_in *)(tmp->ifa_addr))->sin_addr),
-					__lhip_localhost_ipv4,
-					sizeof (__lhip_localhost_ipv4) );
-#else
-				for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-				{
-					((char *)&(((struct sockaddr_in *)(tmp->ifa_addr))->sin_addr))[i]
-						= __lhip_localhost_ipv4[i];
-				}
-#endif
+				__lhip_set_ipv4_value (&(((struct sockaddr_in *)(tmp->ifa_addr))->sin_addr));
 				if ( tmp->ifa_netmask != NULL )
 				{
 					if ( tmp->ifa_netmask->sa_family == AF_INET )
 					{
-#ifdef HAVE_MEMCPY
-						memcpy ( &(((struct sockaddr_in *)(tmp->ifa_netmask))->sin_addr),
-							__lhip_netmask_ipv4,
-							sizeof (__lhip_netmask_ipv4) );
-#else
-						for ( i = 0; i < sizeof (__lhip_netmask_ipv4); i++ )
-						{
-							((char *)&(((struct sockaddr_in *)(tmp->ifa_netmask))->sin_addr))[i]
-								= __lhip_netmask_ipv4[i];
-						}
-#endif
+						__lhip_set_ipv4_mask_value (
+							&(((struct sockaddr_in *)(tmp->ifa_netmask))->sin_addr));
 					}
 					else if ( tmp->ifa_netmask->sa_family == AF_INET6 )
 					{
-#ifdef HAVE_MEMCPY
-						memcpy ( &(((struct sockaddr_in6 *)(tmp->ifa_netmask))->sin6_addr),
-							__lhip_netmask_ipv6,
-							sizeof (__lhip_netmask_ipv6) );
-#else
-						for ( i = 0; i < sizeof (__lhip_netmask_ipv6); i++ )
-						{
-							((char *)&(((struct sockaddr_in6 *)(tmp->ifa_netmask))->sin6_addr))[i]
-								= __lhip_netmask_ipv6[i];
-						}
-#endif
+						__lhip_set_ipv6_mask_value (
+							&(((struct sockaddr_in6 *)(tmp->ifa_netmask))->sin6_addr));
 					}
 				}
 				if ( (tmp->ifa_flags & IFF_BROADCAST) == IFF_BROADCAST )
@@ -909,79 +854,34 @@ getifaddrs (
 					{
 						if ( tmp->ifa_broadaddr->sa_family == AF_INET )
 						{
-#ifdef HAVE_MEMCPY
-							memcpy ( &(((struct sockaddr_in *)(tmp->ifa_broadaddr))
-								->sin_addr), __lhip_netmask_ipv4,
-								sizeof (__lhip_netmask_ipv4) );
-#else
-							for ( i = 0; i < sizeof (__lhip_netmask_ipv4); i++ )
-							{
-								((char *)&(((struct sockaddr_in *)(tmp
-									->ifa_broadaddr))->sin_addr))[i]
-										= __lhip_netmask_ipv4[i];
-							}
-#endif
+							__lhip_set_ipv4_mask_value (
+								&(((struct sockaddr_in *)(tmp->ifa_broadaddr))
+								->sin_addr));
 						}
 						else if ( tmp->ifa_broadaddr->sa_family == AF_INET6 )
 						{
-#ifdef HAVE_MEMCPY
-							memcpy ( &(((struct sockaddr_in6 *)(tmp->ifa_broadaddr))
-								->sin6_addr), __lhip_netmask_ipv6,
-								sizeof (__lhip_netmask_ipv6) );
-#else
-							for ( i = 0; i < sizeof (__lhip_netmask_ipv6); i++ )
-							{
-								((char *)&(((struct sockaddr_in6 *)(tmp
-									->ifa_broadaddr))->sin6_addr))[i]
-										= __lhip_netmask_ipv6[i];
-							}
-#endif
+							__lhip_set_ipv6_mask_value (
+								&(((struct sockaddr_in6 *)(tmp->ifa_broadaddr))
+								->sin6_addr));
 						}
 					}
 				}
 			}
 			else if ( tmp->ifa_addr->sa_family == AF_INET6 )
 			{
-#ifdef HAVE_MEMCPY
-				memcpy ( &(((struct sockaddr_in6 *)(tmp->ifa_addr))->sin6_addr),
-					__lhip_localhost_ipv6,
-					sizeof (__lhip_localhost_ipv6) );
-#else
-				for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-				{
-					((char *)&(((struct sockaddr_in6 *)(tmp->ifa_addr))->sin6_addr))[i]
-						= __lhip_localhost_ipv6[i];
-				}
-#endif
+				__lhip_set_ipv6_value (
+					&(((struct sockaddr_in6 *)(tmp->ifa_addr))->sin6_addr));
 				if ( tmp->ifa_netmask != NULL )
 				{
 					if ( tmp->ifa_netmask->sa_family == AF_INET )
 					{
-#ifdef HAVE_MEMCPY
-						memcpy ( &(((struct sockaddr_in *)(tmp->ifa_netmask))->sin_addr),
-							__lhip_netmask_ipv4,
-							sizeof (__lhip_netmask_ipv4) );
-#else
-						for ( i = 0; i < sizeof (__lhip_netmask_ipv4); i++ )
-						{
-							((char *)&(((struct sockaddr_in *)(tmp->ifa_netmask))->sin_addr))[i]
-								= __lhip_netmask_ipv4[i];
-						}
-#endif
+						__lhip_set_ipv4_mask_value (
+							&(((struct sockaddr_in *)(tmp->ifa_netmask))->sin_addr));
 					}
 					else if ( tmp->ifa_netmask->sa_family == AF_INET6 )
 					{
-#ifdef HAVE_MEMCPY
-						memcpy ( &(((struct sockaddr_in6 *)(tmp->ifa_netmask))->sin6_addr),
-							__lhip_netmask_ipv6,
-							sizeof (__lhip_netmask_ipv6) );
-#else
-						for ( i = 0; i < sizeof (__lhip_netmask_ipv6); i++ )
-						{
-							((char *)&(((struct sockaddr_in6 *)(tmp->ifa_netmask))->sin6_addr))[i]
-								= __lhip_netmask_ipv6[i];
-						}
-#endif
+						__lhip_set_ipv6_mask_value (
+							&(((struct sockaddr_in6 *)(tmp->ifa_netmask))->sin6_addr));
 					}
 				}
 				if ( (tmp->ifa_flags & IFF_BROADCAST) == IFF_BROADCAST )
@@ -991,33 +891,15 @@ getifaddrs (
 					{
 						if ( tmp->ifa_broadaddr->sa_family == AF_INET )
 						{
-#ifdef HAVE_MEMCPY
-							memcpy ( &(((struct sockaddr_in *)(tmp->ifa_broadaddr))
-								->sin_addr), __lhip_netmask_ipv4,
-								sizeof (__lhip_netmask_ipv4) );
-#else
-							for ( i = 0; i < sizeof (__lhip_netmask_ipv4); i++ )
-							{
-								((char *)&(((struct sockaddr_in *)(tmp
-									->ifa_broadaddr))->sin_addr))[i]
-										= __lhip_netmask_ipv4[i];
-							}
-#endif
+							__lhip_set_ipv4_mask_value (
+								&(((struct sockaddr_in *)(tmp->ifa_broadaddr))
+								->sin_addr));
 						}
 						else if ( tmp->ifa_broadaddr->sa_family == AF_INET6 )
 						{
-#ifdef HAVE_MEMCPY
-							memcpy ( &(((struct sockaddr_in6 *)(tmp->ifa_broadaddr))
-								->sin6_addr), __lhip_netmask_ipv6,
-								sizeof (__lhip_netmask_ipv6) );
-#else
-							for ( i = 0; i < sizeof (__lhip_netmask_ipv6); i++ )
-							{
-								((char *)&(((struct sockaddr_in6 *)(tmp
-									->ifa_broadaddr))->sin6_addr))[i]
-										= __lhip_netmask_ipv6[i];
-							}
-#endif
+							__lhip_set_ipv6_mask_value (
+								&(((struct sockaddr_in6 *)(tmp->ifa_broadaddr))
+								->sin6_addr));
 						}
 					}
 				}
@@ -1066,9 +948,7 @@ getnameinfo (
 
 	if ( __lhip_real_getnameinfo_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1114,13 +994,11 @@ getnameinfo (
 			}
 #endif
 			h.h_addr_list[1] = NULL;
-			if ( (memcmp ( &(((const struct sockaddr_in *)sa)->sin_addr),
-				__lhip_localhost_ipv4,
-				sizeof (__lhip_localhost_ipv4) ) == 0)
+			if ( (__lhip_check_ipv4_value ( &(((const struct sockaddr_in *)sa)->sin_addr)) == 1)
 				||
 				(memcmp ( &(((const struct sockaddr_in *)sa)->sin_addr),
 				__lhip_zeroaddr_ipv4,
-				sizeof (__lhip_localhost_ipv4) ) == 0)
+				sizeof (__lhip_zeroaddr_ipv4) ) == 0)
 				||
 				(__lhip_is_local_addr (&h) != 0) )
 			{
@@ -1148,13 +1026,11 @@ getnameinfo (
 			}
 #endif
 			h.h_addr_list[1] = NULL;
-			if ( (memcmp ( &(((const struct sockaddr_in6 *)sa)->sin6_addr),
-				__lhip_localhost_ipv6,
-				sizeof (__lhip_localhost_ipv6) ) == 0)
+			if ( (__lhip_check_ipv6_value ( &(((const struct sockaddr_in6 *)sa)->sin6_addr)) == 1)
 				||
 				(memcmp ( &(((const struct sockaddr_in6 *)sa)->sin6_addr),
 				__lhip_zeroaddr_ipv6,
-				sizeof (__lhip_localhost_ipv6) ) == 0)
+				sizeof (__lhip_zeroaddr_ipv6) ) == 0)
 				||
 				(__lhip_is_local_addr (&h) != 0) )
 			{
@@ -1201,9 +1077,7 @@ getaddrinfo (
 
 	if ( __lhip_real_getaddrinfo_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1237,33 +1111,13 @@ getaddrinfo (
 				{
 					if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
 					{
-#ifdef HAVE_MEMCPY
-						memcpy (
-							&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr),
-							__lhip_localhost_ipv4,
-							sizeof (__lhip_localhost_ipv4) );
-#else
-						for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-						{
-							((char *)&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr))[i]
-								= __lhip_localhost_ipv4[i];
-						}
-#endif
+						__lhip_set_ipv4_value (
+							&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr));
 					}
 					else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
 					{
-#ifdef HAVE_MEMCPY
-						memcpy (
-							&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr),
-							__lhip_localhost_ipv6,
-							sizeof (__lhip_localhost_ipv6) );
-#else
-						for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-						{
-							((char *)&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr))[i]
-								= __lhip_localhost_ipv6[i];
-						}
-#endif
+						__lhip_set_ipv6_value (
+							&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr));
 					}
 					if ( tmp->ai_canonname != NULL )
 					{
@@ -1286,33 +1140,13 @@ getaddrinfo (
 						{
 							if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
 							{
-#ifdef HAVE_MEMCPY
-								memcpy (
-									&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr),
-									__lhip_localhost_ipv4,
-									sizeof (__lhip_localhost_ipv4) );
-#else
-								for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-								{
-									((char *)&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr))[i]
-										= __lhip_localhost_ipv4[i];
-								}
-#endif
+								__lhip_set_ipv4_value (
+									&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr));
 							}
 							else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
 							{
-#ifdef HAVE_MEMCPY
-								memcpy (
-									&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr),
-									__lhip_localhost_ipv6,
-									sizeof (__lhip_localhost_ipv6) );
-#else
-								for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-								{
-									((char *)&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr))[i]
-										= __lhip_localhost_ipv6[i];
-								}
-#endif
+								__lhip_set_ipv6_value (
+									&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr));
 							}
 							if ( tmp->ai_canonname != NULL )
 							{
@@ -1336,33 +1170,13 @@ getaddrinfo (
 				{
 					if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
 					{
-#ifdef HAVE_MEMCPY
-						memcpy (
-							&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr),
-							__lhip_localhost_ipv4,
-							sizeof (__lhip_localhost_ipv4) );
-#else
-						for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-						{
-							((char *)&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr))[i]
-								= __lhip_localhost_ipv4[i];
-						}
-#endif
+						__lhip_set_ipv4_value (
+							&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr));
 					}
 					else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
 					{
-#ifdef HAVE_MEMCPY
-						memcpy (
-							&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr),
-							__lhip_localhost_ipv6,
-							sizeof (__lhip_localhost_ipv6) );
-#else
-						for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-						{
-							((char *)&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr))[i]
-								= __lhip_localhost_ipv6[i];
-						}
-#endif
+						__lhip_set_ipv6_value (
+							&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr));
 					}
 					if ( tmp->ai_canonname != NULL )
 					{
@@ -1385,33 +1199,13 @@ getaddrinfo (
 						{
 							if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
 							{
-#ifdef HAVE_MEMCPY
-								memcpy (
-									&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr),
-									__lhip_localhost_ipv4,
-									sizeof (__lhip_localhost_ipv4) );
-#else
-								for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-								{
-									((char *)&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr))[i]
-										= __lhip_localhost_ipv4[i];
-								}
-#endif
+								__lhip_set_ipv4_value (
+									&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr));
 							}
 							else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
 							{
-#ifdef HAVE_MEMCPY
-								memcpy (
-									&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr),
-									__lhip_localhost_ipv6,
-									sizeof (__lhip_localhost_ipv6) );
-#else
-								for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-								{
-									((char *)&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr))[i]
-										= __lhip_localhost_ipv6[i];
-								}
-#endif
+								__lhip_set_ipv6_value (
+									&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr));
 							}
 							if ( tmp->ai_canonname != NULL )
 							{
@@ -1451,9 +1245,7 @@ socket (
 
 	if ( __lhip_real_socket_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1471,7 +1263,7 @@ socket (
 		|| (type == SOCK_PACKET)
 #endif
 		/* can catch too many calls, because some socket types
-		   allow any value for the protovcol and still work.
+		   allow any value for the protocol and still work.
 		|| (protocol == PF_NETLINK)*/
 		/* will catch too many sockets, because NETLINK_ROUTE = 0,
 		   which is an often-used value for inet sockets.
@@ -1485,9 +1277,7 @@ socket (
 		*/
 		)
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return -1;
 	}
 
@@ -1515,9 +1305,7 @@ recvmsg (
 
 	if ( __lhip_real_recvmsg_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1529,9 +1317,7 @@ recvmsg (
 		return (*__lhip_real_recvmsg_location ()) (s, msg, flags);
 	}
 
-#ifdef HAVE_ERRNO_H
-	errno = -EPERM;
-#endif
+	SET_ERRNO_PERM();
 	return -1;
 }
 
@@ -1556,9 +1342,7 @@ sendmsg (
 
 	if ( __lhip_real_sendmsg_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1570,9 +1354,7 @@ sendmsg (
 		return (*__lhip_real_sendmsg_location ()) (s, msg, flags);
 	}
 
-#ifdef HAVE_ERRNO_H
-	errno = -EPERM;
-#endif
+	SET_ERRNO_PERM();
 	return -1;
 }
 
@@ -1603,9 +1385,7 @@ gethostname (
 
 	if ( __lhip_real_gethostname_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1664,9 +1444,7 @@ getsockopt (
 
 	if ( __lhip_real_getsockopt_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1688,9 +1466,7 @@ getsockopt (
 #if (defined SOL_IP) && (defined IP_PKTINFO)
 	if ( (level == SOL_IP) && (optname == IP_PKTINFO) )
 	{
-# ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-# endif
+		SET_ERRNO_PERM();
 		return -1;
 	}
 #endif
@@ -1724,9 +1500,7 @@ setsockopt (
 
 	if ( __lhip_real_setsockopt_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1749,9 +1523,7 @@ setsockopt (
 #if (defined SOL_IP) && (defined IP_PKTINFO)
 	if ( (level == SOL_IP) && (optname == IP_PKTINFO) )
 	{
-# ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-# endif
+		SET_ERRNO_PERM();
 		return -1;
 	}
 #endif
@@ -1787,9 +1559,7 @@ getsockname (
 
 	if ( __lhip_real_getsockname_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1814,31 +1584,11 @@ getsockname (
 	{
 		if ( name->sa_family == AF_INET )
 		{
-#ifdef HAVE_MEMCPY
-			memcpy ( &(((struct sockaddr_in *)name)->sin_addr),
-				__lhip_localhost_ipv4,
-				sizeof (__lhip_localhost_ipv4) );
-#else
-			for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
-			{
-				((char *)&(((struct sockaddr_in *)name)->sin_addr))[i]
-					= __lhip_localhost_ipv4[i];
-			}
-#endif
+			__lhip_set_ipv4_value (&(((struct sockaddr_in *)name)->sin_addr));
 		}
 		else if ( name->sa_family == AF_INET6 )
 		{
-#ifdef HAVE_MEMCPY
-			memcpy ( &(((struct sockaddr_in6 *)name)->sin6_addr),
-				__lhip_localhost_ipv6,
-				sizeof (__lhip_localhost_ipv6) );
-#else
-			for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
-			{
-				((char *)&(((struct sockaddr_in6 *)name)->sin6_addr))[i]
-					= __lhip_localhost_ipv6[i];
-			}
-#endif
+			__lhip_set_ipv6_value (&(((struct sockaddr_in6 *)name)->sin6_addr));
 		}
 	}
 	return res;
@@ -1869,9 +1619,7 @@ bind (
 
 	if ( __lhip_real_bind_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1893,35 +1641,27 @@ bind (
 
 	if ( my_addr->sa_family == AF_INET )
 	{
-		if ( (memcmp ( &(((const struct sockaddr_in *)my_addr)->sin_addr),
-			__lhip_localhost_ipv4,
-			sizeof (__lhip_localhost_ipv4) ) != 0)
+		if ( (__lhip_check_ipv4_value ( &(((const struct sockaddr_in *)my_addr)->sin_addr)) != 1)
 			&&
 			(memcmp ( &(((const struct sockaddr_in *)my_addr)->sin_addr),
 			__lhip_zeroaddr_ipv4,
-			sizeof (__lhip_localhost_ipv4) ) != 0) )
+			sizeof (__lhip_zeroaddr_ipv4) ) != 0) )
 		{
 			/* not 127.0.0.1 and not 0.0.0.0 address - forbid, to avoid guessing */
-#ifdef HAVE_ERRNO_H
-			errno = -EPERM;
-#endif
+			SET_ERRNO_PERM();
 			return -1;
 		}
 	}
 	else if ( my_addr->sa_family == AF_INET6 )
 	{
-		if ( (memcmp ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr),
-			__lhip_localhost_ipv6,
-			sizeof (__lhip_localhost_ipv6) ) != 0)
+		if ( (__lhip_check_ipv6_value ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr)) != 1)
 			&&
 			(memcmp ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr),
 			__lhip_zeroaddr_ipv6,
-			sizeof (__lhip_localhost_ipv6) ) != 0) )
+			sizeof (__lhip_zeroaddr_ipv6) ) != 0) )
 		{
 			/* not ::1 and not ::0 address - forbid, to avoid guessing */
-#ifdef HAVE_ERRNO_H
-			errno = -EPERM;
-#endif
+			SET_ERRNO_PERM();
 			return -1;
 		}
 	}
@@ -1949,9 +1689,7 @@ socketpair (
 
 	if ( __lhip_real_socketpair_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -ENOSYS;
-#endif
+		SET_ERRNO_MISSING();
 		return -1;
 	}
 
@@ -1969,7 +1707,7 @@ socketpair (
 		|| (type == SOCK_PACKET)
 #endif
 		/* can catch too many calls, because some socket types
-		   allow any value for the protovcol and still work.
+		   allow any value for the protocol and still work.
 		|| (protocol == PF_NETLINK)*/
 		/* will catch too many sockets, because NETLINK_ROUTE = 0,
 		   which is an often-used value for inet sockets.
@@ -1983,9 +1721,7 @@ socketpair (
 		*/
 		)
 	{
-#ifdef HAVE_ERRNO_H
-		errno = -EPERM;
-#endif
+		SET_ERRNO_PERM();
 		return -1;
 	}
 

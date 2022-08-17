@@ -1,8 +1,8 @@
 /*
  * A library for hiding local IP address.
- *	-- getting the local address and checking for matches.
+ *	-- getting the local address, checking for matches and anonymizing.
  *
- * Copyright (C) 2011-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2011-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -118,7 +118,10 @@ static struct hostent * __lhip_our_real_name_ipv6 = NULL;
 static struct hostent __lhip_tmp;
 static struct addrinfo * __lhip_ai_all = NULL;
 static const unsigned char __lhip_localhost_ipv4[4] = {LHIP_LOCAL_IPV4_ADDR};
+static const unsigned char __lhip_netmask_ipv4[4] = {LHIP_LOCAL_IPV4_MASK};
 static const unsigned char __lhip_localhost_ipv6[16] = {LHIP_LOCAL_IPV6_ADDR};
+static const unsigned char __lhip_netmask_ipv6[16] = {LHIP_LOCAL_IPV6_MASK};
+static const unsigned char __lhip_fake_mac[6] = {1, 2, 3, 4, 5, 6};
 static char __lhip_our_hostname_v4[LHIP_MAXHOSTLEN];
 static char __lhip_our_hostname_v6[LHIP_MAXHOSTLEN];
 static char __lhip_our_gethostname[LHIP_MAXHOSTLEN];
@@ -174,9 +177,6 @@ void __lhip_read_local_addresses (
 	struct hostent * hostent_res;
 	int lhip_errno;
 	size_t i;
-#ifndef HAVE_MEMCPY
-	size_t k;
-#endif
 #ifndef HAVE_MALLOC
 	int localaddr_found;
 #endif
@@ -237,14 +237,7 @@ void __lhip_read_local_addresses (
 			} /* ai_res == 0 ... */
 		} /* ai_res != 0 */
 		/* IPv6: */
-# ifdef HAVE_MEMCPY
-		memcpy (&lhip_addr6, __lhip_localhost_ipv6, sizeof (__lhip_localhost_ipv6));
-# else
-		for ( k = 0; k < sizeof (__lhip_localhost_ipv6); k++ )
-		{
-			((unsigned char *)&(lhip_addr6))[k] = __lhip_localhost_ipv6[k];
-		}
-# endif
+		__lhip_set_ipv6_value (&lhip_addr6);
 		ai_res = (*__lhip_real_gethostbyaddr_r_location ())
 				(&lhip_addr6, sizeof (struct in6_addr), AF_INET6,
 				&__lhip_tmp,
@@ -269,14 +262,7 @@ void __lhip_read_local_addresses (
 				(&lhip_addr, sizeof (struct in_addr), AF_INET);
 			__lhip_add_local_address (__lhip_our_real_name_ipv4);
 		}
-# ifdef HAVE_MEMCPY
-		memcpy (&lhip_addr6, __lhip_localhost_ipv6, sizeof (__lhip_localhost_ipv6));
-# else
-		for ( k = 0; k < sizeof (__lhip_localhost_ipv6); k++ )
-		{
-			((unsigned char *)&(lhip_addr6))[k] = __lhip_localhost_ipv6[k];
-		}
-# endif
+		__lhip_set_ipv6_value (&lhip_addr6);
 		/* don't pass directly, we need the variable */
 		__lhip_our_real_name_ipv6 = (*__lhip_real_gethostbyaddr_location ())
 			(&lhip_addr6, sizeof (struct in6_addr), AF_INET6);
@@ -370,9 +356,8 @@ void __lhip_read_local_addresses (
 			while ( hostent_res->h_addr_list[i] != NULL )
 			{
 				if ( (hostent_res->h_addrtype == AF_INET)
-					&& (memcmp (hostent_res->h_addr_list[i],
-						__lhip_localhost_ipv4,
-						sizeof (__lhip_localhost_ipv4) ) == 0) )
+					&& (__lhip_check_ipv4_value ((struct in_addr *)
+						hostent_res->h_addr_list[i]) == 1) )
 				{
 					__lhip_add_local_address (hostent_res);
 #ifndef HAVE_MALLOC
@@ -380,9 +365,8 @@ void __lhip_read_local_addresses (
 #endif
 				}
 				else if ( (hostent_res->h_addrtype == AF_INET6)
-					&& (memcmp (hostent_res->h_addr_list[i],
-						__lhip_localhost_ipv6,
-						sizeof (__lhip_localhost_ipv6) ) == 0) )
+					&& (__lhip_check_ipv6_value ((struct in6_addr *)
+						(hostent_res->h_addr_list[i])) == 1) )
 				{
 					__lhip_add_local_address (hostent_res);
 #ifndef HAVE_MALLOC
@@ -401,15 +385,7 @@ void __lhip_read_local_addresses (
 	if ( __lhip_real_getnameinfo_location () != NULL )
 	{
 		addr_ipv4.sin_family = AF_INET;
-#ifdef HAVE_MEMCPY
-		memcpy (&(addr_ipv4.sin_addr.s_addr), __lhip_localhost_ipv4,
-			sizeof (struct in_addr));
-#else
-		for ( k = 0; k < sizeof (struct in_addr); k++ )
-		{
-			((unsigned char *)&(addr_ipv4.sin_addr.s_addr))[k] = __lhip_localhost_ipv4[k];
-		}
-#endif
+		__lhip_set_ipv4_value (&(addr_ipv4.sin_addr));
 		ai_res = (*__lhip_real_getnameinfo_location ()) ((struct sockaddr *)&addr_ipv4,
 			sizeof (struct sockaddr_in), __lhip_our_hostname_v4,
 			sizeof (__lhip_our_hostname_v4), NULL, 0, 0);
@@ -425,15 +401,7 @@ void __lhip_read_local_addresses (
 #endif
 		}
 		addr_ipv6.sin6_family = AF_INET6;
-#ifdef HAVE_MEMCPY
-		memcpy (&(addr_ipv6.sin6_addr), __lhip_localhost_ipv6,
-			sizeof (struct in6_addr));
-#else
-		for ( k = 0; k < sizeof (struct in6_addr); k++ )
-		{
-			((unsigned char *)&(addr_ipv6.sin6_addr))[k] = __lhip_localhost_ipv6[k];
-		}
-#endif
+		__lhip_set_ipv6_value (&(addr_ipv6.sin6_addr));
 		ai_res = (*__lhip_real_getnameinfo_location ()) ((struct sockaddr *)&addr_ipv6,
 			sizeof (struct sockaddr_in6), __lhip_our_hostname_v6,
 			sizeof (__lhip_our_hostname_v6), NULL, 0, 0);
@@ -708,7 +676,7 @@ __lhip_is_local_addr (
 					{
 						if ( __lhip_check_hostname_match (
 							__lhip_our_real_name_ipv6->h_aliases[i],
-							h->h_aliases[i]) == 1 )
+							h->h_aliases[j]) == 1 )
 						{
 							return 1;
 						}
@@ -926,6 +894,11 @@ __lhip_is_local_addr (
 
 /* =============================================================== */
 
+/**
+ * Changes the given hostent structure contents so that it contains only
+ *  generic data (like "localhost" or "127.0.0.1")
+ * @param ret the structure to change
+ */
 void
 __lhip_change_data (
 #ifdef LHIP_ANSIC
@@ -957,16 +930,7 @@ __lhip_change_data (
 			i = 0;
 			while ( ret->h_addr_list[i] != NULL )
 			{
-#ifdef HAVE_MEMCPY
-				memcpy (ret->h_addr_list[i],
-					__lhip_localhost_ipv4,
-					sizeof (__lhip_localhost_ipv4));
-#else
-				for ( j = 0; j < sizeof (__lhip_localhost_ipv4); j++ )
-				{
-					ret->h_addr_list[i][j] = (char) __lhip_localhost_ipv4[j];
-				}
-#endif
+				__lhip_set_ipv4_value ((struct in_addr *)(ret->h_addr_list[i]));
 				i++;
 			}
 		}
@@ -975,16 +939,7 @@ __lhip_change_data (
 			i = 0;
 			while ( ret->h_addr_list[i] != NULL )
 			{
-#ifdef HAVE_MEMCPY
-				memcpy (ret->h_addr_list[i],
-					__lhip_localhost_ipv6,
-					sizeof (__lhip_localhost_ipv6));
-#else
-				for ( j = 0; j < sizeof (__lhip_localhost_ipv6); j++ )
-				{
-					ret->h_addr_list[i][j] = (char) __lhip_localhost_ipv6[j];
-				}
-#endif
+				__lhip_set_ipv6_value ((struct in6_addr *)(ret->h_addr_list[i]));
 				i++;
 			}
 		}
@@ -1283,17 +1238,13 @@ __lhip_is_local_address (
 		while ( host->h_addr_list[i] != NULL )
 		{
 			if ( (host->h_addrtype == AF_INET)
-				&& (memcmp (host->h_addr_list[i],
-					__lhip_localhost_ipv4,
-					sizeof (__lhip_localhost_ipv4) ) == 0)
+				&& (__lhip_check_ipv4_value ((struct in_addr *)(host->h_addr_list[i])) == 1)
 			)
 			{
 				return 1;
 			}
 			if ( (host->h_addrtype == AF_INET6)
-				&& (memcmp (host->h_addr_list[i],
-					__lhip_localhost_ipv6,
-					sizeof (__lhip_localhost_ipv6) ) == 0)
+				&& (__lhip_check_ipv6_value ((struct in6_addr *)(host->h_addr_list[i])) == 1)
 			)
 			{
 				return 1;
@@ -1372,3 +1323,252 @@ __lhip_get_address_info (
 		}
 	}
 }
+
+/* =============================================================== */
+
+/**
+ * Changes the given IPv4 address contents so that it contains only
+ *  generic data ("127.0.0.1")
+ * @param addr4 the address to change
+ */
+void
+__lhip_set_ipv4_value (
+#ifdef LHIP_ANSIC
+	struct in_addr * const addr4)
+#else
+	addr4)
+	struct in_addr * const addr4;
+#endif
+{
+#ifndef HAVE_MEMCPY
+	size_t i;
+#endif
+
+	if ( addr4 == NULL )
+	{
+		return;
+	}
+#ifdef HAVE_MEMCPY
+	memcpy ( addr4,
+		__lhip_localhost_ipv4,
+		sizeof (__lhip_localhost_ipv4) );
+#else
+	for ( i = 0; i < sizeof (__lhip_localhost_ipv4); i++ )
+	{
+		((char *)addr4)[i] = __lhip_localhost_ipv4[i];
+	}
+#endif
+}
+
+/* =============================================================== */
+
+/**
+ * Changes the given IPv4 address mask contents so that it contains only
+ *  generic data ("255.255.255.255")
+ * @param mask4 the address mask to change
+ */
+void
+__lhip_set_ipv4_mask_value (
+#ifdef LHIP_ANSIC
+	struct in_addr * const mask4)
+#else
+	mask4)
+	struct in_addr * const mask4;
+#endif
+{
+#ifndef HAVE_MEMCPY
+	size_t i;
+#endif
+
+	if ( mask4 == NULL )
+	{
+		return;
+	}
+#ifdef HAVE_MEMCPY
+	memcpy ( mask4,
+		__lhip_netmask_ipv4,
+		sizeof (__lhip_netmask_ipv4) );
+#else
+	for ( i = 0; i < sizeof (__lhip_netmask_ipv4); i++ )
+	{
+		((char *)mask4)[i] = __lhip_netmask_ipv4[i];
+	}
+#endif
+}
+
+/* =============================================================== */
+
+/**
+ * Changes the given IPv6 address contents so that it contains only
+ *  generic data ("::1")
+ * @param addr6 the address to change
+ */
+void
+__lhip_set_ipv6_value (
+#ifdef LHIP_ANSIC
+	struct in6_addr * const addr6)
+#else
+	addr6)
+	struct in6_addr * const addr6;
+#endif
+{
+#ifndef HAVE_MEMCPY
+	size_t i;
+#endif
+
+	if ( addr6 == NULL )
+	{
+		return;
+	}
+#ifdef HAVE_MEMCPY
+	memcpy ( addr6,
+		__lhip_localhost_ipv6,
+		sizeof (__lhip_localhost_ipv6) );
+#else
+	for ( i = 0; i < sizeof (__lhip_localhost_ipv6); i++ )
+	{
+		((char *)addr6)[i] = __lhip_localhost_ipv6[i];
+	}
+#endif
+}
+
+/* =============================================================== */
+
+/**
+ * Changes the given IPv6 address mask contents so that it contains only
+ *  generic data ("::1")
+ * @param mask6 the address mask to change
+ */
+void
+__lhip_set_ipv6_mask_value (
+#ifdef LHIP_ANSIC
+	struct in6_addr * const mask6)
+#else
+	mask6)
+	struct in6_addr * const mask6;
+#endif
+{
+#ifndef HAVE_MEMCPY
+	size_t i;
+#endif
+
+	if ( mask6 == NULL )
+	{
+		return;
+	}
+#ifdef HAVE_MEMCPY
+	memcpy ( mask6,
+		__lhip_netmask_ipv6,
+		sizeof (__lhip_netmask_ipv6) );
+#else
+	for ( i = 0; i < sizeof (__lhip_netmask_ipv6); i++ )
+	{
+		((char *)mask6)[i] = __lhip_netmask_ipv6[i];
+	}
+#endif
+}
+
+/* =============================================================== */
+
+/**
+ * Changes the given MAC address contents so that it contains only
+ *  generic data ("01:02:03:04:05:06")
+ * @param macaddr the address to change
+ */
+void
+__lhip_set_mac_value (
+#ifdef LHIP_ANSIC
+	void * const macaddr)
+#else
+	macaddr)
+	void * const macaddr;
+#endif
+{
+#ifndef HAVE_MEMCPY
+	size_t i;
+#endif
+
+	if ( macaddr == NULL )
+	{
+		return;
+	}
+#ifdef HAVE_MEMCPY
+	memcpy ( macaddr,
+		__lhip_fake_mac,
+		sizeof (__lhip_fake_mac) );
+#else
+	for ( i = 0; i < sizeof (__lhip_fake_mac); i++ )
+	{
+		((char *)macaddr)[i] = __lhip_fake_mac[i];
+	}
+#endif
+}
+
+/* =============================================================== */
+
+/**
+ * Checks the given IPv4 address contents if it contains only
+ *  generic data ("127.0.0.1")
+ * @param addr4 the address to check
+ * @return 1 if the address is OK
+ */
+int
+__lhip_check_ipv4_value (
+#ifdef LHIP_ANSIC
+	const struct in_addr * const addr4)
+#else
+	addr4)
+	const struct in_addr * const addr4;
+#endif
+{
+#ifndef HAVE_MEMCPY
+	size_t i;
+#endif
+
+	if ( addr4 == NULL )
+	{
+		return 0;
+	}
+	if (memcmp (addr4,
+		__lhip_localhost_ipv4,
+		sizeof (__lhip_localhost_ipv4) ) == 0)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+/* =============================================================== */
+
+/**
+ * Checks the given IPv6 address contents if it contains only
+ *  generic data ("::1")
+ * @param addr6 the address to check
+ * @return 1 if the address is OK
+ */
+int
+__lhip_check_ipv6_value (
+#ifdef LHIP_ANSIC
+	const struct in6_addr * const addr6)
+#else
+	addr6)
+	const struct in6_addr * const addr6;
+#endif
+{
+#ifndef HAVE_MEMCPY
+	size_t i;
+#endif
+
+	if ( addr6 == NULL )
+	{
+		return 0;
+	}
+	if (memcmp (addr6,
+		__lhip_localhost_ipv6,
+		sizeof (__lhip_localhost_ipv6) ) == 0)
+	{
+		return 1;
+	}
+	return 0;
+}
+

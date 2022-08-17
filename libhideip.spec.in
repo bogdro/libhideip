@@ -7,7 +7,7 @@ Summary:	Library for IP address hiding
 Name:		%{name}
 Version:	%{version}
 Release:	1
-URL:		http://rudy.mif.pg.gda.pl/~bogdro/soft/
+URL:		http://libhideip.sf.net
 License:	GPLv3+
 # group must be one of the listed in /usr/share/doc/rpm-.../GROUPS
 Group:		System Environment/Libraries
@@ -58,7 +58,7 @@ DESTDIR="$RPM_BUILD_ROOT" %{__make} install
 %defattr(-,root,root)
 /usr/local/lib/libhideip.so
 /usr/local/lib/libhideip.so.1
-/usr/local/lib/libhideip.so.1.3.3
+/usr/local/lib/libhideip.so.1.4.0
 /usr/local/lib/libhideip.la
 %doc /usr/share/info/libhideip.info.gz
 %doc /usr/share/man/man3/libhideip.3.gz
@@ -75,7 +75,7 @@ DESTDIR="$RPM_BUILD_ROOT" %{__make} install
 
 Summary:	Library for IP address hiding - development package
 Release:	1
-URL:		http://rudy.mif.pg.gda.pl/~bogdro/soft/
+URL:		http://libhideip.sf.net
 License:	GPLv3+
 Group:		Development/Libraries
 #Packager:	Bogdan Drozdowski <bogdandr@op.pl>

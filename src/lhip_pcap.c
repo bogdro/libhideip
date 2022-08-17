@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- libpcap functions' replacements.
  *
- * Copyright (C) 2011-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2011-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -63,7 +63,7 @@ pcap_t * pcap_fopen_offline LHIP_PARAMS ((FILE * fp, char * errbuf));
 int pcap_findalldevs LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
 # endif
 #endif
-#if ! defined(WIN32)
+#if !defined(WIN32)
 pcap_t * pcap_hopen_offline LHIP_PARAMS ((intptr_t a, char * errbuf));
 #endif
 

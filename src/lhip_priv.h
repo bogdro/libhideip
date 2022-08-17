@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- private header file.
  *
- * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -375,6 +375,20 @@ extern void							__lhip_free_local_addresses LHIP_PARAMS ((void));
 extern int GCC_WARN_UNUSED_RESULT				__lhip_is_forbidden_file
 									LHIP_PARAMS ((const char * const name));
 extern void							__lhip_end LHIP_PARAMS ((void));
+extern void							__lhip_set_ipv4_value
+									LHIP_PARAMS ((struct in_addr * const addr4));
+extern void							__lhip_set_ipv4_mask_value
+									LHIP_PARAMS ((struct in_addr * const mask4));
+extern void							__lhip_set_ipv6_value
+									LHIP_PARAMS ((struct in6_addr * const addr6));
+extern void							__lhip_set_ipv6_mask_value
+									LHIP_PARAMS ((struct in6_addr * const mask6));
+extern void							__lhip_set_mac_value
+									LHIP_PARAMS ((void * const macaddr));
+extern int							__lhip_check_ipv4_value
+									LHIP_PARAMS ((const struct in_addr * const addr4));
+extern int							__lhip_check_ipv6_value
+									LHIP_PARAMS ((const struct in6_addr * const addr6));
 
 
 # ifdef __cplusplus
@@ -403,6 +417,14 @@ extern void							__lhip_end LHIP_PARAMS ((void));
 # define LHIP_INIT_STAGE_NOT_INITIALIZED 0
 # define LHIP_INIT_STAGE_AFTER_DLSYM 1
 # define LHIP_INIT_STAGE_FULLY_INITIALIZED 2
+
+# ifdef HAVE_ERRNO_H
+#  define SET_ERRNO_MISSING() {errno = ENOSYS;}
+#  define SET_ERRNO_PERM() {errno = EPERM;}
+# else
+#  define SET_ERRNO_MISSING()
+#  define SET_ERRNO_PERM()
+# endif
 
 #endif /* _LHIP_HEADER */
 

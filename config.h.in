@@ -79,8 +79,17 @@
 /* Whether you have the dlvsym() function in the libdl library */
 #undef HAVE_LIBDL_DLVSYM
 
+/* Define to 1 if you have the `pcap' library (-lpcap). */
+#undef HAVE_LIBPCAP
+
+/* Define to 1 if you have the `resolv' library (-lresolv). */
+#undef HAVE_LIBRESOLV
+
 /* Whether you have the linux/netlink.h header. */
 #undef HAVE_LINUX_NETLINK_H
+
+/* Define to 1 if you have the `lstat' function. */
+#undef HAVE_LSTAT
 
 /* Whether you have the malloc function. */
 #undef HAVE_MALLOC
@@ -154,6 +163,9 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
+/* Define to 1 if you have the `symlink' function. */
+#undef HAVE_SYMLINK
+
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
 
@@ -189,6 +201,9 @@
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+#undef NO_MINUS_C_MINUS_O
 
 /* Name of package */
 #undef PACKAGE

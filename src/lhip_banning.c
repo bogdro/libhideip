@@ -1,8 +1,8 @@
 /*
- * A library for secure removing files.
+ * A library for hiding local IP address.
  *	-- private file and program banning functions.
  *
- * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -56,7 +56,16 @@
 
 static char __lhip_exename[LHIP_MAXPATHLEN];	/* 4096 */
 static char __lhip_omitfile[LHIP_MAXPATHLEN];
+
+#if (defined LHIP_ENABLE_USERBANS) && (defined HAVE_GETENV) && (defined HAVE_MALLOC)
+# define LHIP_CAN_USE_BANS 1
+#else
+# undef LHIP_CAN_USE_BANS
+#endif
+
+#ifdef LSR_CAN_USE_BANS
 static const char __lhip_banfilename[] = LHIP_BANNING_USERFILE;
+#endif
 
 /******************* some of what's below comes from libsafe ***************/
 
@@ -217,7 +226,7 @@ __lhip_check_prog_ban (
 )
 {
 	int	ret = 0;	/* DEFAULT: NO, this program is not banned */
-#if (defined LHIP_ENABLE_USERBANS) && (defined HAVE_GETENV) && (defined HAVE_MALLOC)
+#ifdef LSR_CAN_USE_BANS
 	char *path = NULL;
 	char * full_path = NULL;
 	size_t path_len;
@@ -243,7 +252,7 @@ __lhip_check_prog_ban (
 			ret = __lhip_is_banned_in_file (__lhip_exename, getenv (LHIP_BANNING_ENV));
 		}
 #endif
-#if (defined LHIP_ENABLE_USERBANS) && (defined HAVE_GETENV) && (defined HAVE_MALLOC)
+#ifdef LSR_CAN_USE_BANS
 		if ( ret == 0 )
 		{
 			path = getenv ("HOME");
@@ -264,6 +273,7 @@ __lhip_check_prog_ban (
 					strncpy (full_path, path, path_len+1);
 					strncat (full_path, LHIP_PATH_SEP, filesep_len+1);
 					strncat (full_path, __lhip_banfilename, filename_len+1);
+					full_path[(path_len + 1 + filesep_len + 1 + filename_len + 1)-1] = '\0';
 					ret = __lhip_is_banned_in_file (__lhip_exename, full_path);
 					free (full_path);
 				}

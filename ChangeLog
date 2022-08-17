@@ -1,3 +1,43 @@
+2015-09-06	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* LibHideIP version 0.9
+	  Library marked as not requiring executable stack (security reasons).
+	  Fixed banning functions. Fixed errno setting. Fixed runtime
+	  dependencies. Added unit tests (check >= 0.9.8 required). Minor
+	  code cleanup.
+	* configure.ac: checking for the -Wl,-z -Wl,noexecstack compiler
+	  option and -z noexecstack linker option. Rearranging the check for
+	  libdl to enable the default behaviour (adding it to the LIBS) - this
+	  allows using tests and removes the need to preload libdl along with
+	  LibHideIP. Checking for the "check" library for unit tests. Checking
+	  for the symlink() function for tests. Checking for libpcap and
+	  libresolve which should also be present at runtime
+	* test: added unit tests for LibHideIP
+	* libhideip.spec.in: changed the LibHideIP URL address to SourceForge
+	  and updated filename for the new version
+	* doc/libhideip.3: added SourceForge addresses
+	* src/Makefile.am: added the "randomnames" target for easy internal
+	  name randomization (hiding LibHideIP from simple symbol listing),
+	  updated library version number
+	* src/randomize_names_perl.sh: optimized the name matching
+	* README, INSTALL, doc/libhideip.texi.in: described in detail how to
+	  hide LibHideIP by randomizing internal names
+	* src/lhip_banning.c: created new constants for common #defines
+	* src/lhip_priv.h: added SET_ERRNO_MISSING to set the errno
+	  when the original function is missing on the system. Fixed the
+	  value. Added SET_ERRNO_PERM to set the errno when the operation is
+	  forbidden
+	* src/lhip_exec.c (__lhip_is_forbidden_program): fixed endless loop,
+	  fixed link reading
+	* src/lhip_exec.c (__lhip_is_forbidden_file): fixed link checking
+	* src/lhip_ioctl.c (ioctl): potential fix for compiling on Solaris
+	* src/lhip_addr.c: added functions for setting & checking the neutral
+	  IP addresses and masks
+	* src/lhip_ioctl.c, src/lhip_net.c: using the new address setting and
+	  checking functions from src/lhip_addr.c
+	* src/lhip_addr.c (__lhip_is_local_addr): fixed one check in
+	  comparing the given address to a local IPv6 address.
+
 2013-06-02	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* LibHideIP version 0.8

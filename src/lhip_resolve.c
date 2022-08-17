@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- address resolving functions' replacements.
  *
- * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
  * License: GNU General Public License, v3+
  *
@@ -191,9 +191,7 @@ res_query (
 
 	if ( __lhip_real_res_query_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = -ENOSYS;*/
-#endif
+		/*SET_ERRNO_MISSING();*/
 		return -1;
 	}
 
@@ -207,9 +205,7 @@ res_query (
 
 	if ( __lhip_is_forbidden_name (dname) != 0 )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = -EPERM;*/
-#endif
+		/*SET_ERRNO_PERM();*/
 		return -1;
 	}
 	return (*__lhip_real_res_query_location ()) (dname, class, type, answer, anslen);
@@ -238,9 +234,7 @@ res_search (
 
 	if ( __lhip_real_res_search_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = -ENOSYS;*/
-#endif
+		/*SET_ERRNO_MISSING();*/
 		return -1;
 	}
 
@@ -254,9 +248,7 @@ res_search (
 
 	if ( __lhip_is_forbidden_name (dname) != 0 )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = -EPERM;*/
-#endif
+		/*SET_ERRNO_PERM();*/
 		return -1;
 	}
 
@@ -288,9 +280,7 @@ res_querydomain (
 
 	if ( __lhip_real_res_querydomain_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = -ENOSYS;*/
-#endif
+		/*SET_ERRNO_MISSING();*/
 		return -1;
 	}
 
@@ -304,9 +294,7 @@ res_querydomain (
 
 	if ( __lhip_is_forbidden_name (name) != 0 )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = -EPERM;*/
-#endif
+		/*SET_ERRNO_PERM();*/
 		return -1;
 	}
 
@@ -340,9 +328,7 @@ res_mkquery (
 
 	if ( __lhip_real_res_mkquery_location () == NULL )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = -ENOSYS;*/
-#endif
+		/*SET_ERRNO_MISSING();*/
 		return -1;
 	}
 
@@ -357,9 +343,7 @@ res_mkquery (
 
 	if ( __lhip_is_forbidden_name (dname) != 0 )
 	{
-#ifdef HAVE_ERRNO_H
-		/*errno = -EPERM;*/
-#endif
+		/*SET_ERRNO_PERM();*/
 		return -1;
 	}
 

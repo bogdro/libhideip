@@ -1,7 +1,7 @@
 /*
  * A library for hiding local IP address.
  *
- * Copyright (C) 2008-2013 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2015 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * Syntax example: export LD_PRELOAD=/usr/local/lib/libhideip.so
@@ -52,6 +52,8 @@
 #  define HAVE_IFADDRS_H	1
 #  define HAVE_INTTYPES_H	1
 #  define HAVE_LIBDL		1
+#  define HAVE_LIBDL_DLSYM	1
+#  define HAVE_LIBDL_DLVSYM	1
 #  define HAVE_LINUX_NETLINK_H	1
 #  define HAVE_LSTAT		1
 #  define HAVE_MALLOC		1
@@ -78,6 +80,7 @@
 #  define HAVE_STDINT_H		1
 #  define HAVE_STDLIB_H		1
 #  define HAVE_STRING_H		1
+#  define HAVE_SYMLINK		1
 #  define HAVE_SYSCALL_H	1
 #  define HAVE_SYS_SYSCALL_H	1
 #  define HAVE_SYS_IOCTL_H	1
