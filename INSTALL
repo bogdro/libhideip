@@ -1,0 +1,26 @@
+LibHideIP - a library which hides your local IP address from programs.
+
+Requirements for compiling the full version:
+- a non-root account. Please, NEVER compile or 'make' anything as root.
+- a working C compiler
+- development package for the C library (like glibc-devel and glibc-headers)
+- the 'make' program
+
+Type './configure' to configure the library for your system.
+
+Type 'make' to compile the library.
+Documentation will be compiled (and can be copied right away), if you have
+  the 'makeinfo' program ('texinfo' package).
+
+Type 'make install' to install the library.
+
+=======================================================
+
+Building an RPM package:
+
+1) copy the libhideip.spec file to /usr/src/redhat/SPECS
+2) copy the source package libhideip-XX.tar.gz to /usr/src/redhat/SOURCES
+3) type
+	rpmbuild -ba /usr/src/redhat/SPECS/libhideip.spec
+4) get the rpms from /usr/src/redhat/RPMS/i386 and /usr/src/redhat/SRPMS
+

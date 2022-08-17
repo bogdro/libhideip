@@ -1,0 +1,21 @@
+2008-12-23	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* libhideip version 0.1
+	  Intercepting the following functions: gethostbyaddr, gethostbyaddr_r,
+	  gethostbyname, gethostbyname_r, gethostbyname2, gethostbyname2_r,
+	  gethostent, gethostent_r, getipnodebyaddr, getipnodebyname,
+	  getifaddrs, getnameinfo, getaddrinfo, socket, recvmsg, sendmsg,
+	  gethostname (lhip_net.c), execve, system (lhip_exec.c), ioctl
+	  (lhip_ioctl.c), uname (lhip_uname.c), fopen64, freopen64, open64,
+	  openat64, fopen, freopen, open, openat (lhip_opens.c).
+	  All these functions could either directly or indirectly (opening
+	  files) lead to discovering the local public IP address (not the
+	  "127.0.0.1" address, but the external addresses of the machine's
+	  network interfaces). Support for banning programs is added - the
+	  banned programs get the original results, not hidden.
+	  Compiles on OpenBSD.
+	* doc: TeXinfo documentation comes compiled, manual page added.
+	* README: quick installation guide
+	* AUTHORS: authors list
+	* libhideip.spec: an RPM spec file - can be used to build RPMs.
+

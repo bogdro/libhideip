@@ -1,0 +1,52 @@
+This is the README file for libhideip, a library which
+hides your local IP address from programs.
+
+Author: Bogdan Drozdowski, bogdandr @ op . pl
+License: GPLv3+
+
+Requirements for compiling:
+
+- a non-root account. Please, NEVER compile or 'make' anything as root.
+
+- a working C compiler
+
+- development package for the C library (like glibc-devel and glibc-headers)
+
+  The sys/stat.h contains functions needed to check an executable's type.
+  If it is a symbolic link, libhideip will follow it.
+
+  The dlfcn.h header contains functions needed to call the original functions.
+  It has to have RTLD_NEXT defined. Libhideip wouldn't work without this, so
+  it won't compile without this.
+
+- libdl, the dynamic loading library, with its development package
+  (unless the required functions are in the C library)
+
+- the 'make' program
+
+Type './configure' to configure the program for your system.
+
+Type 'make' to compile the program. LibHideIP assumes that your host has
+ maximum 100 aliases and addresses. If you think this number is not enough,
+ compile LibHideIP with:
+	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'
+ where 'n' is your desired number (10 is minimum).
+
+Documentation comes complied (and can be copied right away), but can be
+  changed and recompiled, if you have the 'makeinfo' program
+  ('texinfo' package).
+
+Type 'make install' to install the program.
+
+Type 'info libhideip' (after installation) or 'info doc/libhideip.info'
+(before installation) to get help on installing and loading the library.
+
+=======================================================
+
+Building an RPM package:
+
+1) copy the libhideip.spec file to /usr/src/redhat/SPECS
+2) copy the source package libhideip-XX.tar.gz to /usr/src/redhat/SOURCES
+3) type
+	rpmbuild -ba /usr/src/redhat/SPECS/libhideip.spec
+4) get the rpms from /usr/src/redhat/RPMS/i386 and /usr/src/redhat/SRPMS

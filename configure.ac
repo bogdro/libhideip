@@ -1,0 +1,208 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.59)
+AC_INIT(libhideip, 0.1, bogdandr@op.pl)
+AM_INIT_AUTOMAKE
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
+	libhideip.spec src/lhip_cfg.h])
+AC_CONFIG_SRCDIR([src/lhip_net.c])
+AC_CONFIG_HEADER([config.h])
+
+# ==================== configure arguments
+
+# ==================== Checks for programs.
+AC_PROG_CC
+AM_CONDITIONAL(ISGCC, test "x$GCC" = "xyes")
+AC_PROG_LIBTOOL
+
+# ==================== Checks for libraries.
+libdl=yes
+AC_CHECK_LIB([dl],[dlsym],
+	[AC_DEFINE([HAVE_LIBDL], [1], [Whether you have the libdl library])
+	AC_DEFINE([HAVE_LIBDL_DLSYM], [1], [Whether you have the dlsym() function in the libdl library])
+	AC_CHECK_LIB([dl],[dlvsym],[AC_DEFINE([HAVE_LIBDL_DLVSYM], [1],
+		[Whether you have the dlvsym() function in the libdl library])])
+	],[libdl=no])
+dlsym=yes
+AC_CHECK_FUNC([dlsym],
+	[AC_DEFINE([HAVE_DLSYM], [1], [Whether you have the dlsym function])],[dlsym=no])
+dlvsym=yes
+AC_CHECK_FUNC([dlvsym],
+	[AC_DEFINE([HAVE_DLVSYM], [1], [Whether you have the dlvsym function])],[dlvsym=no])
+
+if (test "x$libdl" != "xyes"); then
+
+#	AC_CHECK_FUNCS([dlsym dlvsym])
+	if (test "x$dlsym" != "xyes" && test "x$dlvsym" != "xyes"); then
+
+		AC_MSG_ERROR([[I need the dlsym() and optionally dlvsym() function to work.]])
+	fi
+fi
+
+# ==================== Checks for header files.
+AC_CHECK_HEADER([dlfcn.h],[AC_DEFINE([HAVE_DLFCN_H], [1], [Whether you have the dlfcn.h header])],
+	AC_MSG_ERROR([[I need the dlfcn.h file to work.]]), [])
+
+AC_CHECK_DECL([RTLD_NEXT],[AC_DEFINE([HAVE_DECL_RTLD_NEXT], [1], [Whether RTLD_NEXT is defined])],
+	[echo "**************************************"
+	AC_MSG_ERROR([[RTLD_NEXT not defined. Use the GNU C library. Sorry.]])],
+	[
+	#ifndef _GNU_SOURCE
+	#define _GNU_SOURCE	1
+	#endif
+	#ifdef HAVE_DLFCN_H
+	#include <dlfcn.h>
+	#endif
+	])
+
+AC_HEADER_STDC
+
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h errno.h malloc.h\
+	sys/types.h netdb.h sys/socket.h ifaddrs.h arpa/inet.h\
+	netinet/in.h sys/ioctl.h fcntl.h sys/utsname.h asm/types.h])
+
+AC_CHECK_HEADER([net/if.h],AC_DEFINE([HAVE_NET_IF_H],[1],
+	[Whether you have the net/if.h header.]),[],
+	[
+	#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	/* need AF_MAX on OpenBSD */
+	#ifdef HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
+	#else
+	typedef unsigned short int sa_family_t;
+	#endif
+	#ifdef HAVE_ASM_TYPES_H
+	#include <asm/types.h>
+	#else
+	typedef unsigned int __u32;
+	typedef unsigned short __u16;
+	#endif
+	])
+
+AC_CHECK_HEADER([linux/netlink.h],AC_DEFINE([HAVE_LINUX_NETLINK_H],[1],
+	[Whether you have the linux/netlink.h header.]),[],
+	[
+	#ifdef HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
+	#else
+	typedef unsigned short int sa_family_t;
+	#endif
+	#ifdef HAVE_ASM_TYPES_H
+	#include <asm/types.h>
+	#else
+	typedef unsigned int __u32;
+	typedef unsigned short __u16;
+	#endif
+	])
+
+has_sys_stat_h=yes
+AC_CHECK_HEADER([sys/stat.h],AC_DEFINE([HAVE_SYS_STAT_H],[1],
+	[Whether you have the sys/stat.h header.]),[has_sys_stat_h=no])
+
+AC_HEADER_STAT
+
+AC_CHECK_HEADER([stdarg.h],AC_DEFINE([HAVE_STDARG_H],[1],
+	[Whether you have the stdarg.h header.]),
+	[
+	AC_CHECK_HEADER([varargs.h],AC_DEFINE([HAVE_VARARGS_H],[1],
+		[Whether you have the varargs.h header.]))
+	])
+
+# ==================== Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_VOLATILE
+AC_TYPE_OFF_T
+AC_TYPE_SIZE_T
+
+AC_CHECK_TYPES([size_t, mode_t, socklen_t, ssize_t],,,
+	[
+	#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#ifdef HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
+	#endif
+	])
+
+AC_DEFINE_PATH_STYLE()
+
+# ==================== Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNC([malloc],
+	AC_DEFINE([HAVE_MALLOC],[1],[Whether you have the malloc function.]),
+	[AC_MSG_ERROR([[I need the malloc() function.]])])
+
+AC_CHECK_FUNCS([memcpy snprintf lstat memset readlink getipnodebyname \
+	getipnodebyaddr getenv gethostbyaddr_r gethostbyname_r gethostbyname2_r\
+	gethostent_r openat openat64])
+
+AH_TEMPLATE([GETNAMEINFO_ARG4TYPE])
+AH_TEMPLATE([GETNAMEINFO_ARG6TYPE])
+AH_TEMPLATE([GETNAMEINFO_ARG7TYPE])
+AC_CHECK_FUNC([getnameinfo], [AC_DEFINE(HAVE_GETNAMEINFO, [1], [Whether you have the getnameinfo function])
+	AC_PROTOTYPE(getnameinfo,
+	[
+		#ifdef HAVE_SYS_TYPES_H
+		#include <sys/types.h>
+		#endif
+		#ifdef HAVE_SYS_SOCKET_H
+		#include <sys/socket.h>
+		#endif
+		#ifdef HAVE_NETDB_H
+		#include <netdb.h>
+		#endif
+	],
+	[
+		int (*test) (const struct sockaddr *sa, socklen_t salen,
+                       char *host, ARG4TYPE hostlen,
+                       char *serv, ARG6TYPE servlen, ARG7TYPE flags) = &getnameinfo;
+	],
+	ARG4TYPE, [socklen_t, size_t],
+	ARG6TYPE, [socklen_t, size_t],
+	ARG7TYPE, [unsigned int, int])
+	])
+
+# ==================== Checks for compiler options.
+
+if (test "x$GCC" = "xyes" ); then
+
+	AX_GCC_WARN_UNUSED_RESULT()
+
+	AX_C_CHECK_FLAG([-Wall], [CFLAGS="$CFLAGS -Wall"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wextra], [CFLAGS="$CFLAGS -Wextra"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-W], [CFLAGS="$CFLAGS -W"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wfloat-equal], [CFLAGS="$CFLAGS -Wfloat-equal"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wbad-function-cast], [CFLAGS="$CFLAGS -Wbad-function-cast"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wsign-compare], [CFLAGS="$CFLAGS -Wsign-compare"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wunreachable-code], [CFLAGS="$CFLAGS -Wunreachable-code"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wpointer-arith], [CFLAGS="$CFLAGS -Wpointer-arith"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wcast-qual], [CFLAGS="$CFLAGS -Wcast-qual"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wcast-align], [CFLAGS="$CFLAGS -Wcast-align"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wstrict-prototypes], [CFLAGS="$CFLAGS -Wstrict-prototypes"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wformat -Wformat-security], [CFLAGS="$CFLAGS -Wformat -Wformat-security"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wformat -Wformat-nonliteral], [CFLAGS="$CFLAGS -Wformat -Wformat-nonliteral"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wnested-externs], [CFLAGS="$CFLAGS -Wnested-externs"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wshadow], [CFLAGS="$CFLAGS -Wshadow"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wconversion], [CFLAGS="$CFLAGS -Wconversion"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wdeclaration-after-statement], [CFLAGS="$CFLAGS -Wdeclaration-after-statement"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wundef], [CFLAGS="$CFLAGS -Wundef"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wpadded], [CFLAGS="$CFLAGS -Wpadded"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wredundant-decls], [CFLAGS="$CFLAGS -Wredundant-decls"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wfatal-errors], [CFLAGS="$CFLAGS -Wfatal-errors"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-pedantic], [CFLAGS="$CFLAGS -pedantic"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wno-strict-aliasing], [CFLAGS="$CFLAGS -Wno-strict-aliasing"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wmissing-prototypes], [CFLAGS="$CFLAGS -Wmissing-prototypes"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wmissing-declarations], [CFLAGS="$CFLAGS -Wmissing-declarations"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-O1 -Wuninitialized], [CFLAGS="$CFLAGS -O1 -Wuninitialized"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Winit-self], [CFLAGS="$CFLAGS -Winit-self"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-Wlogical-op], [CFLAGS="$CFLAGS -Wlogical-op"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-fstack-protector-all], [CFLAGS="$CFLAGS -fstack-protector-all"], [CFLAGS="$CFLAGS"])
+	AX_C_CHECK_FLAG([-O2], [CFLAGS="$CFLAGS -O2"], [CFLAGS="$CFLAGS"])
+fi
+
+AC_SUBST([AM_CFLAGS],[$CFLAGS])
+
+AC_OUTPUT

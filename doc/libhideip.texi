@@ -1,0 +1,4 @@
+\input texinfo
+@setfilename libhideip.info
+@settitle libhideip manual
+@bye

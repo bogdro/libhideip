@@ -1,0 +1,44 @@
+.\"	Process this file with groff -man -Tascii foo.3
+.\"
+.TH libhideip 3 GNU/Linux "User's Manual"
+
+.SH NAME
+libhideip \- Securing local IP address.
+
+.SH SYNOPSIS
+~/.bash_profile:
+
+.B export LD_PRELOAD=/usr/local/lib/libhideip.so
+
+and/or
+
+/etc/ld.so.preload:
+
+.B /usr/local/lib/libhideip.so
+
+.SH DESCRIPTION
+The libhideip library ensures that no program can get the local public IP address.
+
+.SH NOTES
+The file and command given in the synopsis section may be different on shells other than BASH.
+
+.SH AUTHOR
+Bogdan 'bogdro' Drozdowski,
+bogdandr /AT/ op . pl
+
+bogdro /AT/ rudy . mif . pg . gda . pl
+
+[EN] http://rudy.mif.pg.gda.pl/~bogdro/soft/
+
+[EN] http://rudy.mif.pg.gda.pl/~bogdro/inne/
+
+[PL] http://rudy.mif.pg.gda.pl/~bogdro/
+
+.SH "SEE ALSO"
+
+The 'info' documentation is more descriptive and is the main one. Type
+
+.B 	info libhideip
+
+to read it.
+

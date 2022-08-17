@@ -1,0 +1,213 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* most gcc compilers know a function __attribute__((__warn_unused_result__))
+   */
+#undef GCC_WARN_UNUSED_RESULT
+
+/* */
+#undef GETNAMEINFO_ARG4TYPE
+
+/* */
+#undef GETNAMEINFO_ARG6TYPE
+
+/* */
+#undef GETNAMEINFO_ARG7TYPE
+
+/* Define to 1 if you have the <arpa/inet.h> header file. */
+#undef HAVE_ARPA_INET_H
+
+/* Define to 1 if you have the <asm/types.h> header file. */
+#undef HAVE_ASM_TYPES_H
+
+/* Whether RTLD_NEXT is defined */
+#undef HAVE_DECL_RTLD_NEXT
+
+/* Whether you have the dlfcn.h header */
+#undef HAVE_DLFCN_H
+
+/* Whether you have the dlsym function */
+#undef HAVE_DLSYM
+
+/* Whether you have the dlvsym function */
+#undef HAVE_DLVSYM
+
+/* Define to 1 if you have the <errno.h> header file. */
+#undef HAVE_ERRNO_H
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* Define to 1 if you have the `getenv' function. */
+#undef HAVE_GETENV
+
+/* Define to 1 if you have the `gethostbyaddr_r' function. */
+#undef HAVE_GETHOSTBYADDR_R
+
+/* Define to 1 if you have the `gethostbyname2_r' function. */
+#undef HAVE_GETHOSTBYNAME2_R
+
+/* Define to 1 if you have the `gethostbyname_r' function. */
+#undef HAVE_GETHOSTBYNAME_R
+
+/* Define to 1 if you have the `gethostent_r' function. */
+#undef HAVE_GETHOSTENT_R
+
+/* Define to 1 if you have the `getipnodebyaddr' function. */
+#undef HAVE_GETIPNODEBYADDR
+
+/* Define to 1 if you have the `getipnodebyname' function. */
+#undef HAVE_GETIPNODEBYNAME
+
+/* Whether you have the getnameinfo function */
+#undef HAVE_GETNAMEINFO
+
+/* Define to 1 if you have the <ifaddrs.h> header file. */
+#undef HAVE_IFADDRS_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Whether you have the libdl library */
+#undef HAVE_LIBDL
+
+/* Whether you have the dlsym() function in the libdl library */
+#undef HAVE_LIBDL_DLSYM
+
+/* Whether you have the dlvsym() function in the libdl library */
+#undef HAVE_LIBDL_DLVSYM
+
+/* Whether you have the linux/netlink.h header. */
+#undef HAVE_LINUX_NETLINK_H
+
+/* Define to 1 if you have the `lstat' function. */
+#undef HAVE_LSTAT
+
+/* Whether you have the malloc function. */
+#undef HAVE_MALLOC
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the `memcpy' function. */
+#undef HAVE_MEMCPY
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `memset' function. */
+#undef HAVE_MEMSET
+
+/* Define to 1 if the system has the type `mode_t'. */
+#undef HAVE_MODE_T
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#undef HAVE_NETDB_H
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#undef HAVE_NETINET_IN_H
+
+/* Whether you have the net/if.h header. */
+#undef HAVE_NET_IF_H
+
+/* Define to 1 if you have the `openat' function. */
+#undef HAVE_OPENAT
+
+/* Define to 1 if you have the `openat64' function. */
+#undef HAVE_OPENAT64
+
+/* Define to 1 if you have the `readlink' function. */
+#undef HAVE_READLINK
+
+/* Define to 1 if the system has the type `size_t'. */
+#undef HAVE_SIZE_T
+
+/* Define to 1 if you have the `snprintf' function. */
+#undef HAVE_SNPRINTF
+
+/* Define to 1 if the system has the type `socklen_t'. */
+#undef HAVE_SOCKLEN_T
+
+/* Define to 1 if the system has the type `ssize_t'. */
+#undef HAVE_SSIZE_T
+
+/* Whether you have the stdarg.h header. */
+#undef HAVE_STDARG_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#undef HAVE_SYS_SOCKET_H
+
+/* Whether you have the sys/stat.h header. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/utsname.h> header file. */
+#undef HAVE_SYS_UTSNAME_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Whether you have the varargs.h header. */
+#undef HAVE_VARARGS_H
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* path style 16=dos 32=unix 64=url 128=mac */
+#undef PATH_STYLE
+
+/* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
+#undef STAT_MACROS_BROKEN
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+/* Define to rpl_malloc if the replacement function should be used. */
+#undef malloc
+
+/* Define to `long' if <sys/types.h> does not define. */
+#undef off_t
+
+/* Define to `unsigned' if <sys/types.h> does not define. */
+#undef size_t
+
+/* Define to empty if the keyword `volatile' does not work. Warning: valid
+   code using `volatile' can become incorrect without. Disable with care. */
+#undef volatile
