@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- ioctl function replacement.
  *
- * Copyright (C) 2008 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -195,9 +195,11 @@ ioctl (
 #ifdef HAVE_ERRNO_H
 	int err = 0;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
-	void * data1;
-	void * data2;
+#endif
+	void * data1 = NULL;
+	void * data2 = NULL;
 	int ret;
 	struct ifreq * addrs;
 	struct ifconf * cfg;
@@ -221,9 +223,11 @@ ioctl (
 		return -1;
 	}
 
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_start (args, request);
 	data1 = va_arg (args, void *);
 	data2 = va_arg (args, void *);
+#endif
 
 	if ( (__lhip_check_prog_ban () != 0) || (__lhip_get_init_stage () < 2) )
 	{
@@ -234,7 +238,9 @@ ioctl (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -354,7 +360,9 @@ ioctl (
 #ifdef HAVE_ERRNO_H
 	err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 	errno = err;
 #endif

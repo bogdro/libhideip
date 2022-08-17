@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- private header file.
  *
- * Copyright (C) 2008 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -258,7 +258,8 @@ extern int GCC_WARN_UNUSED_RESULT __lhip_get_init_stage PARAMS((void));
 	"ipv6_route",	\
 	"hosts",	\
 	"ifcfg-",	\
-	"hostname"
+	"hostname",	\
+	"mactab"
 
 # define LOCAL_IPV4_ADDR 127, 0, 0, 1
 # define LOCAL_IPV4_MASK 255, 255, 255, 255
@@ -267,9 +268,9 @@ extern int GCC_WARN_UNUSED_RESULT __lhip_get_init_stage PARAMS((void));
 
 
 # if (PATH_STYLE==32) || (PATH_STYLE==128)	/* unix or mac */
-#  define PATH_SEP "/"
+#  define LHIP_PATH_SEP "/"
 # else
-#  define PATH_SEP "\\"
+#  define LHIP_PATH_SEP "\\"
 # endif
 
 #endif /* _LHIP_HEADER */

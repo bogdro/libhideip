@@ -36,7 +36,7 @@ Documentation comes complied (and can be copied right away), but can be
   changed and recompiled, if you have the 'makeinfo' program
   ('texinfo' package).
 
-Type 'make install' to install the program.
+Type 'make install' to install the library.
 
 Type 'info libhideip' (after installation) or 'info doc/libhideip.info'
 (before installation) to get help on installing and loading the library.

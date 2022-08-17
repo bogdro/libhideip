@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- file opening functions' replacements.
  *
- * Copyright (C) 2007-2008 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -555,9 +555,11 @@ open64 (
 # pragma GCC poison open64
 #endif
 
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
+#endif
 	int ret_fd;
-	mode_t mode;
+	mode_t mode = 0666;
 #ifdef HAVE_ERRNO_H
 	int err = 0;
 #endif
@@ -584,8 +586,10 @@ open64 (
 		return -1;
 	}
 
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_start (args, flags);
 	mode = va_arg (args, mode_t);
+#endif
 
 	if ( path == NULL )
 	{
@@ -596,7 +600,9 @@ open64 (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -612,7 +618,9 @@ open64 (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -628,7 +636,9 @@ open64 (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -655,7 +665,9 @@ open64 (
 	{
 		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
 		{
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 			va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 			errno = -EPERM;
 #endif
@@ -670,7 +682,9 @@ open64 (
 #ifdef HAVE_ERRNO_H
 	err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 	errno = err;
 #endif
@@ -700,9 +714,11 @@ open (
 # pragma GCC poison open
 #endif
 
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
+#endif
 	int ret_fd;
-	mode_t mode;
+	mode_t mode = 0666;
 #ifdef HAVE_ERRNO_H
 	int err = 0;
 #endif
@@ -729,8 +745,10 @@ open (
 		return -1;
 	}
 
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_start (args, flags);
 	mode = va_arg (args, mode_t);
+#endif
 
 	if ( name == NULL )
 	{
@@ -741,7 +759,9 @@ open (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -757,7 +777,9 @@ open (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -773,7 +795,9 @@ open (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -800,7 +824,9 @@ open (
 	{
 		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
 		{
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 			va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 			errno = -EPERM;
 #endif
@@ -815,7 +841,9 @@ open (
 #ifdef HAVE_ERRNO_H
 	err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 	errno = err;
 #endif
@@ -847,8 +875,10 @@ openat64 (
 #endif
 
 	int ret_fd;
-	mode_t mode;
+	mode_t mode = 0666;
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
+#endif
 #ifdef HAVE_ERRNO_H
 	int err = 0;
 #endif
@@ -876,8 +906,10 @@ openat64 (
 		return -1;
 	}
 
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_start (args, flags);
 	mode = va_arg (args, mode_t);
+#endif
 
 	if ( pathname == NULL )
 	{
@@ -888,7 +920,9 @@ openat64 (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -904,7 +938,9 @@ openat64 (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -920,7 +956,9 @@ openat64 (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -947,7 +985,9 @@ openat64 (
 	{
 		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
 		{
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 			va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 			errno = -EPERM;
 #endif
@@ -962,7 +1002,9 @@ openat64 (
 #ifdef HAVE_ERRNO_H
 	err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 	errno = err;
 #endif
@@ -1000,8 +1042,10 @@ openat (
 #endif
 
 	int ret_fd;
-	mode_t mode;
+	mode_t mode = 0666;
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
+#endif
 #ifdef HAVE_ERRNO_H
 	int err = 0;
 #endif
@@ -1029,8 +1073,10 @@ openat (
 		return -1;
 	}
 
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_start (args, flags);
 	mode = va_arg (args, mode_t);
+#endif
 
 	if ( pathname == NULL )
 	{
@@ -1041,7 +1087,9 @@ openat (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -1057,7 +1105,9 @@ openat (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -1073,7 +1123,9 @@ openat (
 #ifdef HAVE_ERRNO_H
 		err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 		va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 		errno = err;
 #endif
@@ -1100,7 +1152,9 @@ openat (
 	{
 		if ( strstr (linkpath, __lhip_valuable_files[j]) != NULL )
 		{
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 			va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 			errno = -EPERM;
 #endif
@@ -1115,7 +1169,9 @@ openat (
 #ifdef HAVE_ERRNO_H
 	err = errno;
 #endif
+#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_end (args);
+#endif
 #ifdef HAVE_ERRNO_H
 	errno = err;
 #endif

@@ -2,7 +2,7 @@
  * A library for secure removing files.
  *	-- private file and program banning functions.
  *
- * Copyright (C) 2007-2008 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -120,7 +120,7 @@ __lhip_check_prog_ban (
 
 	if ( __lhip_real_fopen_location () != NULL )
 	{
-		fp = (*__lhip_real_fopen_location ()) (SYSCONFDIR PATH_SEP "libhideip.progban", "r");
+		fp = (*__lhip_real_fopen_location ()) (SYSCONFDIR LHIP_PATH_SEP "libhideip.progban", "r");
 		if (fp != NULL)
 		{
 			while ( fgets (omitfile, sizeof (omitfile), fp) != NULL )

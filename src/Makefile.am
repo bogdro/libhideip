@@ -8,7 +8,7 @@ EXTRA_DIST = lhip_cfg.h.in
 # interface changed => C++, R:=0
 # - interface add => A++
 # - interface removed => A:=0
-libhideip_la_LDFLAGS = -version-info 1:0:0
+libhideip_la_LDFLAGS = -version-info 1:1:0
 
 #nobase_include_HEADERS = lhip_priv.h
 

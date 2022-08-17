@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- execution functions' replacements.
  *
- * Copyright (C) 2008 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or
@@ -84,7 +84,22 @@ static const char *programs[] =
 	"wget",
 	"host",
 	"hostname",
-	"uname"
+	"uname",
+	"arp",
+	"netstat",
+	"domainname",
+	"ipmaddr",
+	"mii",
+	"route",
+	"ifdown",
+	"ifup",
+	"iftop",
+	"tcpdump",
+	"ppp",
+	"isdn",
+	"ssh",
+	"telnet",
+	"rsh"
 };
 
 /* The programs LibHideIP conditionally forbids to execute (when they're used to get
@@ -343,7 +358,7 @@ system (
 			{
 				strncpy (path_dir, path, (size_t)(first_char - path));
 				strncat (path_dir, linkpath, LHIP_MAXPATHLEN-strlen (path_dir));
-				strncat (path_dir, PATH_SEP, LHIP_MIN(LHIP_MAXPATHLEN-strlen (path_dir), 1));
+				strncat (path_dir, LHIP_PATH_SEP, LHIP_MIN(LHIP_MAXPATHLEN-strlen (path_dir), 1));
 				res = stat (path_dir, &st);
 				if ( res >= 0 ) break;	/* object was found */
 				path = &first_char[1];

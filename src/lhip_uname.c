@@ -2,7 +2,7 @@
  * A library for hiding local IP address.
  *	-- uname function replacement.
  *
- * Copyright (C) 2008 Bogdan Drozdowski, bogdandr (at) op.pl
+ * Copyright (C) 2008-2009 Bogdan Drozdowski, bogdandr (at) op.pl
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or

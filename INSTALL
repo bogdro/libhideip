@@ -4,11 +4,19 @@ Requirements for compiling the full version:
 - a non-root account. Please, NEVER compile or 'make' anything as root.
 - a working C compiler
 - development package for the C library (like glibc-devel and glibc-headers)
+  with the sys/stat.h and dlfcn.h
+- libdl, the dynamic loading library, with its development package
+  (unless the required functions are in the C library)
 - the 'make' program
 
 Type './configure' to configure the library for your system.
 
-Type 'make' to compile the library.
+Type 'make' to compile the library. LibHideIP assumes that your host has
+ maximum 100 aliases and addresses. If you think this number is not enough,
+ compile LibHideIP with:
+	make CFLAGS='-DLHIP_MAX_HOSTNAMES=n'
+ where 'n' is your desired number (10 is minimum).
+
 Documentation will be compiled (and can be copied right away), if you have
   the 'makeinfo' program ('texinfo' package).
 

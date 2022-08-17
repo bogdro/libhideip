@@ -1,3 +1,17 @@
+2009-02-16	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* libhideip version 0.2
+	  Renamed PATH_SEP to LHIP_PATH_SEP to avoid conflicts.
+	* README, INSTALL, doc/libhideip.texi.in: small update.
+	* libhideip.spec.in: fixed the version number.
+	* src/lhip_exec.c: forbid executing more programs: "arp", "netstat",
+	  anything with "domainname" in name, "ipmaddr", anything with "mii"
+	  in name, "route", "ifdown", "ifup", "iftop", "tcpdump", anything
+	  with "ppp" in name, anything with "isdn" in name, "ssh", "telnet",
+	  "rsh". Forbid reading of files with "mactab" in name.
+	* src/lhip_opens.c, src/lhip_ioctl.c: better checking for
+	  stdarg.h/varargs.h.
+
 2008-12-23	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* libhideip version 0.1
