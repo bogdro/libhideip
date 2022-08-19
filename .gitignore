@@ -25,10 +25,10 @@ TODO*
 libhideip.pc
 libhideip.spec
 libtool
-# libhideip.h
+libhideip.h
 lhip_cfg.h
 lhip_paths.h
-# lhip_public.c
+lhip_public.c
 
 lhiptest
 lhiptest_banning
