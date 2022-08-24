@@ -14,5 +14,5 @@ os:
 branches:
         - dev
 
-script: ./configure --enable-public-interface && make
+script: touch configure aclocal.m4 Makefile.in src/Makefile.in doc/Makefile.in config.h.in && ./configure --enable-public-interface && make
 
