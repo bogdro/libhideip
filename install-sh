@@ -47,6 +47,7 @@ scriptversion=2005-02-02.21
 # Don't use :- since 4.3BSD and earlier shells don't like it.
 doit="${DOITPROG-}"
 
+
 # put in absolute paths if you don't have them in your path; or use env. vars.
 
 mvprog="${MVPROG-mv}"

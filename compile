@@ -29,6 +29,7 @@ scriptversion=2009-10-06.20; # UTC
 # bugs to <bug-automake@gnu.org> or send patches to
 # <automake-patches@gnu.org>.
 
+
 case $1 in
   '')
      echo "$0: No command.  Try \`$0 --help' for more information." 1>&2
