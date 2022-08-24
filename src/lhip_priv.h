@@ -216,6 +216,7 @@ typedef void pcap_t;
 typedef void pcap_if_t;
 typedef unsigned int bpf_u_int32;
 /*typedef unsigned int intptr_t;*/
+struct pcap_rmtauth {};
 #  endif
 # endif
 
@@ -337,7 +338,10 @@ typedef pcap_t * (*pp_Fp_ui_cp)			LHIP_PARAMS ((FILE * fp, u_int t, char * errbu
 typedef pcap_t * (*pp_ipt_cp)			LHIP_PARAMS ((intptr_t a, char * errbuf));
 typedef pcap_t * (*pp_ipt_ui_cp)		LHIP_PARAMS ((intptr_t a, u_int t, char * errbuf));
 typedef int (*i_ifpp_cp)			LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
-typedef int (*i_cp_rmtp_ifpp_cp)		LHIP_PARAMS ((char *source,
+# ifndef HAVE_PCAP_FINDALLDEVS_EX
+#  define PCAP_FINDALLDEVS_EX_ARG1TYPE char*
+# endif
+typedef int (*i_cp_rmtp_ifpp_cp)		LHIP_PARAMS ((PCAP_FINDALLDEVS_EX_ARG1TYPE source,
 							struct pcap_rmtauth *auth,
 							pcap_if_t **alldevs, char *errbuf));
 
