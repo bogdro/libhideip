@@ -35,7 +35,6 @@ timestamp='2003-06-17'
 # The plan is that this can be called by configure scripts if you
 # don't specify an explicit build system type.
 
-
 me=`echo "$0" | sed -e 's,.*/,,'`
 
 usage="\

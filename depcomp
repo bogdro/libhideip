@@ -27,7 +27,6 @@ scriptversion=2005-02-09.22
 
 # Originally written by Alexandre Oliva <oliva@dcc.unicamp.br>.
 
-
 case $1 in
   '')
      echo "$0: No command.  Try \`$0 --help' for more information." 1>&2
