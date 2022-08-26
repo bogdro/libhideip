@@ -26,7 +26,7 @@
 # include "lhip_cfg.h"
 
 # define _BSD_TYPES 1
-# define __POSIX_VISIBLE 200112	/* netinet6 on FreeBSD */
+# define _POSIX_C_SOURCE 200809L
 
 # undef LHIP_ATTR
 # ifdef __GNUC__
