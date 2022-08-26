@@ -13775,12 +13775,6 @@ then :
   printf "%s\n" "#define HAVE_NETINET_IN_H 1" >>confdefs.h
 
 fi
-ac_fn_c_check_header_compile "$LINENO" "netinet6/in6.h" "ac_cv_header_netinet6_in6_h" "$ac_includes_default"
-if test "x$ac_cv_header_netinet6_in6_h" = xyes
-then :
-  printf "%s\n" "#define HAVE_NETINET6_IN6_H 1" >>confdefs.h
-
-fi
 ac_fn_c_check_header_compile "$LINENO" "sys/ioctl.h" "ac_cv_header_sys_ioctl_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_ioctl_h" = xyes
 then :
