@@ -30,6 +30,7 @@
 #define _ATFILE_SOURCE 1
 #define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 #define _DARWIN_C_SOURCE 1
+#define __BSD_VISIBLE 1
 
 #if (defined HAVE_DLFCN_H) && ((defined HAVE_DLSYM) || (defined HAVE_LIBDL))
 	/* need RTLD_NEXT and dlvsym(), so define _GNU_SOURCE */
@@ -382,14 +383,14 @@ __lhip_main (LHIP_VOID)
 		*(void **) (&__lhip_real_pcap_findalldevs)      = dlsym  (RTLD_NEXT, "pcap_findalldevs");
 		*(void **) (&__lhip_real_pcap_findalldevs_ex)   = dlsym  (RTLD_NEXT, "pcap_findalldevs_ex");
 
+#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
 		*(void **) (&__lhip_real_getaddrinfo_a)         = dlsym  (RTLD_NEXT, "getaddrinfo_a");
 		if ( __lhip_real_getaddrinfo_a == NULL )
 		{
 			__lhip_handle_anl = dlopen("libanl.so", RTLD_NOW);
-#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
 			*(void **) (&__lhip_real_getaddrinfo_a) = dlsym  (__lhip_handle_anl, "getaddrinfo_a");
-#endif
 		}
+#endif
 
 		__lhip_is_initialized = LHIP_INIT_STAGE_AFTER_DLSYM;
 

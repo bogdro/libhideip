@@ -28,6 +28,7 @@
 #define _ATFILE_SOURCE 1
 #define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 #define _DARWIN_C_SOURCE 1
+#define __BSD_VISIBLE 1
 
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>	/* execve(), readlink() */
