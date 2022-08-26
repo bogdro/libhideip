@@ -73,6 +73,8 @@
 
 # include <stdio.h>		/* FILE */
 
+# define _BSD_TYPES 1
+
 # ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>	/* size_t */
 # endif
