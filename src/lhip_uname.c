@@ -22,6 +22,8 @@
 
 #include "lhip_cfg.h"
 
+#define uname tmp_fix_for_freebsd_uname /* FreeBSD inlines the function */
+
 #ifdef HAVE_SYS_UTSNAME_H
 # include <sys/utsname.h>
 #else
@@ -55,6 +57,9 @@ struct utsname
 #  undef HAVE_MALLOC
 # endif
 #endif
+
+#undef uname
+extern int uname (struct utsname *__name);
 
 /* =============================================================== */
 
