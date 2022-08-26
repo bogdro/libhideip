@@ -19,6 +19,8 @@ script: touch configure aclocal.m4 Makefile.in src/Makefile.in doc/Makefile.in c
         (cat /usr/include/netinet/in.h || true) &&
         echo '-----------------------------' &&
         (cat /usr/include/netinet6/in6.h || true) &&
+        echo '-----------------------------' &&
+        (cat /usr/include/sys/cdefs.h || true) &&
         ./configure --enable-public-interface &&
         touch doc/libhideip.info &&
         make
