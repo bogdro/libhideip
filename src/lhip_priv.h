@@ -25,9 +25,6 @@
 
 # include "lhip_cfg.h"
 
-# define _BSD_TYPES 1
-# define _POSIX_C_SOURCE 200809L
-
 # undef LHIP_ATTR
 # ifdef __GNUC__
 #  define LHIP_ATTR(x)	__attribute__(x)

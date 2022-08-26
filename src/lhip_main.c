@@ -23,15 +23,6 @@
 
 #include "lhip_cfg.h"
 
-#define _BSD_SOURCE 1
-#define _XOPEN_SOURCE 500
-#define _POSIX_C_SOURCE 200809L
-#define _DEFAULT_SOURCE 1
-#define _ATFILE_SOURCE 1
-#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
-#define _DARWIN_C_SOURCE 1
-#define __BSD_VISIBLE 1
-
 #if (defined HAVE_DLFCN_H) && ((defined HAVE_DLSYM) || (defined HAVE_LIBDL))
 	/* need RTLD_NEXT and dlvsym(), so define _GNU_SOURCE */
 # include <dlfcn.h>
