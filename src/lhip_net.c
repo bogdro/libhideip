@@ -96,6 +96,10 @@ struct msghdr
 # include <netinet/in.h>
 #endif
 
+#ifdef HAVE_NETINET6_IN6_H
+# include <netinet6/in6.h>
+#endif
+
 #if (!defined HAVE_NETINET_IN_H) && (!defined HAVE_SYS_SOCKET_H)
 struct sockaddr
 {

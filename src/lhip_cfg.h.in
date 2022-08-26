@@ -71,6 +71,7 @@
 #  define HAVE_NET_IF_H		1
 #  define HAVE_NETDB_H		1
 #  define HAVE_NETINET_IN_H	1
+#  undef  HAVE_NETINET6_IN6_H
 #  define HAVE_OPENAT		1
 #  define HAVE_OPENAT64		1
 #  undef  HAVE_PCAP_H
