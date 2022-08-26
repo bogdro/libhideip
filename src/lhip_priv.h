@@ -25,6 +25,9 @@
 
 # include "lhip_cfg.h"
 
+# define _BSD_TYPES 1
+# define __POSIX_VISIBLE 200112	/* netinet6 on FreeBSD */
+
 # undef LHIP_ATTR
 # ifdef __GNUC__
 #  define LHIP_ATTR(x)	__attribute__(x)
@@ -72,8 +75,6 @@
 # endif
 
 # include <stdio.h>		/* FILE */
-
-# define _BSD_TYPES 1
 
 # ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>	/* size_t */

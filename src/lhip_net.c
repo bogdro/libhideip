@@ -31,6 +31,7 @@
 #define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
 #define _DARWIN_C_SOURCE 1
 #define __BSD_VISIBLE 1
+#define __POSIX_VISIBLE 200112	/* netinet6 on FreeBSD */
 
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
