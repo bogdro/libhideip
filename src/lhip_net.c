@@ -22,11 +22,6 @@
 
 #include "lhip_cfg.h"
 
-#define _BSD_SOURCE 1
-#define _SVID_SOURCE 1
-#define _DEFAULT_SOURCE 1
-#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
-
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif

@@ -21,8 +21,6 @@
 
 #include "lhip_cfg.h"
 
-#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
-
 #ifdef HAVE_STRING_H
 # if (!defined STDC_HEADERS) && (defined HAVE_MEMORY_H)
 #  include <memory.h>

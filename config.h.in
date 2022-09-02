@@ -1,4 +1,4 @@
-/* config.h.in.  Generated from configure.ac by autoheader. */
+/* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* most gcc compilers know a function __attribute__((__warn_unused_result__))
    */

@@ -21,8 +21,6 @@
 
 #include "lhip_cfg.h"
 
-#define _GNU_SOURCE 1		/* getaddrinfo_a + struct gaicb in lhip_priv.h */
-
 #include "lhip_priv.h"
 
 #include <stddef.h> /* NULL */
@@ -66,8 +64,10 @@ extern pcap_t * pcap_open_offline_with_tstamp_precision LHIP_PARAMS ((const char
 extern pcap_t * pcap_fopen_offline LHIP_PARAMS ((FILE * fp, char * errbuf));
 extern pcap_t * pcap_fopen_offline_with_tstamp_precision LHIP_PARAMS ((FILE *, u_int, char *));
 extern int pcap_findalldevs LHIP_PARAMS ((pcap_if_t ** devs, char * errbuf));
+#  ifdef HAVE_PCAP_FINDALLDEVS_EX
 extern int pcap_findalldevs_ex LHIP_PARAMS ((PCAP_FINDALLDEVS_EX_ARG1TYPE source,
 	struct pcap_rmtauth *auth, pcap_if_t **alldevs, char *errbuf));
+#  endif /* HAVE_PCAP_FINDALLDEVS_EX */
 
 #  ifdef __cplusplus
 }

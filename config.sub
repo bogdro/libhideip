@@ -45,7 +45,6 @@ timestamp='2003-06-18'
 # a failure to support a valid configuration from a meaningless
 # configuration.
 
-
 # The goal of this file is to map all the various variations of a given
 # machine specification into a single specification in the form:
 #	CPU_TYPE-MANUFACTURER-OPERATING_SYSTEM

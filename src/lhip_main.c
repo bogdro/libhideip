@@ -25,9 +25,6 @@
 
 #if (defined HAVE_DLFCN_H) && ((defined HAVE_DLSYM) || (defined HAVE_LIBDL))
 	/* need RTLD_NEXT and dlvsym(), so define _GNU_SOURCE */
-# ifndef _GNU_SOURCE
-#  define _GNU_SOURCE	1
-# endif
 # include <dlfcn.h>
 # ifndef RTLD_NEXT
 #  define RTLD_NEXT ((void *) -1l)
@@ -377,14 +374,14 @@ __lhip_main (LHIP_VOID)
 		*(void **) (&__lhip_real_pcap_findalldevs)      = dlsym  (RTLD_NEXT, "pcap_findalldevs");
 		*(void **) (&__lhip_real_pcap_findalldevs_ex)   = dlsym  (RTLD_NEXT, "pcap_findalldevs_ex");
 
+#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
 		*(void **) (&__lhip_real_getaddrinfo_a)         = dlsym  (RTLD_NEXT, "getaddrinfo_a");
 		if ( __lhip_real_getaddrinfo_a == NULL )
 		{
 			__lhip_handle_anl = dlopen("libanl.so", RTLD_NOW);
-#if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
 			*(void **) (&__lhip_real_getaddrinfo_a) = dlsym  (__lhip_handle_anl, "getaddrinfo_a");
-#endif
 		}
+#endif
 
 		__lhip_is_initialized = LHIP_INIT_STAGE_AFTER_DLSYM;
 
