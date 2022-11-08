@@ -153,7 +153,7 @@ Building an RPM package:
 2) copy the source package libhideip-XX.tar.gz to $HOME/rpmbuild/SOURCES
 3) type
 	rpmbuild -ba $HOME/rpmbuild/SPECS/libhideip.spec
-4) get the RPMs from $HOME/rpmbuild/RPMS/i386 and $HOME/rpmbuild/SRPMS
+4) get the RPMs from $HOME/rpmbuild/RPMS/<arch> and $HOME/rpmbuild/SRPMS
 
 Building an RPM package (the old way):
 
@@ -161,4 +161,4 @@ Building an RPM package (the old way):
 2) copy the source package libhideip-XX.tar.gz to /usr/src/redhat/SOURCES
 3) type
 	rpmbuild -ba /usr/src/redhat/SPECS/libhideip.spec
-4) get the RPMs from /usr/src/redhat/RPMS/i386 and /usr/src/redhat/SRPMS
+4) get the RPMs from /usr/src/redhat/RPMS/<arch> and /usr/src/redhat/SRPMS
