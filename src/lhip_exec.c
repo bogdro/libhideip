@@ -1,5 +1,5 @@
 /*
- * A library for hiding local IP address.
+ * LibHideIP - A library for hiding local IP address.
  *	-- execution functions' replacements.
  *
  * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
@@ -252,6 +252,22 @@ static char * __lhip_get_target_link_path (
 		return NULL;
 	}
 
+# ifdef HAVE_CANONICALIZE_FILE_NAME
+	current_name = canonicalize_file_name (name);
+	if ( current_name != NULL )
+	{
+		return current_name;
+	}
+# endif
+# ifdef HAVE_REALPATH
+	current_name = realpath (name, NULL);
+	if ( current_name != NULL )
+	{
+		return current_name;
+	}
+# endif
+
+	/* find the real path manually: */
 	current_name = LHIP_STRDUP (name);
 	if ( current_name != NULL )
 	{
