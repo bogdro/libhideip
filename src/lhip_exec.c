@@ -608,7 +608,7 @@ static int __lhip_is_forbidden_program (
 			__lhip_linkpath[i] = '\0';
 		}
 
-		strncpy (__lhip_linkpath, name, j);
+		strncpy (__lhip_linkpath, name, j + 1);
 		__lhip_linkpath[j] = '\0';
 #if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
 		if ( is_system )

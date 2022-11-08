@@ -169,7 +169,7 @@ static int __lhip_is_forbidden_name (
 	else
 #endif
 	{
-		strncpy (__lhip_name_copy, name, LHIP_MIN (j, LHIP_MAXPATHLEN-1));
+		strncpy (__lhip_name_copy, name, LHIP_MIN (j + 1, LHIP_MAXPATHLEN-1));
 		__lhip_name_copy[LHIP_MAXPATHLEN-1] = '\0';
 		h.h_name = __lhip_name_copy;
 	}
