@@ -218,7 +218,7 @@ to install the library.
 To make LibHideIP impossible to detect, you must change all the internal
 public function names. To do this, you can use the name randomizing scripts in the
 src directory. You will need the @command{sed} and @command{sort} programs
-and either Perl or GNU awk.
+and either @url{https://www.perl.org/, Perl} or GNU awk.
 You can change the name prefix at the top of these scripts to something unique.
 When the script is done working, reconfigure, recompile and reinstall the library.
 
@@ -228,7 +228,7 @@ Thus, a typical build sequence with less detection would be
 
 @samp{cd src}
 
-@command{./randomize_names_gawk.sh} (or @samp{make randomnames})
+@command{./randomize_names_gawk.sh} (or @samp{make x-randomnames})
 
 @samp{cd ..}
 
@@ -443,17 +443,8 @@ bogdro (at) users . sourceforge . net@*
 bogdro-soft (at) gmx . com
 @end quotation
 
-
-or look at the websites:
-@itemize
-@item [EN] @url{https://libhideip.sourceforge.io}
-@item [EN] @url{http://bogdro.evai.pl/soft/}
-@item [EN] @url{http://bogdro.evai.pl/soft4asm/}
-@item [EN] @url{http://bogdro.evai.pl/index-en.php}
-@item [EN] @url{http://bogdro.byethost18.com/soft/}
-@item [EN] @url{http://bogdro.byethost18.com/soft4asm/}
-@item [EN] @url{http://bogdro.byethost18.com/index-en.php}
-@end itemize
+or look at the website:@*
+@url{https://libhideip.sourceforge.io}
 
 @c ==================================================================
 
