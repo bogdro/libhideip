@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.71])
-AC_INIT([libhideip],[1.9.2],[bogdro@users.sourceforge.net])
+AC_INIT([LibHideIP],[2.0],[bogdro@users.sourceforge.net], [libhideip], [https://libhideip.sourceforge.io])
 AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
@@ -246,9 +246,11 @@ AC_CHECK_HEADER([dirent.h],AC_DEFINE([HAVE_DIRENT_H],[1],
 AC_C_CONST
 AC_C_VOLATILE
 AC_TYPE_OFF_T
+AC_TYPE_MODE_T
 AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
 
-AC_CHECK_TYPES([size_t, mode_t, socklen_t, ssize_t],,,
+AC_CHECK_TYPES([socklen_t],,,
 	[
 	#ifdef HAVE_SYS_TYPES_H
 	#include <sys/types.h>
@@ -268,7 +270,8 @@ AC_CHECK_FUNC([malloc],
 AC_CHECK_FUNCS([memcpy memset readlink getipnodebyname getipnodebyaddr \
 	getenv gethostbyaddr_r gethostbyname_r gethostbyname2_r \
 	gethostent_r openat openat64 realloc symlink lstat res_nquery \
-	execveat fexecve snprintf strdup stat stat64 lstat64])
+	execveat fexecve snprintf strdup stat stat64 lstat64 \
+	realpath canonicalize_file_name])
 
 AH_TEMPLATE([GETNAMEINFO_ARG4TYPE])
 AH_TEMPLATE([GETNAMEINFO_ARG6TYPE])
@@ -373,6 +376,7 @@ if (test "x$GCC" = "xyes" ); then
         AX_C_CHECK_FLAG([-Wstringop-truncation], [CFLAGS="$CFLAGS -Wstringop-truncation"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wduplicated-branches], [CFLAGS="$CFLAGS -Wduplicated-branches"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-fstack-check], [CFLAGS="$CFLAGS -fstack-check"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-fanalyzer], [CFLAGS="$CFLAGS -fanalyzer"], [CFLAGS="$CFLAGS"])
 
 	# required for the compiler, which is used by libtool instead of the linker
 	AX_C_CHECK_FLAG([-Wl,-z -Wl,noexecstack], [CFLAGS="$CFLAGS -Wl,-z -Wl,noexecstack"], [CFLAGS="$CFLAGS"])
