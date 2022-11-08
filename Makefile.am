@@ -1,5 +1,5 @@
 #
-# A library for hiding local IP address.
+# LibHideIP - A library for hiding local IP address.
 #	-- Makefile.am, part of the build system.
 #
 # Copyright (C) 2007-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
@@ -30,7 +30,7 @@ EXTRA_DIST = libhideip.spec.in doc/libhideip.3 m4/ax_c_check_flag.m4 \
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libhideip.pc
 
-pack:	doc/libhideip.info dist-gzip
+X-pack:	doc/libhideip.info dist-gzip
 	tar zxf libhideip-@VERSION@.tar.gz
 	echo '\input texinfo'			 > libhideip-@VERSION@/doc/libhideip.texi
 	echo '@setfilename libhideip.info'	>> libhideip-@VERSION@/doc/libhideip.texi
@@ -39,4 +39,4 @@ pack:	doc/libhideip.info dist-gzip
 	tar zcf libhideip-@VERSION@.tar.gz libhideip-@VERSION@
 	rm -fr libhideip-@VERSION@
 
-.PHONY: pack
+.PHONY: X-pack

@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 #
-# A library for hiding local IP address.
+# LibHideIP - A library for hiding local IP address.
 #	-- Makefile.am, part of the build system.
 #
 # Copyright (C) 2007-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
@@ -787,8 +787,10 @@ uninstall-am: uninstall-libLTLIBRARIES \
 lhip_paths.h: Makefile
 	echo '#define SYSCONFDIR "$(sysconfdir)"' > lhip_paths.h
 
-randomnames: clean
+x-randomnames: clean
 	./randomize_names_gawk.sh
+
+.PHONY: x-randomnames
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,5 +1,5 @@
 /*
- * A library for hiding local IP address.
+ * LibHideIP - A library for hiding local IP address.
  *	-- file opening functions' replacements.
  *
  * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
@@ -467,7 +467,7 @@ open64 (
 # ifdef LHIP_ANSIC
 	va_start (args, flags);
 # else
-	va_start (args);
+	va_start (args); /* cppcheck-suppress preprocessorErrorDirective */
 	path = va_arg (args, char * const);
 	flags = va_arg (args, int);
 # endif

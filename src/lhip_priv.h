@@ -1,5 +1,5 @@
 /*
- * A library for hiding local IP address.
+ * LibHideIP - A library for hiding local IP address.
  *	-- private header file.
  *
  * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
@@ -75,10 +75,6 @@
 
 # ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>	/* size_t */
-# endif
-
-# ifndef HAVE_SSIZE_T
-typedef int ssize_t;
 # endif
 
 # ifdef HAVE_NETDB_H

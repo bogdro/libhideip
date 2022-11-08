@@ -1,5 +1,5 @@
 /*
- * A library for hiding local IP address.
+ * LibHideIP - A library for hiding local IP address.
  *	-- ioctl function replacement.
  *
  * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
@@ -282,7 +282,7 @@ ioctl (
 # ifdef LHIP_ANSIC
 	va_start (args, request);
 # else
-	va_start (args);
+	va_start (args); /* cppcheck-suppress preprocessorErrorDirective */
 	d = va_arg (args, int);
 	request = va_arg (args, unsigned long int);
 # endif

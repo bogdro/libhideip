@@ -1,5 +1,5 @@
 /*
- * A library for hiding local IP address.
+ * LibHideIP - A library for hiding local IP address.
  *	-- private file and program banning functions.
  *
  * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net

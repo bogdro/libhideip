@@ -1,5 +1,5 @@
 /*
- * A library for hiding local IP address.
+ * LibHideIP - A library for hiding local IP address.
  *	-- unit test for banning functions.
  *
  * Copyright (C) 2015-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net

@@ -1,5 +1,5 @@
 #
-# A library for hiding local IP address.
+# LibHideIP - A library for hiding local IP address.
 #	-- Makefile.am, part of the build system.
 #
 # Copyright (C) 2007-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
@@ -49,6 +49,7 @@ nodist_libhideip_la_SOURCES += lhip_public.c
 libhideip_la_DISTCLEANFILES += lhip_public.c
 endif
 
-randomnames: clean
+x-randomnames: clean
 	./randomize_names_gawk.sh
 
+.PHONY: x-randomnames

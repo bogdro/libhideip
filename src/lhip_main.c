@@ -1,5 +1,5 @@
 /*
- * A library for hiding local IP address.
+ * LibHideIP - A library for hiding local IP address.
  *
  * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * Parts of this file are Copyright (C) Free Software Foundation, Inc.
@@ -396,7 +396,7 @@ __lhip_main (LHIP_VOID)
 /* =============================================================== */
 
 void LHIP_ATTR ((destructor))
-__lhip_end (LHIP_VOID)
+__lhip_end (LHIP_VOID) /* cppcheck-suppress unusedFunction */
 {
 	if ( __lhip_handle_resolv != NULL )
 	{
