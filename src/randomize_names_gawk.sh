@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# A library for hiding local IP address.
+# LibHideIP - A library for hiding local IP address.
 #	-- a name randomizing script that uses GNU awk.
 #
 # Copyright (C) 2007-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
@@ -24,11 +24,11 @@
 # Change this to whatever you wish (but it has to start with a letter or a '_')
 NEWNAMEPREFIX=__printf
 
-for i in `awk '{if (/(__lhip[a-zA-Z0-9_]+)/ && ! /^((\/\*)|#)/)
+for i in $(awk '{if (/(__lhip[a-zA-Z0-9_]+)/ && ! /^((\/\*)|#)/)
 		{
 			match ($0, /(__lhip[a-zA-Z0-9_]+)/, a);
 			print a[1];
-		}}' *.c *.h *.h.in | sort -u`; do
+		}}' ./*.c ./*.h ./*.h.in | sort -u); do
 
-	sed -i "s/\b$i\b/$NEWNAMEPREFIX$RANDOM$RANDOM$RANDOM/g" *;
+	sed -i "s/\b$i\b/$NEWNAMEPREFIX$RANDOM$RANDOM$RANDOM/g" ./*;
 done

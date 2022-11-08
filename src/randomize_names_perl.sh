@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# A library for hiding local IP address.
+# LibHideIP - A library for hiding local IP address.
 #	-- a name randomizing script that uses Perl.
 #
 # Copyright (C) 2007-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
@@ -24,8 +24,8 @@
 # Change this to whatever you wish (but it has to start with a letter or a '_')
 NEWNAMEPREFIX=__printf
 
-for i in `perl -ne 'if (/(__lhip[a-zA-Z0-9_]+)/o) {my $m=$1; if (! /^((\/\*)|#)/o) {print "$m\n";}}' \
-	 *.c *.h *.h.in | sort -u`; do
+for i in $(perl -ne 'if (/(__lhip[a-zA-Z0-9_]+)/o) {my $m=$1; if (! /^((\/\*)|#)/o) {print "$m\n";}}' \
+	 ./*.c ./*.h ./*.h.in | sort -u); do
 
-	sed -i "s/\b$i\b/$NEWNAMEPREFIX$RANDOM$RANDOM$RANDOM/g" *;
+	sed -i "s/\b$i\b/$NEWNAMEPREFIX$RANDOM$RANDOM$RANDOM/g" ./*;
 done
