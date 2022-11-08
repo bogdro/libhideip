@@ -603,10 +603,7 @@ static int __lhip_is_forbidden_program (
 	j = LHIP_MAXPATHLEN;
 #endif
 	{
-		for ( i = 0; i < j + 1; i++ )
-		{
-			__lhip_linkpath[i] = '\0';
-		}
+		LHIP_MEMSET (__lhip_linkpath, 0, j + 1);
 
 		strncpy (__lhip_linkpath, name, j + 1);
 		__lhip_linkpath[j] = '\0';
