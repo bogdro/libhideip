@@ -816,6 +816,14 @@ execve (
 		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
+	if ( argv != NULL )
+	{
+		if ( __lhip_is_forbidden_program (argv[0], argv, 0) != 0 )
+		{
+			LHIP_SET_ERRNO_PERM();
+			return -1;
+		}
+	}
 	return (*__lhip_real_execve_location ()) (filename, argv, envp);
 }
 
@@ -866,6 +874,14 @@ fexecve (
 		{
 			LHIP_SET_ERRNO_PERM();
 			return -1;
+		}
+		if ( argv != NULL )
+		{
+			if ( __lhip_is_forbidden_program (argv[0], argv, 0) != 0 )
+			{
+				LHIP_SET_ERRNO_PERM();
+				return -1;
+			}
 		}
 	}
 	return (*__lhip_real_fexecve_location ()) (fd, argv, envp);
@@ -918,6 +934,14 @@ execveat (
 	{
 		LHIP_SET_ERRNO_PERM();
 		return -1;
+	}
+	if ( argv != NULL )
+	{
+		if ( __lhip_is_forbidden_program (argv[0], argv, 0) != 0 )
+		{
+			LHIP_SET_ERRNO_PERM();
+			return -1;
+		}
 	}
 	return (*__lhip_real_execveat_location ()) (dirfd, filename, argv, envp, flags);
 }
