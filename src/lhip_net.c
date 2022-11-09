@@ -919,6 +919,7 @@ getnameinfo (
 				||
 				(__lhip_is_local_addr (&h) != 0) )
 			{
+				LHIP_MEMSET (host, 0, (size_t)hostlen);
 				strncpy (host, local_name, hostlen - 1);
 				host[hostlen-1] = '\0';
 			}
@@ -944,6 +945,7 @@ getnameinfo (
 				||
 				(__lhip_is_local_addr (&h) != 0) )
 			{
+				LHIP_MEMSET (host, 0, (size_t)hostlen);
 				strncpy (host, local_name, hostlen - 1);
 				host[hostlen-1] = '\0';
 			}
@@ -974,6 +976,7 @@ getaddrinfo (
 	struct addrinfo *tmp;
 	struct hostent * our_name_ipv4;
 	struct hostent * our_name_ipv6;
+	size_t namelen;
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -1024,8 +1027,9 @@ getaddrinfo (
 					}
 					if ( tmp->ai_canonname != NULL )
 					{
-						strncpy (tmp->ai_canonname, local_name,
-							strlen (tmp->ai_canonname) + 1 );
+						namelen = strlen (tmp->ai_canonname);
+						LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
+						strncpy (tmp->ai_canonname, local_name, namelen + 1 );
 					}
 
 					tmp = tmp->ai_next;
@@ -1053,8 +1057,9 @@ getaddrinfo (
 							}
 							if ( tmp->ai_canonname != NULL )
 							{
-								strncpy (tmp->ai_canonname, local_name,
-									strlen (tmp->ai_canonname) + 1 );
+								namelen = strlen (tmp->ai_canonname);
+								LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
+								strncpy (tmp->ai_canonname, local_name, namelen + 1 );
 							}
 
 							tmp = tmp->ai_next;
@@ -1083,8 +1088,9 @@ getaddrinfo (
 					}
 					if ( tmp->ai_canonname != NULL )
 					{
-						strncpy (tmp->ai_canonname, local_name,
-							strlen (tmp->ai_canonname) + 1 );
+						namelen = strlen (tmp->ai_canonname);
+						LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
+						strncpy (tmp->ai_canonname, local_name, namelen + 1 );
 					}
 
 					tmp = tmp->ai_next;
@@ -1112,8 +1118,9 @@ getaddrinfo (
 							}
 							if ( tmp->ai_canonname != NULL )
 							{
-								strncpy (tmp->ai_canonname, local_name,
-									strlen (tmp->ai_canonname) + 1 );
+								namelen = strlen (tmp->ai_canonname);
+								LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
+								strncpy (tmp->ai_canonname, local_name, namelen + 1 );
 							}
 
 							tmp = tmp->ai_next;

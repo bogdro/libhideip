@@ -848,6 +848,7 @@ __lhip_change_data (
 		if ( ret->h_name != NULL )
 		{
 			len = strlen (ret->h_name);
+			LHIP_MEMSET (ret->h_name, 0, len);
 			strncpy (ret->h_name, "localhost",
 				LHIP_MIN (len+1, 10));
 			ret->h_name[len] = '\0';
@@ -1064,13 +1065,13 @@ __lhip_add_local_address (
 			= (char **) malloc ( (j+1) * sizeof (char *));
 		if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases != NULL )
 		{
+			/* end-of-list marker */
+			__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[j] = NULL;
 			for ( i = 0; i < j; i++ )
 			{
 				__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[i] =
 					LHIP_STRDUP (host->h_aliases[i]);
 			}
-			/* end-of-list marker */
-			__lhip_our_names_addr[__lhip_number_of_hostnames].h_aliases[j] = NULL;
 		}
 		j = 0;
 		if ( host->h_addr_list != NULL )
@@ -1087,6 +1088,8 @@ __lhip_add_local_address (
 				= (char **) malloc ( (j+1) * sizeof (char *));
 			if ( __lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list != NULL )
 			{
+				/* end-of-list marker */
+				__lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list[j] = NULL;
 				for ( i = 0; i < j; i++ )
 				{
 					__lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list[i] =
@@ -1098,8 +1101,6 @@ __lhip_add_local_address (
 							(size_t) host->h_length );
 					}
 				}
-				/* end-of-list marker */
-				__lhip_our_names_addr[__lhip_number_of_hostnames].h_addr_list[j] = NULL;
 			}
 		}
 		__lhip_our_names_addr[__lhip_number_of_hostnames].h_addrtype
