@@ -106,6 +106,9 @@
 /* Define to 1 if you have the `resolv' library (-lresolv). */
 #undef HAVE_LIBRESOLV
 
+/* Define to 1 if you have the <linux/fcntl.h> header file. */
+#undef HAVE_LINUX_FCNTL_H
+
 /* Whether you have the linux/netlink.h header. */
 #undef HAVE_LINUX_NETLINK_H
 

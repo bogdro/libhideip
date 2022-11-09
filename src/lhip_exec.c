@@ -59,6 +59,10 @@
 # include <libgen.h>
 #endif
 
+#ifdef HAVE_LINUX_FCNTL_H
+# include <linux/fcntl.h>
+#endif
+
 #include "lhip_priv.h"
 
 /* The programs LibHideIP forbids to execute. */
@@ -902,6 +906,10 @@ execveat (
 	int flags;
 #endif
 {
+#if (defined AT_EMPTY_PATH) && (defined HAVE_LINUX_FCNTL_H)
+	char * real_name;
+	int res;
+#endif
 	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
@@ -943,6 +951,34 @@ execveat (
 			return -1;
 		}
 	}
+#if (defined AT_EMPTY_PATH) && (defined HAVE_LINUX_FCNTL_H)
+	if ( ((filename == NULL) || (filename[0] == '\0'))
+		&& ((flags & AT_EMPTY_PATH) == AT_EMPTY_PATH))
+	{
+		/* the dirfd is the actual file to execute */
+		real_name = __lhip_get_target_link_path_fd (dirfd);
+		if ( real_name != NULL )
+		{
+			res = __lhip_is_forbidden_program (real_name, argv, 0);
+# ifdef HAVE_MALLOC
+			free ((void *)real_name);
+# endif
+			if ( res != 0 )
+			{
+				LHIP_SET_ERRNO_PERM();
+				return -1;
+			}
+			if ( argv != NULL )
+			{
+				if ( __lhip_is_forbidden_program (argv[0], argv, 0) != 0 )
+				{
+					LHIP_SET_ERRNO_PERM();
+					return -1;
+				}
+			}
+		}
+	}
+#endif
 	return (*__lhip_real_execveat_location ()) (dirfd, filename, argv, envp, flags);
 }
 

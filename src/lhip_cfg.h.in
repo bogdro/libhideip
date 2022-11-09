@@ -61,6 +61,7 @@
 #  define HAVE_LIBDL_DLSYM		1
 #  define HAVE_LIBDL_DLVSYM		1
 #  define HAVE_LIBGEN_H			1
+#  define HAVE_LINUX_FCNTL_H		1
 #  define HAVE_LINUX_NETLINK_H		1
 #  define HAVE_LINUX_RANDOM_H		1
 #  define HAVE_LSTAT			1

@@ -13824,6 +13824,12 @@ then :
   printf "%s\n" "#define HAVE_LINUX_RANDOM_H 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "linux/fcntl.h" "ac_cv_header_linux_fcntl_h" "$ac_includes_default"
+if test "x$ac_cv_header_linux_fcntl_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LINUX_FCNTL_H 1" >>confdefs.h
+
+fi
 
 
 ac_fn_c_check_header_compile "$LINENO" "net/if.h" "ac_cv_header_net_if_h" "
