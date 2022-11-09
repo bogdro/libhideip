@@ -260,6 +260,17 @@ AC_CHECK_TYPES([socklen_t],,,
 	#endif
 	])
 
+AC_CHECK_TYPES([struct pcap_rmtauth],,,
+	[
+	#ifdef HAVE_PCAP_H
+	#include <pcap.h>
+	#else
+	#ifdef HAVE_PCAP_PCAP_H
+	#include <pcap/pcap.h>
+	#endif
+	#endif
+	])
+
 AC_DEFINE_PATH_STYLE()
 
 # ==================== Checks for library functions.

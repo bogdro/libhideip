@@ -14460,6 +14460,25 @@ printf "%s\n" "#define HAVE_SOCKLEN_T 1" >>confdefs.h
 fi
 
 
+ac_fn_c_check_type "$LINENO" "struct pcap_rmtauth" "ac_cv_type_struct_pcap_rmtauth" "
+	#ifdef HAVE_PCAP_H
+	#include <pcap.h>
+	#else
+	#ifdef HAVE_PCAP_PCAP_H
+	#include <pcap/pcap.h>
+	#endif
+	#endif
+
+"
+if test "x$ac_cv_type_struct_pcap_rmtauth" = xyes
+then :
+
+printf "%s\n" "#define HAVE_STRUCT_PCAP_RMTAUTH 1" >>confdefs.h
+
+
+fi
+
+
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for path style" >&5
 printf %s "checking for path style... " >&6; }

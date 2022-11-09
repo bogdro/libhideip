@@ -212,7 +212,9 @@ typedef void pcap_t;
 typedef void pcap_if_t;
 typedef unsigned int bpf_u_int32;
 /*typedef unsigned int intptr_t;*/
+#   ifndef HAVE_STRUCT_PCAP_RMTAUTH
 struct pcap_rmtauth {char dummy;};
+#   endif
 #  endif
 # endif
 
