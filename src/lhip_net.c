@@ -1288,13 +1288,13 @@ gethostname (
 	fflush (stderr);
 #endif
 
-#ifndef LHIP_ENABLE_GUI_APPS
 	if ( __lhip_real_gethostname_location () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return -1;
 	}
 
+#ifndef LHIP_ENABLE_GUI_APPS
 	if ( ( name == NULL ) || ( len == 0 ) )
 	{
 		LHIP_SET_ERRNO (err);
