@@ -482,7 +482,7 @@ int __lhip_is_forbidden_file (
 	}
 #ifdef HAVE_MALLOC
 	free (name_copy);
-	if ( (__lhip_linkpath != NULL) && (__lhip_linkpath != name_copy) )
+	if ( (__lhip_linkpath != NULL) /*&& (__lhip_linkpath != name_copy)*/ )
 	{
 		free ((void *)__lhip_linkpath);
 	}
@@ -636,10 +636,7 @@ static int __lhip_is_forbidden_program (
 						path_dir = (char *) malloc (j + 1);
 						if ( path_dir != NULL )
 						{
-							for ( i = 0; i < j + 1; i++ )
-							{
-								path_dir[i] = '\0';
-							}
+							LHIP_MEMSET (path_dir, 0, j + 1);
 
 							do
 							{
