@@ -40,9 +40,11 @@
 #  define HAVE_DLSYM			1
 #  define HAVE_DLVSYM			1
 #  define HAVE_ERRNO_H			1
-#  undef HAVE_EXECVEAT
+#  define HAVE_EXECVEAT			1
 #  define HAVE_FCNTL_H			1
 #  define HAVE_FEXECVE			1
+#  define HAVE_FOPEN64			1
+#  define HAVE_FREOPEN64		1
 #  define HAVE_GETENV			1
 #  define HAVE_GETADDRINFO_A		1
 #  define HAVE_GETHOSTBYADDR_R		1
@@ -72,6 +74,7 @@
 #  define HAVE_NET_IF_H			1
 #  define HAVE_NETDB_H			1
 #  define HAVE_NETINET_IN_H		1
+#  define HAVE_OPEN64			1
 #  define HAVE_OPENAT			1
 #  define HAVE_OPENAT64			1
 #  undef  HAVE_PCAP_H

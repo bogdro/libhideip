@@ -14741,6 +14741,24 @@ then :
   printf "%s\n" "#define HAVE_CANONICALIZE_FILE_NAME 1" >>confdefs.h
 
 fi
+ac_fn_c_check_func "$LINENO" "fopen64" "ac_cv_func_fopen64"
+if test "x$ac_cv_func_fopen64" = xyes
+then :
+  printf "%s\n" "#define HAVE_FOPEN64 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "freopen64" "ac_cv_func_freopen64"
+if test "x$ac_cv_func_freopen64" = xyes
+then :
+  printf "%s\n" "#define HAVE_FREOPEN64 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "open64" "ac_cv_func_open64"
+if test "x$ac_cv_func_open64" = xyes
+then :
+  printf "%s\n" "#define HAVE_OPEN64 1" >>confdefs.h
+
+fi
 
 
 

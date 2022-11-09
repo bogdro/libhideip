@@ -172,33 +172,36 @@ generic_fopen (
 
 /* ======================================================= */
 
-#ifdef fopen64
-# undef fopen64
-#endif
+#ifdef HAVE_FOPEN64
+
+# ifdef fopen64
+#  undef fopen64
+# endif
 
 FILE*
 fopen64 (
-#ifdef LHIP_ANSIC
+# ifdef LHIP_ANSIC
 	const char * const name, const char * const mode)
-#else
+# else
 	name, mode)
 	const char * const name;
 	const char * const mode;
-#endif
+# endif
 {
-#if (defined __GNUC__) && (!defined fopen64)
-# pragma GCC poison fopen64
-#endif
+# if (defined __GNUC__) && (!defined fopen64)
+#  pragma GCC poison fopen64
+# endif
 	__lhip_main ();
 
-#ifdef LHIP_DEBUG
+# ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: fopen64(%s, %s)\n",
 		(name == NULL)? "null" : name,
 		(mode == NULL)? "null" : mode);
 	fflush (stderr);
-#endif
+# endif
 	return generic_fopen (name, mode, __lhip_real_fopen64_location ());
 }
+#endif /* HAVE_FOPEN64 */
 
 /* ======================================================= */
 
@@ -294,36 +297,39 @@ generic_freopen (
 
 /* ======================================================= */
 
-#ifdef freopen64
-# undef freopen64
-#endif
+#ifdef HAVE_FREOPEN64
+
+# ifdef freopen64
+#  undef freopen64
+# endif
 
 FILE*
 freopen64 (
-#ifdef LHIP_ANSIC
+# ifdef LHIP_ANSIC
 	const char * const name, const char * const mode, FILE * stream)
-#else
+# else
 	name, mode, stream)
 	const char * const name;
 	const char * const mode;
 	FILE * stream;
-#endif
+# endif
 {
-#if (defined __GNUC__) && (!defined freopen64)
-# pragma GCC poison freopen64
-#endif
+# if (defined __GNUC__) && (!defined freopen64)
+#  pragma GCC poison freopen64
+# endif
 	__lhip_main ();
 
-#ifdef LHIP_DEBUG
+# ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: freopen64(%s, %s, %ld)\n",
 		(name == NULL)? "null" : name,
 		(mode == NULL)? "null" : mode,
 		(long int)stream);
 	fflush (stderr);
-#endif
+# endif
 	return generic_freopen (name, mode, stream,
 		__lhip_real_freopen64_location ());
 }
+#endif /* HAVE_FREOPEN64 */
 
 /* ======================================================= */
 
@@ -418,9 +424,11 @@ generic_open (
 
 /* ======================================================= */
 
-#if (defined TEST_COMPILE) && (defined WAS_LHIP_ANSIC)
-# define LHIP_ANSIC 1
-#endif
+#ifdef HAVE_OPEN64
+
+# if (defined TEST_COMPILE) && (defined WAS_LHIP_ANSIC)
+#  define LHIP_ANSIC 1
+# endif
 
 /* 'man 2 open' gives:
     int open(const char *pathname, int flags);
@@ -429,68 +437,69 @@ generic_open (
     int open(const char *path, int oflag, ...  );
  */
 
-#ifdef open64
-# undef open64
-#endif
+# ifdef open64
+#  undef open64
+# endif
 
 int
 open64 (
-#ifdef LHIP_ANSIC
+# ifdef LHIP_ANSIC
 	const char * const path, const int flags, ... )
-#else
+# else
 	va_alist )
 	va_dcl /* no semicolons here! */
 	/*
 	path, flags )
 	const char * const path;
 	const int flags;*/
-#endif
+# endif
 {
-#if (defined __GNUC__) && (!defined open64)
-# pragma GCC poison open64
-#endif
+# if (defined __GNUC__) && (!defined open64)
+#  pragma GCC poison open64
+# endif
 
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+# if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	va_list args;
-# ifndef LHIP_ANSIC
+#  ifndef LHIP_ANSIC
 	char * const path;
 	int flags;
+#  endif
 # endif
-#endif
 	int ret_fd;
 	mode_t mode = 0666;
 	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
 
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
-# ifdef LHIP_ANSIC
+# if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+#  ifdef LHIP_ANSIC
 	va_start (args, flags);
-# else
+#  else
 	va_start (args); /* cppcheck-suppress preprocessorErrorDirective */
 	path = va_arg (args, char * const);
 	flags = va_arg (args, int);
-# endif
+#  endif
 	if ( (flags & O_CREAT) != 0 )
 	{
 		mode = va_arg (args, mode_t);
 	}
-#endif
+# endif
 
-#ifdef LHIP_DEBUG
+# ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: open64(%s, 0%o, ...)\n",
 		(path == NULL)? "null" : path, flags);
 	fflush (stderr);
-#endif
+# endif
 
 	ret_fd = generic_open (path, flags, mode, __lhip_real_open64_location ());
-#if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
+# if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	LHIP_GET_ERRNO(err);
 	va_end (args);
 	LHIP_SET_ERRNO (err);
-#endif
+# endif
 	return ret_fd;
 }
+#endif /* HAVE_OPEN64 */
 
 /* ======================================================= */
 
