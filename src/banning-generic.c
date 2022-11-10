@@ -263,7 +263,7 @@ __banning_is_banned (
 			strncat (glob_banning_fullname, global_banning_filename,
 				global_banning_filename_len + 1);
 			glob_banning_fullname[(glob_dir_name_len + 1 +
-			path_sep_len + 1 + global_banning_filename_len + 1) - 1] = '\0';
+				path_sep_len + 1 + global_banning_filename_len + 1) - 1] = '\0';
 			ret = __banning_is_banned_in_file (file_name_to_check,
 				glob_banning_fullname);
 			free (glob_banning_fullname);

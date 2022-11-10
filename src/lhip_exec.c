@@ -473,6 +473,7 @@ int __lhip_is_forbidden_file (
 	__lhip_linkpath = __lhip_get_target_link_path (name_copy);
 #else
 	strncpy (__lhip_linkpath, name, sizeof (__lhip_linkpath)-1);
+	__lhip_linkpath[sizeof (__lhip_linkpath) - 1] = '\0';
 	strncpy (__lhip_linkpath, __lhip_get_target_link_path (__lhip_linkpath), sizeof (__lhip_linkpath)-1);
 	__lhip_linkpath[sizeof (__lhip_linkpath) - 1] = '\0';
 #endif
@@ -584,6 +585,8 @@ static int __lhip_is_forbidden_program (
 	char *first_char;
 # if (defined HAVE_GETENV) && (defined HAVE_SYS_STAT_H)
 	char *path;
+	size_t path_len;
+	size_t new_path_len;
 #  ifdef HAVE_MALLOC
 	char *path_dir;
 #  endif
@@ -671,14 +674,16 @@ static int __lhip_is_forbidden_program (
 					}
 					else
 					{
+						path_len = strlen (path);
+						new_path_len = strlen (__lhip_linkpath);
 						path_dir = (char *) malloc (
-							strlen (path) + 1 + strlen (__lhip_linkpath) + 1);
+							path_len + 1 + new_path_len + 1);
 						if ( path_dir != NULL )
 						{
-							strncpy (path_dir, path, strlen (path) + 1);
-							path_dir[strlen (path) + 1] = '\0';
+							strncpy (path_dir, path, path_len + 1);
+							path_dir[path_len+ 1] = '\0';
 							__lhip_append_path (path_dir, __lhip_linkpath, j);
-							path_dir[strlen (path) + 1 + strlen (__lhip_linkpath)] = '\0';
+							path_dir[path_len + 1 + new_path_len] = '\0';
 						}
 					}
 					/* path_dir, if not NULL, contains "PATH/name" */
