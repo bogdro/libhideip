@@ -165,7 +165,6 @@ static void teardown_test(void)
 	unlink(LHIP_TEST_FILENAME);
 	unlink(LHIP_TEST_BANNED_FILENAME);
 	unlink(LHIP_LINK_FILENAME);
-	printf("----------------Unlink\n");
 	/*__lhip_end();*/
 }
 
