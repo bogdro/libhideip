@@ -72,7 +72,7 @@ lhiptest_other_SOURCES = lhiptest_other.c $(LHIPTEST_COMMON_SRC)
 lhiptest_other_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
 lhiptest_other_LDADD = $(LHIPTEST_COMMON_LIB)
 
-zcompile: $(TESTS)
-.PHONY: zcompile
+x-compile: $(TESTS)
+.PHONY: x-compile
 
 endif
