@@ -581,11 +581,11 @@ static int __lhip_is_forbidden_program (
 	struct stat st;
 #  endif
 # endif
-	char *first_char = NULL;
+	char *first_char;
 # if (defined HAVE_GETENV) && (defined HAVE_SYS_STAT_H)
-	char *path = NULL;
+	char *path;
 #  ifdef HAVE_MALLOC
-	char *path_dir = NULL;
+	char *path_dir;
 #  endif
 # endif
 #endif
