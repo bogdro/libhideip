@@ -278,7 +278,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 		}
 		if ( __lhip_uname_res.nodename[0] != '\0' )
 		{
-			ai_res = (*__lhip_real_gethostbyname_r_location ()) (__lhip_our_gethostname,
+			ai_res = (*__lhip_real_gethostbyname_r_location ()) (__lhip_uname_res.nodename,
 				&__lhip_tmp,
 				/* buffer: */
 				__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
