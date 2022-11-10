@@ -196,6 +196,12 @@ extern int gethostent_r LHIP_PARAMS ((
                struct hostent *ret, char *buf, size_t buflen,
                struct hostent **result, int *h_errnop));
 #endif
+#ifndef HAVE_BINDRESVPORT
+extern int bindresvport LHIP_PARAMS ((int sockfd, struct sockaddr_in *sin));
+#endif
+#ifndef HAVE_BINDRESVPORT6
+extern int bindresvport6 LHIP_PARAMS ((int sockfd, struct sockaddr_in6 *sin));
+#endif
 
 #ifdef __cplusplus
 }
@@ -1562,6 +1568,110 @@ bind (
 		}
 	}
 	return (*__lhip_real_bind_location ()) (sockfd, my_addr, addrlen);
+}
+
+/* =============================================================== */
+
+int
+bindresvport (
+#ifdef LHIP_ANSIC
+	int sockfd, struct sockaddr_in *my_addr)
+#else
+	sockfd, my_addr)
+	int sockfd;
+	struct sockaddr_in *my_addr;
+#endif
+{
+	LHIP_MAKE_ERRNO_VAR(err);
+
+	__lhip_main ();
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: bindresvport()\n");
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_bindresvport_location () == NULL )
+	{
+		LHIP_SET_ERRNO_MISSING();
+		return -1;
+	}
+
+	if ( my_addr == NULL )
+	{
+		LHIP_SET_ERRNO (err);
+		return (*__lhip_real_bindresvport_location ()) (sockfd, my_addr);
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		LHIP_SET_ERRNO (err);
+		return (*__lhip_real_bindresvport_location ()) (sockfd, my_addr);
+	}
+
+	if ( (__lhip_check_ipv4_value (&(my_addr->sin_addr)) != 1)
+		&&
+		(memcmp ( &(my_addr->sin_addr),
+			__lhip_zeroaddr_ipv4,
+			sizeof (__lhip_zeroaddr_ipv4) ) != 0) )
+	{
+		/* not 127.0.0.1 and not 0.0.0.0 address - forbid, to avoid guessing */
+		LHIP_SET_ERRNO_PERM();
+		return -1;
+	}
+	return (*__lhip_real_bindresvport_location ()) (sockfd, my_addr);
+}
+
+/* =============================================================== */
+
+int
+bindresvport6 (
+#ifdef LHIP_ANSIC
+	int sockfd, struct sockaddr_in6 *my_addr)
+#else
+	sockfd, my_addr)
+	int sockfd;
+	struct sockaddr_in6 *my_addr;
+#endif
+{
+	LHIP_MAKE_ERRNO_VAR(err);
+
+	__lhip_main ();
+#ifdef LHIP_DEBUG
+	fprintf (stderr, "libhideip: bindresvport6()\n");
+	fflush (stderr);
+#endif
+
+	if ( __lhip_real_bindresvport6_location () == NULL )
+	{
+		LHIP_SET_ERRNO_MISSING();
+		return -1;
+	}
+
+	if ( my_addr == NULL )
+	{
+		LHIP_SET_ERRNO (err);
+		return (*__lhip_real_bindresvport6_location ()) (sockfd, my_addr);
+	}
+
+	if ( (__lhip_check_prog_ban () != 0)
+		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
+	{
+		LHIP_SET_ERRNO (err);
+		return (*__lhip_real_bindresvport6_location ()) (sockfd, my_addr);
+	}
+
+	if ( (__lhip_check_ipv6_value (&(my_addr->sin6_addr)) != 1)
+		&&
+		(memcmp ( &(my_addr->sin6_addr),
+			__lhip_zeroaddr_ipv6,
+			sizeof (__lhip_zeroaddr_ipv6) ) != 0) )
+	{
+		/* not ::1 and not ::0 address - forbid, to avoid guessing */
+		LHIP_SET_ERRNO_PERM();
+		return -1;
+	}
+	return (*__lhip_real_bindresvport6_location ()) (sockfd, my_addr);
 }
 
 /* =============================================================== */

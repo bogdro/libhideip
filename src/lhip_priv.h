@@ -320,6 +320,9 @@ typedef int (*r_i_ccp_i_i_cucp_i_cucp_ucp_i)	LHIP_PARAMS ((res_state state, int 
 							int class, int type, const unsigned char *data,
 							int datalen, const unsigned char *newrr,
 							unsigned char *buf, int buflen));
+typedef int (*i_i_ssa)				LHIP_PARAMS ((int s, struct sockaddr_in *sin));
+typedef int (*i_i_ssa6)				LHIP_PARAMS ((int s, struct sockaddr_in6 *sin));
+
 /* libpcap functions: */
 typedef char * (*cp_cp)				LHIP_PARAMS ((char *errbuf));
 typedef int (*i_ccp_uip_uip_cp)			LHIP_PARAMS ((const char * device, bpf_u_int32 * netp,
@@ -379,6 +382,8 @@ extern GCC_WARN_UNUSED_RESULT i_i_ia2				__lhip_real_socketpair_location LHIP_PA
 # if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
 extern GCC_WARN_UNUSED_RESULT i_i_sgpp_i_ssp			__lhip_real_getaddrinfo_a_location LHIP_PARAMS ((void));
 # endif
+extern GCC_WARN_UNUSED_RESULT i_i_ssa				__lhip_real_bindresvport_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_ssa6				__lhip_real_bindresvport6_location LHIP_PARAMS ((void));
 
 /* file-related functions: */
 extern GCC_WARN_UNUSED_RESULT fp_cp_cp				__lhip_real_fopen64_location LHIP_PARAMS ((void));

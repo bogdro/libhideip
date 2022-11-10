@@ -14765,6 +14765,18 @@ then :
   printf "%s\n" "#define HAVE_OPEN64 1" >>confdefs.h
 
 fi
+ac_fn_c_check_func "$LINENO" "bindresvport" "ac_cv_func_bindresvport"
+if test "x$ac_cv_func_bindresvport" = xyes
+then :
+  printf "%s\n" "#define HAVE_BINDRESVPORT 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "bindresvport6" "ac_cv_func_bindresvport6"
+if test "x$ac_cv_func_bindresvport6" = xyes
+then :
+  printf "%s\n" "#define HAVE_BINDRESVPORT6 1" >>confdefs.h
+
+fi
 
 
 

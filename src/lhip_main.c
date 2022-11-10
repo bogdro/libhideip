@@ -99,6 +99,8 @@ static i_i_ia2				__lhip_real_socketpair		= NULL;
 #if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
 static i_i_sgpp_i_ssp			__lhip_real_getaddrinfo_a	= NULL;
 #endif
+static i_i_ssa				__lhip_real_bindresvport	= NULL;
+static i_i_ssa6				__lhip_real_bindresvport6	= NULL;
 
 /* file-related functions: */
 static fp_cp_cp				__lhip_real_fopen64		= NULL;
@@ -306,6 +308,8 @@ __lhip_main (LHIP_VOID)
 		*(void **) (&__lhip_real_getsockname)      = dlsym (RTLD_NEXT, "getsockname");
 		*(void **) (&__lhip_real_bind)             = dlsym (RTLD_NEXT, "bind");
 		*(void **) (&__lhip_real_socketpair)       = dlsym (RTLD_NEXT, "socketpair");
+		*(void **) (&__lhip_real_bindresvport)     = dlsym (RTLD_NEXT, "bindresvport");
+		*(void **) (&__lhip_real_bindresvport6)    = dlsym (RTLD_NEXT, "bindresvport6");
 		/* file-related functions: */
 #ifdef LHIP_CANT_USE_VERSIONED_FOPEN
 		*(void **) (&__lhip_real_fopen64)          = dlsym  (RTLD_NEXT, "fopen64");
@@ -662,6 +666,20 @@ i_ssp_slp __lhip_real_getsockname_location (LHIP_VOID)
 i_cssp_sl __lhip_real_bind_location (LHIP_VOID)
 {
 	return __lhip_real_bind;
+}
+
+/* =============================================================== */
+
+i_i_ssa __lhip_real_bindresvport_location (LHIP_VOID)
+{
+	return __lhip_real_bindresvport;
+}
+
+/* =============================================================== */
+
+i_i_ssa6 __lhip_real_bindresvport6_location (LHIP_VOID)
+{
+	return __lhip_real_bindresvport6;
 }
 
 /* =============================================================== */

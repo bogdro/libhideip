@@ -1021,6 +1021,133 @@ START_TEST(test_bind_banned6)
 }
 END_TEST
 
+#ifdef HAVE_BINDRESVPORT
+/* requires privileges
+START_TEST(test_bindresvport)
+{
+	int a;
+	int sock;
+	int err;
+
+	LHIP_PROLOG_FOR_TEST();
+	sock = socket (AF_INET, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		sa_in.sin_family = AF_INET;
+		sa_in.sin_addr.s_addr = inet_addr ("0.0.0.0");
+		sa_in.sin_port = 5553;
+		a = bindresvport (sock, &sa_in);
+		err = errno;
+		close (sock);
+		if ( a < 0 )
+		{
+			fail("test_bindresvport: socket not bound, but should have been: errno=%d\n", err);
+		}
+	}
+	else
+	{
+		fail("test_bindresvport: socket not opened, but should have been: errno=%d\n", errno);
+	}
+}
+END_TEST
+// */
+
+START_TEST(test_bindresvport_banned)
+{
+	int a;
+	int sock;
+
+	LHIP_PROLOG_FOR_TEST();
+	/*
+	Files with IP addresses are forbidden to be read, and also LibHideIP
+	forbids any other method to get the IP address. The user's address
+	must be hardcoded in the test.
+	*/
+	sock = socket (AF_INET, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		sa_in.sin_family = AF_INET;
+		sa_in.sin_addr.s_addr = inet_addr ("192.168.1.226");
+		sa_in.sin_port = 5553;
+		a = bindresvport (sock, &sa_in);
+		close (sock);
+		if ( a >= 0 )
+		{
+			fail("test_bindresvport_banned: socket bound, but shouldn't have been\n");
+		}
+	}
+	else
+	{
+		fail("test_bindresvport_banned: socket not opened, but should have been: errno=%d\n", errno);
+	}
+}
+END_TEST
+#endif /* HAVE_BINDRESVPORT */
+
+#ifdef HAVE_BINDRESVPORT6
+/* requires privileges
+START_TEST(test_bindresvport6)
+{
+	int a;
+	int sock;
+	int err;
+	const unsigned char zero_ipv6[16]
+		= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	LHIP_PROLOG_FOR_TEST();
+	sock = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		sa_in6.sin6_family = AF_INET6;
+		memcpy (&(sa_in6.sin6_addr.s6_addr), zero_ipv6,
+			sizeof (zero_ipv6));
+		sa_in6.sin6_port = 5553;
+		a = bindresvport6 (sock, &sa_in6);
+		err = errno;
+		close (sock);
+		if ( a < 0 )
+		{
+			fail("test_bindresvport6: socket not bound, but should have been: errno=%d\n", err);
+		}
+	}
+	else
+	{
+		fail("test_bindresvport6: socket not opened, but should have been: errno=%d\n", errno);
+	}
+}
+END_TEST
+// */
+
+START_TEST(test_bindresvport6_banned)
+{
+	int a;
+	int sock;
+	unsigned char addr_ipv6[16]
+		= {0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0x53, 0x10, 0x3c, 0x51, 0x8f, 0x6d, 0xe7, 0x03 };
+
+	LHIP_PROLOG_FOR_TEST();
+	sock = socket (AF_INET6, SOCK_STREAM, 0);
+	if ( sock >= 0 )
+	{
+		sa_in6.sin6_family = AF_INET6;
+		memcpy (&(sa_in6.sin6_addr.s6_addr), addr_ipv6,
+			sizeof (addr_ipv6));
+		sa_in6.sin6_port = 5553;
+		a = bindresvport6 (sock, &sa_in6);
+		close (sock);
+		if ( a >= 0 )
+		{
+			fail("test_bindresvport6_banned: socket bound, but shouldn't have been\n");
+		}
+	}
+	else
+	{
+		fail("test_bindresvport6_banned: socket not opened, but should have been: errno=%d\n", errno);
+	}
+}
+END_TEST
+#endif /* HAVE_BINDRESVPORT6 */
+
 START_TEST(test_socketpair)
 {
 	int twosocks[2];
@@ -1428,6 +1555,16 @@ static Suite * lhip_create_suite(void)
 	tcase_add_test(tests_net, test_setsockopt6);
 	tcase_add_test(tests_net, test_setsockopt_banned);
 	tcase_add_test(tests_net, test_setsockopt_banned6);
+#endif
+#ifdef HAVE_BINDRESVPORT
+	/* requires privileges:
+	tcase_add_test(tests_net, test_bindresvport); */
+	tcase_add_test(tests_net, test_bindresvport_banned);
+#endif
+#ifdef HAVE_BINDRESVPORT6
+	/* requires privileges:
+	tcase_add_test(tests_net, test_bindresvport6); */
+	tcase_add_test(tests_net, test_bindresvport6_banned);
 #endif
 #ifdef HAVE_UNISTD_H
 # ifndef LHIP_ENABLE_GUI_APPS
