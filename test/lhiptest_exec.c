@@ -97,6 +97,8 @@ extern int fexecve LHIP_PARAMS ((int fd, char *const argv[], char *const envp[])
 }
 #endif
 
+#define IFCONFIG_DIR "/usr/bin"
+
 /* ====================== Execution functions */
 
 #ifdef HAVE_UNISTD_H
@@ -122,8 +124,11 @@ START_TEST(test_execve_banned)
 	char * envp[] = { NULL };
 
 	LHIP_PROLOG_FOR_TEST();
-	a = execve ("/sbin/ifconfig", args, envp);
+	a = execve (IFCONFIG_DIR "/ifconfig", args, envp);
 	ck_assert_int_ne(a, 0);
+# ifdef HAVE_ERRNO_H
+	ck_assert_int_eq(errno, EPERM);
+# endif
 	exit (LHIP_EXIT_VALUE); /* expected exit value if the banned program didn't indeed run */
 }
 END_TEST
@@ -163,14 +168,19 @@ START_TEST(test_execveat_banned)
 	char * args[] = { NULL };
 	char * envp[] = { NULL };
 	int dirfd;
+	int err;
 
 	LHIP_PROLOG_FOR_TEST();
-	dirfd = open ("/sbin", O_DIRECTORY | O_PATH);
+	dirfd = open (IFCONFIG_DIR, O_DIRECTORY | O_PATH);
 	if ( dirfd >= 0 )
 	{
 		a = execveat (dirfd, progname, args, envp, 0);
+		err = errno;
 		close (dirfd);
 		ck_assert_int_ne(a, 0);
+#  ifdef HAVE_ERRNO_H
+		ck_assert_int_eq(err, EPERM);
+#  endif
 		exit (LHIP_EXIT_VALUE); /* expected exit value if the banned program didn't indeed run */
 	}
 	else
@@ -179,7 +189,109 @@ START_TEST(test_execveat_banned)
 	}
 }
 END_TEST
-# endif
+
+#  ifdef HAVE_SYMLINK
+START_TEST(test_execveat_banned_link)
+{
+	int a;
+	char * args[] = { NULL };
+	char * envp[] = { NULL };
+	int dirfd;
+	int err;
+
+	LHIP_PROLOG_FOR_TEST();
+	a = symlink (IFCONFIG_DIR "/ifconfig", LHIP_LINK_FILENAME);
+	if (a != 0)
+	{
+		fail("test_execveat_banned_link: link could not have been created: errno=%d, res=%d\n", errno, a);
+	}
+	dirfd = open (".", O_DIRECTORY | O_PATH);
+	if ( dirfd >= 0 )
+	{
+		a = execveat (dirfd, LHIP_LINK_FILENAME, args, envp, 0);
+		err = errno;
+		close (dirfd);
+		unlink (LHIP_LINK_FILENAME);
+ 		ck_assert_int_ne(a, 0);
+#  ifdef HAVE_ERRNO_H
+		ck_assert_int_eq(err, EPERM);
+#   endif
+		exit (LHIP_EXIT_VALUE); /* expected exit value if the banned program didn't indeed run */
+	}
+	else
+	{
+		fail("test_execveat_banned_link: directory not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
+#  endif /* HAVE_SYMLINK */
+
+#  ifdef AT_EMPTY_PATH
+START_TEST(test_execveat_banned_empty_path)
+{
+	int a;
+	char * args[] = { NULL };
+	char * envp[] = { NULL };
+	int fd;
+	int err;
+
+	LHIP_PROLOG_FOR_TEST();
+	fd = open (IFCONFIG_DIR "/ifconfig", O_RDONLY);
+	if ( fd >= 0 )
+	{
+		a = execveat (fd, "", args, envp, AT_EMPTY_PATH);
+		err = errno;
+		close (fd);
+		ck_assert_int_ne(a, 0);
+#   ifdef HAVE_ERRNO_H
+		ck_assert_int_eq(err, EPERM);
+#   endif
+		exit (LHIP_EXIT_VALUE); /* expected exit value if the banned program didn't indeed run */
+	}
+	else
+	{
+		fail("test_execveat_banned_empty_path: directory not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
+
+#   ifdef HAVE_SYMLINK
+START_TEST(test_execveat_banned_empty_path_link)
+{
+	int a;
+	char * args[] = { NULL };
+	char * envp[] = { NULL };
+	int fd;
+	int err;
+
+	LHIP_PROLOG_FOR_TEST();
+	a = symlink (IFCONFIG_DIR "/ifconfig", LHIP_LINK_FILENAME);
+	if (a != 0)
+	{
+		fail("test_execveat_banned_empty_path_link: link could not have been created: errno=%d, res=%d\n", errno, a);
+	}
+	fd = open (LHIP_LINK_FILENAME, O_RDONLY);
+	if ( fd >= 0 )
+	{
+		a = execveat (fd, "", args, envp, AT_EMPTY_PATH);
+		err = errno;
+		close (fd);
+		unlink (LHIP_LINK_FILENAME);
+		ck_assert_int_ne(a, 0);
+#   ifdef HAVE_ERRNO_H
+		ck_assert_int_eq(err, EPERM);
+#   endif
+		exit (LHIP_EXIT_VALUE); /* expected exit value if the banned program didn't indeed run */
+	}
+	else
+	{
+		fail("test_execveat_banned_empty_path_link: directory not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
+#   endif /* HAVE_SYMLINK */
+#  endif /* AT_EMPTY_PATH */
+# endif /* HAVE_EXECVEAT */
 
 # ifdef HAVE_FEXECVE
 START_TEST(test_fexecve)
@@ -216,6 +328,7 @@ START_TEST(test_fexecve_banned)
 	char * args[] = { NULL, "https://libhideip.sourceforge.io", NULL };
 	char * envp[] = { NULL };
 	int prog_fd;
+	int err;
 
 	LHIP_PROLOG_FOR_TEST();
 	prog_fd = open (progname, O_RDONLY);
@@ -223,8 +336,12 @@ START_TEST(test_fexecve_banned)
 	{
 		args[0] = progname; /* must be set */
 		a = fexecve (prog_fd, args, envp);
+		err = errno;
 		close (prog_fd);
 		ck_assert_int_ne(a, 0);
+#  ifdef HAVE_ERRNO_H
+		ck_assert_int_eq(err, EPERM);
+#  endif
 		exit (LHIP_EXIT_VALUE); /* expected exit value if the banned program didn't indeed run */
 	}
 	else
@@ -251,8 +368,11 @@ START_TEST(test_system_banned)
 	int a;
 
 	LHIP_PROLOG_FOR_TEST();
-	a = system ("/sbin/ifconfig");
+	a = system (IFCONFIG_DIR "/ifconfig");
 	ck_assert_int_ne(a, 0);
+#ifdef HAVE_ERRNO_H
+	ck_assert_int_eq(errno, EPERM);
+#endif
 }
 END_TEST
 
@@ -261,8 +381,11 @@ START_TEST(test_system_banned2)
 	int a;
 
 	LHIP_PROLOG_FOR_TEST();
-	a = system ("/sbin/ifconfig -a");
+	a = system (IFCONFIG_DIR "/ifconfig -a");
 	ck_assert_int_ne(a, 0);
+#ifdef HAVE_ERRNO_H
+	ck_assert_int_eq(errno, EPERM);
+#endif
 }
 END_TEST
 
@@ -283,6 +406,15 @@ static Suite * lhip_create_suite(void)
 	tcase_add_exit_test(tests_exec, test_execveat, 0);
 	/*tcase_add_test(tests_exec, test_execveat_banned);*/
 	tcase_add_exit_test(tests_exec, test_execveat_banned, LHIP_EXIT_VALUE);
+#  ifdef HAVE_SYMLINK
+	tcase_add_exit_test(tests_exec, test_execveat_banned_link, LHIP_EXIT_VALUE);
+#  endif
+#  ifdef AT_EMPTY_PATH
+	tcase_add_exit_test(tests_exec, test_execveat_banned_empty_path, LHIP_EXIT_VALUE);
+#   ifdef HAVE_SYMLINK
+	tcase_add_exit_test(tests_exec, test_execveat_banned_empty_path_link, LHIP_EXIT_VALUE);
+#   endif
+#  endif
 # endif
 # ifdef HAVE_FEXECVE
 	tcase_add_exit_test(tests_exec, test_fexecve, 0);
