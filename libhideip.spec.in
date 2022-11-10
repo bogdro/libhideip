@@ -56,8 +56,8 @@ ldconfig
 
 %defattr(-,root,root)
 %{_libdir}/libhideip.so
-%{_libdir}/libhideip.so.8
-%{_libdir}/libhideip.so.8.0.1
+%{_libdir}/libhideip.so.9
+%{_libdir}/libhideip.so.9.0.0
 %{_libdir}/libhideip.la
 %doc %{_infodir}/libhideip.info%_extension
 %doc %{_mandir}/man3/libhideip.3%_extension
