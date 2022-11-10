@@ -467,7 +467,9 @@ open64 (
 # endif
 	int ret_fd;
 	mode_t mode = 0666;
+# if (defined HAVE_STDARG_H) || (defined HAVE_VARARGS_H)
 	LHIP_MAKE_ERRNO_VAR(err);
+# endif
 
 	__lhip_main ();
 

@@ -1443,12 +1443,9 @@ START_TEST(test_gethostname)
 	LHIP_PROLOG_FOR_TEST();
 	a = gethostname (buf, sizeof(buf));
 	ck_assert_int_eq(a, 0);
-	if (buf != NULL)
+	if (strncmp (buf, "localhost", strlen (buf)) != 0)
 	{
-		if (strncmp (buf, "localhost", strlen (buf)) != 0)
-		{
-			fail("test_gethostname: buf contains something else than 'localhost': '%s'\n", buf);
-		}
+		fail("test_gethostname: buf contains something else than 'localhost': '%s'\n", buf);
 	}
 }
 END_TEST
