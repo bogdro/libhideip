@@ -33,7 +33,7 @@ check_PROGRAMS = lhiptest_banning lhiptest_exec lhiptest_ioctl lhiptest_net \
 #nodist_include_HEADERS = lhiptest_common.h
 EXTRA_DIST = lhiptest_common.h
 LHIPTEST_COMMON_SRC = lhiptest_common.c lhiptest_common.h
-LHIPTEST_COMMON_CFLAGS = @CHECK_CFLAGS@ -I $(top_builddir)/src
+LHIPTEST_COMMON_CFLAGS = @CHECK_CFLAGS@ -DHAVE_CONFIG_H -I $(top_builddir)/src
 LHIPTEST_COMMON_LIB = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
 
 lhiptest_banning_SOURCES = lhiptest_banning.c $(LHIPTEST_COMMON_SRC)
