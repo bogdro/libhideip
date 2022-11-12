@@ -681,7 +681,7 @@ static int __lhip_is_forbidden_program (
 						if ( path_dir != NULL )
 						{
 							strncpy (path_dir, path, path_len + 1);
-							path_dir[path_len+ 1] = '\0';
+							path_dir[path_len + 1] = '\0';
 							__lhip_append_path (path_dir, __lhip_linkpath, j);
 							path_dir[path_len + 1 + new_path_len] = '\0';
 						}
