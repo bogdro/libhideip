@@ -82,6 +82,10 @@ which can be used to read IP addresses from files under @file{/proc} and
 some of the functions from the @file{libpcap} library, to prevent raw opening
 of network devices.
 
+There is @strong{NO NEED} to rebuild your software, because LibHideIP is
+a pre-loadable library, meaning you just need to @strong{RUN} the software
+with LibHideIP loaded.
+
 Intercepting the raw @samp{syscall()} function is impossible, because the
 number of parameters varies from one syscall to another.
 
@@ -111,6 +115,17 @@ Additionally, GUI applications may show errors similar to
 just @samp{localhost}. Check the compiling options (@ref{How to compile?})
 for a work-around.
 
+LibHideIP is also a library for programmers - look inside @file{$@{includedir@}/} (default is
+@file{/usr/local/include}) for a header file with all the functions - @file{libhideip.h}, and
+look inside @file{$@{libdir@}/} (default is @file{/usr/local/lib}) for an "import library" - @file{libhideip.a}.
+
+@strong{NOTE} To use LibHideIP as a development library, pass @option{--enable-public-interface}
+to @command{./configure} and include the header @strong{BEFORE}
+any system headers. Compile-time errors may occur otherwise. Remember to link your
+program with LibHideIP - adding @option{-lhideip} (optionally preceded with
+@option{-L $@{libdir@}}) to GCC is enough. See the
+chapter on developing to learn how to use LibHideIP (@ref{Developing}).
+
 LibHideIP's homepage is @url{https://libhideip.sourceforge.io}.
 
 @c ==================================================================
@@ -137,7 +152,7 @@ and related functions' implementations, causing overflows (probably stack) which
 the environment variables' usage and thus may disable banning files except
 the global file. Probably fixed in version 2.22.
 
-The @file{sys/stat.h} contains functions needed to check an executable's type.
+The @file{sys/stat.h} header contains functions needed to check an executable's type.
 If it is a symbolic link, LibHideIP will follow it.
 
 The @file{dlfcn.h} header contains functions needed to call the original functions.
@@ -146,6 +161,7 @@ won't compile without this.
 
 The @file{stdarg.h}/@file{varargs.h} header contains stuff needed to intercept
 @samp{ioctl()} and the opening functions.
+
 @item The @file{libdl} library (usually part of the C library) for dynamic
 function addressing (unless the required functions are in the C library)
 @item the @command{make} program
@@ -165,7 +181,7 @@ library with
 See the chapter on developing to learn how to use LibHideIP (@ref{Developing}).
 
 LibHideIP allows some programs to be banned (not allowed to run under
-LibHideIP, because they might need accesss to the IP address). One banning
+LibHideIP, because they might need access to the IP address). One banning
 file is always supported - @file{$@{sysconfdir@}/libhideip.progban}
 (@file{$@{sysconfdir@}} is @file{/usr/local/etc} unless set otherwise during configure).
 
@@ -217,7 +233,7 @@ to install the library.
 
 To make LibHideIP impossible to detect, you must change all the internal
 public function names. To do this, you can use the name randomizing scripts in the
-src directory. You will need the @command{sed} and @command{sort} programs
+@file{src} directory. You will need the @command{sed} and @command{sort} programs
 and either @url{https://www.perl.org/, Perl} or GNU awk.
 You can change the name prefix at the top of these scripts to something unique.
 When the script is done working, reconfigure, recompile and reinstall the library.
@@ -238,7 +254,7 @@ Thus, a typical build sequence with less detection would be
 If you want to do this manually (or you don't have @command{sed} or
 @command{sort} and Perl or GNU awk), open the @file{src/lhip_priv.h} file in a text
 editor and look for lines starting with @code{extern}. The @code{__lhip...} names in these
-lines are the function names to convert. Take each name and substitue all its
+lines are the function names to convert. Take each name and substitute all its
 appearances in each source file in the @file{src} directory using a text editor or
 the following commands:
 
@@ -250,7 +266,7 @@ the following commands:
 
 @samp{sed -i 's/__lhip_get_init_stage/_your_function_nameN/g' *.c* *.h*}
 
-Then find other symbols that start with @code{__lhip...} in other files and
+Then find other symbols that start with @code{__lhip} in other files and
 change them too (using a text editor or commands similar to the above).
 
 Then reconfigure, recompile and reinstall the library.
@@ -396,7 +412,7 @@ specify which programs should LibHideIP not mess with. Put each entry on its own
 If additional banning files haven't been disabled (@ref{How to compile?}), they can
 be located in users' home directories (e.g. @file{/home/user1/.libhideip.progban}).
 You can also put the file in any location and set the environment variable
-@code{LIBHIDEIP_BANFILE} to point at that file, e.g.@*
+@code{LIBHIDEIP_BANFILE} to point at that file, e.g.
 
 	@samp{export LIBHIDEIP_BANFILE=/opt/config/libhideip.progban}
 
@@ -437,7 +453,7 @@ To report usage problems, include:
 
 Bogdan 'bogdro' Drozdowski.
 
-To contact me, try one of these adresses: @*
+To contact me, try one of these addresses: @*
 @quotation
 bogdro (at) users . sourceforge . net@*
 bogdro-soft (at) gmx . com
