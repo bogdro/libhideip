@@ -291,6 +291,8 @@ typedef int (*i_i_ia2)				LHIP_PARAMS ((int d, int type, int protocol, int sv[2]
 typedef int (*i_i_sgpp_i_ssp)			LHIP_PARAMS ((int mode, struct gaicb *list[],
 							int nitems, struct sigevent *sevp));
 # endif
+typedef int (*i_i_ssa)				LHIP_PARAMS ((int s, struct sockaddr_in *sin));
+typedef int (*i_i_ssa6)				LHIP_PARAMS ((int s, struct sockaddr_in6 *sin));
 
 /* file-related functions: */
 typedef FILE*	(*fp_cp_cp)			LHIP_PARAMS ((const char * const name, const char * const mode));
@@ -320,8 +322,6 @@ typedef int (*r_i_ccp_i_i_cucp_i_cucp_ucp_i)	LHIP_PARAMS ((res_state state, int 
 							int class, int type, const unsigned char *data,
 							int datalen, const unsigned char *newrr,
 							unsigned char *buf, int buflen));
-typedef int (*i_i_ssa)				LHIP_PARAMS ((int s, struct sockaddr_in *sin));
-typedef int (*i_i_ssa6)				LHIP_PARAMS ((int s, struct sockaddr_in6 *sin));
 
 /* libpcap functions: */
 typedef char * (*cp_cp)				LHIP_PARAMS ((char *errbuf));
