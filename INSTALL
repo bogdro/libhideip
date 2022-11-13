@@ -100,7 +100,7 @@ Thus, a typical build sequence with less detection would be
 
 	./configure
 	cd src
-	./randomize_names_gawk.sh (or 'make randomnames')
+	./randomize_names_gawk.sh (or 'make x-randomnames')
 	cd ..
 	make
 
@@ -110,7 +110,7 @@ NOTE: 'make install' is NOT recommended. Create and install an RPM package
 
 =======================================================
 
-Building an RPM package (the new way):
+Building an RPM package:
 
 1) copy the libhideip.spec file to $HOME/rpmbuild/SPECS
 2) copy the source package libhideip-XX.tar.gz to $HOME/rpmbuild/SOURCES
