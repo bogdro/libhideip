@@ -1572,6 +1572,10 @@ bind (
 
 /* =============================================================== */
 
+#ifdef TEST_COMPILE
+# undef LHIP_ANSIC
+#endif
+
 int
 bindresvport (
 #ifdef LHIP_ANSIC
@@ -1675,10 +1679,6 @@ bindresvport6 (
 }
 
 /* =============================================================== */
-
-#ifdef TEST_COMPILE
-# undef LHIP_ANSIC
-#endif
 
 int
 socketpair (
