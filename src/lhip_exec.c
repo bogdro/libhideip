@@ -320,10 +320,10 @@ static char * __lhip_get_target_link_path (
 			{
 				break;
 			}
+			LHIP_MEMSET (__lhip_newlinkpath, 0, dirname_len + 1 + (size_t)lsize + 1);
 # else /* ! HAVE_MALLOC */
-			lsize = sizeof (__lhip_newlinkpath);
+			LHIP_MEMSET (__lhip_newlinkpath, 0, sizeof (__lhip_newlinkpath));
 # endif /* HAVE_MALLOC */
-			LHIP_MEMSET (__lhip_newlinkpath, 0, (size_t)lsize);
 			lnk_res = readlink (current_name, __lhip_newlinkpath, (size_t)lsize);
 			if ( (lnk_res < 0) || (lnk_res > lsize) )
 			{
