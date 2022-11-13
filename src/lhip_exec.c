@@ -626,7 +626,7 @@ static int __lhip_is_forbidden_program (
 				/* space found - copy everything before it as the program name */
 				strncpy (__lhip_linkpath, name,
 					LHIP_MIN ((size_t)(first_char - name), j));
-				__lhip_linkpath[first_char - name] = '\0';
+				__lhip_linkpath[LHIP_MIN ((size_t)(first_char - name), j)] = '\0';
 			}
 			__lhip_linkpath[j] = '\0';
 			if ( strncmp (__lhip_linkpath, LHIP_PATH_SEP, strlen(LHIP_PATH_SEP)) != 0 )
