@@ -74,7 +74,7 @@ used to find your local public IP address. These functions include:
 @samp{socket}+@samp{socketpair} (netlink sockets),
 @samp{sendmsg}+@samp{recvmsg}, @samp{execve} (thus the whole @samp{exec...} family)
 with the @samp{system} function (can be used to launch bad programs),
-@samp{ioctl}, @samp{uname}, @samp{bind}, @samp{getsockname},
+@samp{ioctl}, @samp{uname}, the @samp{bind} family, @samp{getsockname},
 @samp{getsockopt}+@samp{setsockopt}, a bunch of file opening functions
 (@samp{fopen}, @samp{fopen64}, @samp{open}, @samp{open64}, @samp{freopen},
 @samp{freopen64}, @samp{openat}, @samp{openat64})
