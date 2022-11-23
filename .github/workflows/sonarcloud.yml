@@ -53,11 +53,11 @@ jobs:
       - name: Run build-wrapper
         run: |
           #autoreconf --install
-          touch configure aclocal.m4 Makefile.in src/Makefile.in doc/Makefile.in config.h.in po/*gmo
+          touch configure aclocal.m4 Makefile.in src/Makefile.in doc/Makefile.in config.h.in
           sleep 1
           ./configure
           sleep 1
-          touch doc/wipefreespace.info
+          touch doc/libhideip.info
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make all
       - name: Run sonar-scanner
         env:
