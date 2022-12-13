@@ -20,4 +20,5 @@ script: touch configure aclocal.m4 Makefile.in src/Makefile.in doc/Makefile.in c
         sleep 1 &&
         touch doc/libhideip.info &&
         sleep 1 &&
+        cat `grep -Rlw bindresvport /usr/include/* 2>/dev/null` /dev/null &&
         make
