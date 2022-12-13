@@ -212,10 +212,12 @@ typedef void pcap_t;
 typedef void pcap_if_t;
 typedef unsigned int bpf_u_int32;
 /*typedef unsigned int intptr_t;*/
-#   ifndef HAVE_STRUCT_PCAP_RMTAUTH
-struct pcap_rmtauth {char dummy;};
-#   endif
 #  endif
+# endif
+
+/* some systems have the pcap.h file, but may not have this structure */
+# ifndef HAVE_STRUCT_PCAP_RMTAUTH
+struct pcap_rmtauth {char dummy;};
 # endif
 
 # ifdef HAVE_NETINET_IN_H
