@@ -13830,6 +13830,18 @@ then :
   printf "%s\n" "#define HAVE_LINUX_FCNTL_H 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "rpc/rpc.h" "ac_cv_header_rpc_rpc_h" "$ac_includes_default"
+if test "x$ac_cv_header_rpc_rpc_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_RPC_RPC_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "rpc.h" "ac_cv_header_rpc_h" "$ac_includes_default"
+if test "x$ac_cv_header_rpc_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_RPC_H 1" >>confdefs.h
+
+fi
 
 
 ac_fn_c_check_header_compile "$LINENO" "net/if.h" "ac_cv_header_net_if_h" "

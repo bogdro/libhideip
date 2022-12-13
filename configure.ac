@@ -166,7 +166,8 @@ AC_PROG_EGREP
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h errno.h malloc.h\
 	sys/types.h netdb.h sys/socket.h ifaddrs.h arpa/inet.h\
 	netinet/in.h sys/ioctl.h fcntl.h sys/utsname.h asm/types.h\
-	arpa/nameser.h stdint.h inttypes.h linux/random.h linux/fcntl.h])
+	arpa/nameser.h stdint.h inttypes.h linux/random.h linux/fcntl.h \
+	rpc/rpc.h rpc.h])
 
 AC_CHECK_HEADER([net/if.h],AC_DEFINE([HAVE_NET_IF_H],[1],
 	[Whether you have the net/if.h header.]),[],

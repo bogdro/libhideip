@@ -162,6 +162,15 @@ typedef unsigned short int __u16;
 # include <unistd.h>	/* gethostname () */
 #endif
 
+/* rpc.h: bindresvport() on FreeBSD */
+#ifdef HAVE_RPC_H
+# include <rpc.h>
+#endif
+
+#ifdef HAVE_RPC_RPC_H
+# include <rpc/rpc.h>
+#endif
+
 #include "lhip_priv.h"
 
 #ifdef __cplusplus
