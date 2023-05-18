@@ -64,10 +64,16 @@
 /* Define to 1 if you have the `freopen64' function. */
 #undef HAVE_FREOPEN64
 
+/* Define to 1 if you have the seven-argument form of gethostbyaddr_r(). */
+#undef HAVE_FUNC_GETHOSTBYADDR_R_7
+
+/* Define to 1 if you have the eight-argument form of gethostbyaddr_r(). */
+#undef HAVE_FUNC_GETHOSTBYADDR_R_8
+
 /* Define to 1 if you have the `getenv' function. */
 #undef HAVE_GETENV
 
-/* Define to 1 if you have the `gethostbyaddr_r' function. */
+/* Define to 1 if you have some form of gethostbyaddr_r(). */
 #undef HAVE_GETHOSTBYADDR_R
 
 /* Define to 1 if you have the `gethostbyname2_r' function. */

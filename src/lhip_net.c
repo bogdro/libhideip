@@ -295,11 +295,27 @@ gethostbyaddr (
 
 int
 gethostbyaddr_r (
-#ifdef LHIP_ANSIC
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+# ifdef LHIP_ANSIC
+	const void *addr, socklen_t len, int type,
+	struct hostent *ret, char *buf, size_t buflen,
+	int *h_errnop)
+# else
+	addr, len, type, ret, buf, buflen, h_errnop)
+	const void *addr;
+	socklen_t len;
+	int type;
+	struct hostent *ret;
+	char *buf;
+	size_t buflen;
+	int *h_errnop;
+# endif
+#else
+# ifdef LHIP_ANSIC
 	const void *addr, socklen_t len, int type,
 	struct hostent *ret, char *buf, size_t buflen,
 	struct hostent **result, int *h_errnop)
-#else
+# else
 	addr, len, type, ret, buf, buflen, result, h_errnop)
 	const void *addr;
 	socklen_t len;
@@ -309,6 +325,7 @@ gethostbyaddr_r (
 	size_t buflen;
 	struct hostent **result;
 	int *h_errnop;
+# endif
 #endif
 {
 	LHIP_MAKE_ERRNO_VAR(err);
@@ -330,7 +347,11 @@ gethostbyaddr_r (
 	{
 		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_gethostbyaddr_r_location ())
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+			(addr, len, type, ret, buf, buflen, h_errnop);
+#else
 			(addr, len, type, ret, buf, buflen, result, h_errnop);
+#endif
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
@@ -338,10 +359,18 @@ gethostbyaddr_r (
 	{
 		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_gethostbyaddr_r_location ())
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+			(addr, len, type, ret, buf, buflen, h_errnop);
+#else
 			(addr, len, type, ret, buf, buflen, result, h_errnop);
+#endif
 	}
 	my_ret = (*__lhip_real_gethostbyaddr_r_location ())
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+		(addr, len, type, ret, buf, buflen, h_errnop);
+#else
 		(addr, len, type, ret, buf, buflen, result, h_errnop);
+#endif
 	if ( my_ret == 0 )
 	{
 		__lhip_change_data (ret);
