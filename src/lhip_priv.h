@@ -258,9 +258,20 @@ typedef int(*i_vp_sl_i_shp_cp_s_shpp_ip)	LHIP_PARAMS ((const char *addr, size_t 
 # endif
 #endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
 typedef struct hostent * (*shp_cp)		LHIP_PARAMS ((const char *name));
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 typedef int (*i_cp_shp_cp_s_shpp_ip)		LHIP_PARAMS ((const char *name,
 							struct hostent *ret, char *buf, size_t buflen,
 							struct hostent **result, int *h_errnop));
+#else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
+# ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+typedef struct hostent * (*i_cp_shp_cp_s_shpp_ip)	LHIP_PARAMS ((const char *name,
+							struct hostent *ret, char *buf,
+							size_t buflen, int *h_errnop));
+# else /* ! HAVE_FUNC_GETHOSTBYNAME_R_5 */
+typedef int (*i_cp_shp_cp_s_shpp_ip)		LHIP_PARAMS ((const char *name,
+							struct hostent *ret, struct hostent_data *data));
+# endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
+#endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
 typedef struct hostent * (*shp_cp_i)		LHIP_PARAMS ((const char *name, int af));
 typedef int (*i_cp_i_shp_cp_s_shpp_i)		LHIP_PARAMS ((const char *name, int af,
 							struct hostent *ret, char *buf, size_t buflen,
