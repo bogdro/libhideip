@@ -475,7 +475,7 @@ gethostbyname (
 int
 #else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
 # ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
-struct hostent  *
+struct hostent *
 # else /* ! HAVE_FUNC_GETHOSTBYNAME_R_5 */
 int
 # endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
@@ -734,19 +734,51 @@ gethostent (
 
 /* =============================================================== */
 
+#ifdef HAVE_FUNC_GETHOSTENT_R_5
 int
+#else /* ! HAVE_FUNC_GETHOSTENT_R_5 */
+# ifdef HAVE_FUNC_GETHOSTENT_R_4
+struct hostent *
+# else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
+int
+# endif /* HAVE_FUNC_GETHOSTENT_R_4 */
+#endif /* HAVE_FUNC_GETHOSTENT_R_5 */
+
 gethostent_r (
-#ifdef LHIP_ANSIC
+#ifdef HAVE_FUNC_GETHOSTENT_R_5
+# ifdef LHIP_ANSIC
 	struct hostent *ret, char *buf, size_t buflen,
 	struct hostent **result, int *h_errnop)
-#else
+# else
 	ret, buf, buflen,result, h_errnop)
 	struct hostent *ret;
 	char *buf;
 	size_t buflen;
 	struct hostent **result;
 	int *h_errnop;
-#endif
+# endif
+#else /* ! HAVE_FUNC_GETHOSTENT_R_5 */
+# ifdef HAVE_FUNC_GETHOSTENT_R_4
+#  ifdef LHIP_ANSIC
+	struct hostent *ret, char *buf,
+	int buflen, int *h_errnop)
+#  else
+	ret, buf, buflen, h_errnop)
+	struct hostent *ret;
+	char *buf;
+	int buflen;
+	int *h_errnop;
+#  endif
+# else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
+#  ifdef LHIP_ANSIC
+	struct hostent *htent, struct hostent_data *ht_data)
+#  else
+	htent, ht_data)
+	struct hostent *htent;
+	struct hostent_data *ht_data;
+#  endif
+# endif /* HAVE_FUNC_GETHOSTENT_R_4 */
+#endif /* HAVE_FUNC_GETHOSTENT_R_5 */
 {
 	LHIP_MAKE_ERRNO_VAR(err);
 	int my_ret;
@@ -767,7 +799,15 @@ gethostent_r (
 	{
 		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_gethostent_r_location ())
+#ifdef HAVE_FUNC_GETHOSTENT_R_5
 			(ret, buf, buflen, result, h_errnop);
+#else /* ! HAVE_FUNC_GETHOSTENT_R_5 */
+# ifdef HAVE_FUNC_GETHOSTENT_R_4
+			(ret, buf, buflen, h_errnop);
+# else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
+			(htent, ht_data);
+# endif /* HAVE_FUNC_GETHOSTENT_R_4 */
+#endif /* HAVE_FUNC_GETHOSTENT_R_5 */
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
@@ -775,11 +815,27 @@ gethostent_r (
 	{
 		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_gethostent_r_location ())
+#ifdef HAVE_FUNC_GETHOSTENT_R_5
 			(ret, buf, buflen, result, h_errnop);
+#else /* ! HAVE_FUNC_GETHOSTENT_R_5 */
+# ifdef HAVE_FUNC_GETHOSTENT_R_4
+			(ret, buf, buflen, h_errnop);
+# else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
+			(htent, ht_data);
+# endif /* HAVE_FUNC_GETHOSTENT_R_4 */
+#endif /* HAVE_FUNC_GETHOSTENT_R_5 */
 	}
 
 	my_ret = (*__lhip_real_gethostent_r_location ())
+#ifdef HAVE_FUNC_GETHOSTENT_R_5
 		(ret, buf, buflen, result, h_errnop);
+#else /* ! HAVE_FUNC_GETHOSTENT_R_5 */
+# ifdef HAVE_FUNC_GETHOSTENT_R_4
+		(ret, buf, buflen, h_errnop);
+# else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
+		(htent, ht_data);
+# endif /* HAVE_FUNC_GETHOSTENT_R_4 */
+#endif /* HAVE_FUNC_GETHOSTENT_R_5 */
 	if ( my_ret == 0 )
 	{
 		__lhip_change_data (ret);

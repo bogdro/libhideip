@@ -280,9 +280,8 @@ AC_CHECK_FUNC([malloc],
 	AC_DEFINE([HAVE_MALLOC],[1],[Whether you have the malloc function.]))
 
 AC_CHECK_FUNCS([memcpy memset readlink getipnodebyname getipnodebyaddr \
-	getenv gethostbyname2_r \
-	gethostent_r openat openat64 realloc symlink lstat res_nquery \
-	execveat fexecve snprintf strdup stat stat64 lstat64 \
+	getenv gethostbyname2_r openat openat64 realloc symlink lstat \
+	res_nquery execveat fexecve snprintf strdup stat stat64 lstat64 \
 	realpath canonicalize_file_name fopen64 freopen64 open64 \
 	bindresvport bindresvport6])
 
@@ -314,6 +313,7 @@ AC_CHECK_FUNC([getnameinfo], [AC_DEFINE(HAVE_GETNAMEINFO, [1], [Whether you have
 
 AX_FUNC_WHICH_GETHOSTBYADDR_R
 AX_FUNC_WHICH_GETHOSTBYNAME_R
+AX_FUNC_WHICH_GETHOSTENT_R
 
 if (test "x$libpcap" = "xyes"); then
 
