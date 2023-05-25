@@ -9,7 +9,7 @@
 # DESCRIPTION
 #
 #   Determines which historical variant of the gethostbyaddr_r() call
-#   (taking seven or eight arguments) is available on the system and
+#   (taking five, seven or eight arguments) is available on the system and
 #   defines one of the following macros accordingly:
 #
 #     HAVE_FUNC_GETHOSTBYADDR_R_8
