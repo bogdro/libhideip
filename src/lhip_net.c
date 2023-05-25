@@ -293,6 +293,12 @@ gethostbyaddr (
 
 /* =============================================================== */
 
+#if (!defined HAVE_FUNC_GETHOSTBYADDR_R_8) \
+	&& (!defined HAVE_FUNC_GETHOSTBYADDR_R_7) \
+	&& (!defined HAVE_FUNC_GETHOSTBYADDR_R_5)
+# define HAVE_FUNC_GETHOSTBYADDR_R_8 1
+#endif
+
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 int
 #else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
@@ -470,6 +476,12 @@ gethostbyname (
 }
 
 /* =============================================================== */
+
+#if (!defined HAVE_FUNC_GETHOSTBYNAME_R_6) \
+	&& (!defined HAVE_FUNC_GETHOSTBYNAME_R_5) \
+	&& (!defined HAVE_FUNC_GETHOSTBYNAME_R_3)
+# define HAVE_FUNC_GETHOSTBYNAME_R_6 1
+#endif
 
 #ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 int
@@ -733,6 +745,12 @@ gethostent (
 }
 
 /* =============================================================== */
+
+#if (!defined HAVE_FUNC_GETHOSTENT_R_5) \
+	&& (!defined HAVE_FUNC_GETHOSTENT_R_4) \
+	&& (!defined HAVE_FUNC_GETHOSTENT_R_2)
+# define HAVE_FUNC_GETHOSTENT_R_5 1
+#endif
 
 #ifdef HAVE_FUNC_GETHOSTENT_R_5
 int
