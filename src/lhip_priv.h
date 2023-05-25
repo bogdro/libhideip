@@ -242,15 +242,21 @@ typedef struct {
 /* --- Function typedefs. */
 /* network-related functions: */
 typedef struct hostent * (*shp_vp_sl_i)		LHIP_PARAMS ((const void * addr, socklen_t len, int type));
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
+typedef int (*i_vp_sl_i_shp_cp_s_shpp_ip)	LHIP_PARAMS ((const void *addr, socklen_t len, int type,
+							struct hostent *ret, char *buf, size_t buflen,
+							struct hostent **result, int *h_errnop));
+#else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
 # ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+/* SunOS */
 typedef struct hostent * (*i_vp_sl_i_shp_cp_s_shpp_ip)	LHIP_PARAMS ((const char *, int, int,
 							struct hostent *, char *,
 							int, int *));
 # else
-typedef int (*i_vp_sl_i_shp_cp_s_shpp_ip)	LHIP_PARAMS ((const void *addr, socklen_t len, int type,
-							struct hostent *ret, char *buf, size_t buflen,
-							struct hostent **result, int *h_errnop));
+typedef int(*i_vp_sl_i_shp_cp_s_shpp_ip)	LHIP_PARAMS ((const char *addr, size_t len, int type,
+							struct hostent *ret, struct hostent_data *data));
 # endif
+#endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
 typedef struct hostent * (*shp_cp)		LHIP_PARAMS ((const char *name));
 typedef int (*i_cp_shp_cp_s_shpp_ip)		LHIP_PARAMS ((const char *name,
 							struct hostent *ret, char *buf, size_t buflen,
