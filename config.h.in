@@ -64,6 +64,9 @@
 /* Define to 1 if you have the `freopen64' function. */
 #undef HAVE_FREOPEN64
 
+/* Define to 1 if you have the five-argument form of gethostbyaddr_r(). */
+#undef HAVE_FUNC_GETHOSTBYADDR_R_5
+
 /* Define to 1 if you have the seven-argument form of gethostbyaddr_r(). */
 #undef HAVE_FUNC_GETHOSTBYADDR_R_7
 

@@ -293,30 +293,19 @@ gethostbyaddr (
 
 /* =============================================================== */
 
-#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
+int
+#else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
+# ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
 /* SunOS */
 struct hostent *
-#else
+# else
 int
-#endif
+# endif
+#endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
 
 gethostbyaddr_r (
-#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
-# ifdef LHIP_ANSIC
-	const char *addr, int len, int type,
-	struct hostent *ret, char *buf, int buflen,
-	int *h_errnop)
-# else
-	addr, len, type, ret, buf, buflen, h_errnop)
-	const void *addr;
-	int len;
-	int type;
-	struct hostent *ret;
-	char *buf;
-	int buflen;
-	int *h_errnop;
-# endif
-#else
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 # ifdef LHIP_ANSIC
 	const void *addr, socklen_t len, int type,
 	struct hostent *ret, char *buf, size_t buflen,
@@ -332,7 +321,36 @@ gethostbyaddr_r (
 	struct hostent **result;
 	int *h_errnop;
 # endif
-#endif
+#else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
+# ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+#  ifdef LHIP_ANSIC
+	const char *addr, int len, int type,
+	struct hostent *ret, char *buf, int buflen,
+	int *h_errnop)
+#  else
+	addr, len, type, ret, buf, buflen, h_errnop)
+	const char *addr;
+	int len;
+	int type;
+	struct hostent *ret;
+	char *buf;
+	int buflen;
+	int *h_errnop;
+#  endif
+# else /* ! HAVE_FUNC_GETHOSTBYADDR_R_7 */
+#  ifdef LHIP_ANSIC
+	const char *addr, size_t len, int type,
+	struct hostent *ret, struct hostent_data *data)
+#  else
+	addr, len, type, ret, data)
+	const char *addr;
+	size_t len;
+	int type;
+	struct hostent *ret;
+	struct hostent_data *data;
+#  endif
+# endif /* HAVE_FUNC_GETHOSTBYADDR_R_7 */
+#endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
 {
 	LHIP_MAKE_ERRNO_VAR(err);
 	int my_ret;
@@ -353,10 +371,18 @@ gethostbyaddr_r (
 	{
 		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_gethostbyaddr_r_location ())
-#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
-			(addr, len, type, ret, buf, buflen, h_errnop);
-#else
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 			(addr, len, type, ret, buf, buflen, result, h_errnop);
+#else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
+# ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+			(addr, len, type, ret, buf, buflen, h_errnop);
+# else
+			(addr, len, type, ret, data);
+# endif
+#endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
+
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+#else
 #endif
 	}
 
@@ -365,18 +391,30 @@ gethostbyaddr_r (
 	{
 		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_gethostbyaddr_r_location ())
-#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
-			(addr, len, type, ret, buf, buflen, h_errnop);
-#else
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 			(addr, len, type, ret, buf, buflen, result, h_errnop);
+#else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
+# ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+			(addr, len, type, ret, buf, buflen, h_errnop);
+# else
+			(addr, len, type, ret, data);
+# endif
+#endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
+
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+#else
 #endif
 	}
 	my_ret = (*__lhip_real_gethostbyaddr_r_location ())
-#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
-		(addr, len, type, ret, buf, buflen, h_errnop);
-#else
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 		(addr, len, type, ret, buf, buflen, result, h_errnop);
-#endif
+#else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
+# ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+		(addr, len, type, ret, buf, buflen, h_errnop);
+# else
+		(addr, len, type, ret, data);
+# endif
+#endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
 	if ( my_ret == 0 )
 	{
 		__lhip_change_data (ret);

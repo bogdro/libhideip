@@ -15572,13 +15572,46 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 
 fi
 
+#
+# FIVE ARGUMENTS
+# (e.g. AIX)
+#
+
+if test "$ac_cv_func_which_gethostbyaddr_r" = "unknown"; then
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <netdb.h>
+int
+main (void)
+{
+
+            char *name = "www.gnu.org";
+            struct hostent ret;
+            int len = 11;
+            int addr_type = 1;
+            struct hostent_data data;
+            (void)gethostbyaddr_r(name, len, addr_type, &ret, &data) /* ; */
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_cv_func_which_gethostbyaddr_r=five
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+
+fi
+
 ################################################################
 
 
 fi
 
 case "$ac_cv_func_which_gethostbyaddr_r" in
-    eight|seven)
+    eight|seven|five)
 
 printf "%s\n" "#define HAVE_GETHOSTBYADDR_R 1" >>confdefs.h
 
@@ -15599,6 +15632,14 @@ printf "%s\n" "#define HAVE_FUNC_GETHOSTBYADDR_R_8 1" >>confdefs.h
 printf "%s\n" "seven" >&6; }
 
 printf "%s\n" "#define HAVE_FUNC_GETHOSTBYADDR_R_7 1" >>confdefs.h
+
+    ;;
+
+    five)
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: five" >&5
+printf "%s\n" "five" >&6; }
+
+printf "%s\n" "#define HAVE_FUNC_GETHOSTBYADDR_R_5 1" >>confdefs.h
 
     ;;
 

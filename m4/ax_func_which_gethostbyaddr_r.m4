@@ -14,6 +14,7 @@
 #
 #     HAVE_FUNC_GETHOSTBYADDR_R_8
 #     HAVE_FUNC_GETHOSTBYADDR_R_7
+#     HAVE_FUNC_GETHOSTBYADDR_R_5
 #
 #   as well as
 #
@@ -21,7 +22,7 @@
 #
 # LICENSE
 #
-#   Copyright (c) 2023 Bogdan Drozdowski <bogdro@users.sourceforge.net>
+#   Copyright (c) 2023 Bogdan Drozdowski <bogdro /at/ users.sourceforge.net>
 #   Based on AX_FUNC_WHICH_GETHOSTBYNAME_R:
 #    Copyright (c) 2008 Caolan McNamara <caolan@skynet.ie>
 #    Copyright (c) 2008 Daniel Richard G. <skunk@iskunk.org>
@@ -52,7 +53,7 @@
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-#serial 8
+#serial 1
 
 AC_DEFUN([AX_FUNC_WHICH_GETHOSTBYADDR_R], [
 
@@ -125,12 +126,32 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <netdb.h>],
 
 fi
 
+#
+# FIVE ARGUMENTS
+# (e.g. AIX)
+#
+
+if test "$ac_cv_func_which_gethostbyaddr_r" = "unknown"; then
+
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <netdb.h>],
+        [
+            char *name = "www.gnu.org";
+            struct hostent ret;
+            int len = 11;
+            int addr_type = 1;
+            struct hostent_data data;
+            (void)gethostbyaddr_r(name, len, addr_type, &ret, &data) /* ; */
+        ])],
+    [ac_cv_func_which_gethostbyaddr_r=five])
+
+fi
+
 ################################################################
 
 ]) dnl end AC_CACHE_VAL
 
 case "$ac_cv_func_which_gethostbyaddr_r" in
-    eight|seven)
+    eight|seven|five)
     AC_DEFINE([HAVE_GETHOSTBYADDR_R], [1],
               [Define to 1 if you have some form of gethostbyaddr_r().])
     ;;
@@ -147,6 +168,12 @@ case "$ac_cv_func_which_gethostbyaddr_r" in
     AC_MSG_RESULT([seven])
     AC_DEFINE([HAVE_FUNC_GETHOSTBYADDR_R_7], [1],
               [Define to 1 if you have the seven-argument form of gethostbyaddr_r().])
+    ;;
+
+    five)
+    AC_MSG_RESULT([five])
+    AC_DEFINE([HAVE_FUNC_GETHOSTBYADDR_R_5], [1],
+              [Define to 1 if you have the five-argument form of gethostbyaddr_r().])
     ;;
 
     no)
