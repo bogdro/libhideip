@@ -433,13 +433,23 @@ gethostbyname (
 
 /* =============================================================== */
 
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 int
+#else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
+# ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+struct hostent  *
+# else /* ! HAVE_FUNC_GETHOSTBYNAME_R_5 */
+int
+# endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
+#endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
+
 gethostbyname_r (
-#ifdef LHIP_ANSIC
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
+# ifdef LHIP_ANSIC
 	const char *name,
 	struct hostent *ret, char *buf, size_t buflen,
 	struct hostent **result, int *h_errnop)
-#else
+# else
 	name, ret, buf, buflen, result, h_errnop)
 	const char *name;
 	struct hostent *ret;
@@ -447,7 +457,33 @@ gethostbyname_r (
 	size_t buflen;
 	struct hostent **result;
 	int *h_errnop;
-#endif
+# endif
+#else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
+# ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+#  ifdef LHIP_ANSIC
+	const char *name,
+	struct hostent *ret, char *buf, int buflen,
+	int *h_errnop)
+#  else
+	name, ret, buf, buflen, h_errnop)
+	const char *name;
+	struct hostent *ret;
+	char *buf;
+	int buflen;
+	int *h_errnop;
+#  endif
+# else /* ! HAVE_FUNC_GETHOSTBYNAME_R_5 */
+#  ifdef LHIP_ANSIC
+	const char *name,
+	struct hostent *ret, struct hostent_data *data)
+#  else
+	name, ret, data)
+	const char *name;
+	struct hostent *ret;
+	struct hostent_data *data;
+#  endif
+# endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
+#endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
 {
 	LHIP_MAKE_ERRNO_VAR(err);
 	int my_ret;
@@ -468,7 +504,15 @@ gethostbyname_r (
 	{
 		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_gethostbyname_r_location ())
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 			(name, ret, buf, buflen, result, h_errnop);
+#else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
+# ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+			(name, ret, buf, buflen,  h_errnop);
+# else /* ! HAVE_FUNC_GETHOSTBYNAME_R_5 */
+			(name, ret, data);
+# endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
+#endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
@@ -476,11 +520,27 @@ gethostbyname_r (
 	{
 		LHIP_SET_ERRNO(err);
 		return (*__lhip_real_gethostbyname_r_location ())
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 			(name, ret, buf, buflen, result, h_errnop);
+#else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
+# ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+			(name, ret, buf, buflen,  h_errnop);
+# else /* ! HAVE_FUNC_GETHOSTBYNAME_R_5 */
+			(name, ret, data);
+# endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
+#endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
 	}
 
 	my_ret = (*__lhip_real_gethostbyname_r_location ())
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 		(name, ret, buf, buflen, result, h_errnop);
+#else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
+# ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+		(name, ret, buf, buflen,  h_errnop);
+# else /* ! HAVE_FUNC_GETHOSTBYNAME_R_5 */
+		(name, ret, data);
+# endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
+#endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
 	if ( my_ret == 0 )
 	{
 		__lhip_change_data (ret);

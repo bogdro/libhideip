@@ -70,6 +70,15 @@
 /* Define to 1 if you have the eight-argument form of gethostbyaddr_r(). */
 #undef HAVE_FUNC_GETHOSTBYADDR_R_8
 
+/* Define to 1 if you have the three-argument form of gethostbyname_r(). */
+#undef HAVE_FUNC_GETHOSTBYNAME_R_3
+
+/* Define to 1 if you have the five-argument form of gethostbyname_r(). */
+#undef HAVE_FUNC_GETHOSTBYNAME_R_5
+
+/* Define to 1 if you have the six-argument form of gethostbyname_r(). */
+#undef HAVE_FUNC_GETHOSTBYNAME_R_6
+
 /* Define to 1 if you have the `getenv' function. */
 #undef HAVE_GETENV
 
@@ -79,7 +88,7 @@
 /* Define to 1 if you have the `gethostbyname2_r' function. */
 #undef HAVE_GETHOSTBYNAME2_R
 
-/* Define to 1 if you have the `gethostbyname_r' function. */
+/* Define to 1 if you have some form of gethostbyname_r(). */
 #undef HAVE_GETHOSTBYNAME_R
 
 /* Define to 1 if you have the `gethostent_r' function. */
