@@ -243,9 +243,9 @@ typedef struct {
 /* network-related functions: */
 typedef struct hostent * (*shp_vp_sl_i)		LHIP_PARAMS ((const void * addr, socklen_t len, int type));
 # ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
-typedef int (*i_vp_sl_i_shp_cp_s_shpp_ip)	LHIP_PARAMS ((const char *, int, int,
+typedef struct hostent * (*i_vp_sl_i_shp_cp_s_shpp_ip)	LHIP_PARAMS ((const char *, int, int,
 							struct hostent *, char *,
-							int, int *h_errnop));
+							int, int *));
 # else
 typedef int (*i_vp_sl_i_shp_cp_s_shpp_ip)	LHIP_PARAMS ((const void *addr, socklen_t len, int type,
 							struct hostent *ret, char *buf, size_t buflen,

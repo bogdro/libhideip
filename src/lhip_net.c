@@ -293,21 +293,27 @@ gethostbyaddr (
 
 /* =============================================================== */
 
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+/* SunOS */
+struct hostent *
+#else
 int
+#endif
+
 gethostbyaddr_r (
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
 # ifdef LHIP_ANSIC
-	const void *addr, socklen_t len, int type,
-	struct hostent *ret, char *buf, size_t buflen,
+	const char *addr, int len, int type,
+	struct hostent *ret, char *buf, int buflen,
 	int *h_errnop)
 # else
 	addr, len, type, ret, buf, buflen, h_errnop)
 	const void *addr;
-	socklen_t len;
+	int len;
 	int type;
 	struct hostent *ret;
 	char *buf;
-	size_t buflen;
+	int buflen;
 	int *h_errnop;
 # endif
 #else
