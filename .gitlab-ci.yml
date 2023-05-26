@@ -10,8 +10,8 @@ build:
   stage: build
   script:
   - touch configure aclocal.m4 Makefile.in src/Makefile.in
-    doc/Makefile.in config.h.in && sleep 1 && ./configure && touch doc/libhideip.info
-    && sleep 1 && make
+    doc/Makefile.in config.h.in && sleep 1 && ./configure && sleep 1 &&
+    touch doc/libhideip.info && sleep 1 && make
 stages:
 - test
 - build
