@@ -353,7 +353,11 @@ gethostbyaddr_r (
 #endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
 {
 	LHIP_MAKE_ERRNO_VAR(err);
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+	struct hostent * my_ret;
+#else
 	int my_ret;
+#endif
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -364,7 +368,11 @@ gethostbyaddr_r (
 	if ( __lhip_real_gethostbyaddr_r_location () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+		return NULL;
+#else
 		return -1;
+#endif
 	}
 
 	if ( (addr == NULL) || (ret == NULL) )
@@ -415,7 +423,11 @@ gethostbyaddr_r (
 		(addr, len, type, ret, data);
 # endif
 #endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+	if ( my_ret != NULL )
+#else
 	if ( my_ret == 0 )
+#endif
 	{
 		__lhip_change_data (ret);
 	}
@@ -524,7 +536,11 @@ gethostbyname_r (
 #endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
 {
 	LHIP_MAKE_ERRNO_VAR(err);
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+	struct hostent * my_ret;
+#else
 	int my_ret;
+#endif
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -535,7 +551,11 @@ gethostbyname_r (
 	if ( __lhip_real_gethostbyname_r_location () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+		return NULL;
+#else
 		return -1;
+#endif
 	}
 
 	if ( (name == NULL) || (ret == NULL) )
@@ -579,7 +599,11 @@ gethostbyname_r (
 		(name, ret, data);
 # endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
 #endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+	if ( my_ret != NULL )
+#else
 	if ( my_ret == 0 )
+#endif
 	{
 		__lhip_change_data (ret);
 	}
@@ -771,17 +795,21 @@ gethostent_r (
 #  endif
 # else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
 #  ifdef LHIP_ANSIC
-	struct hostent *htent, struct hostent_data *ht_data)
+	struct hostent *ret, struct hostent_data *ht_data)
 #  else
-	htent, ht_data)
-	struct hostent *htent;
+	ret, ht_data)
+	struct hostent *ret;
 	struct hostent_data *ht_data;
 #  endif
 # endif /* HAVE_FUNC_GETHOSTENT_R_4 */
 #endif /* HAVE_FUNC_GETHOSTENT_R_5 */
 {
 	LHIP_MAKE_ERRNO_VAR(err);
+#ifdef HAVE_FUNC_GETHOSTENT_R_4
+	struct hostent * my_ret;
+#else
 	int my_ret;
+#endif
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -792,7 +820,11 @@ gethostent_r (
 	if ( __lhip_real_gethostent_r_location () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
+#ifdef HAVE_FUNC_GETHOSTENT_R_4
+		return NULL;
+#else
 		return -1;
+#endif
 	}
 
 	if ( ret == NULL )
@@ -805,7 +837,7 @@ gethostent_r (
 # ifdef HAVE_FUNC_GETHOSTENT_R_4
 			(ret, buf, buflen, h_errnop);
 # else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
-			(htent, ht_data);
+			(ret, ht_data);
 # endif /* HAVE_FUNC_GETHOSTENT_R_4 */
 #endif /* HAVE_FUNC_GETHOSTENT_R_5 */
 	}
@@ -821,7 +853,7 @@ gethostent_r (
 # ifdef HAVE_FUNC_GETHOSTENT_R_4
 			(ret, buf, buflen, h_errnop);
 # else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
-			(htent, ht_data);
+			(ret, ht_data);
 # endif /* HAVE_FUNC_GETHOSTENT_R_4 */
 #endif /* HAVE_FUNC_GETHOSTENT_R_5 */
 	}
@@ -833,10 +865,14 @@ gethostent_r (
 # ifdef HAVE_FUNC_GETHOSTENT_R_4
 		(ret, buf, buflen, h_errnop);
 # else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
-		(htent, ht_data);
+		(ret, ht_data);
 # endif /* HAVE_FUNC_GETHOSTENT_R_4 */
 #endif /* HAVE_FUNC_GETHOSTENT_R_5 */
+#ifdef HAVE_FUNC_GETHOSTENT_R_4
+	if ( my_ret != NULL )
+#else
 	if ( my_ret == 0 )
+#endif
 	{
 		__lhip_change_data (ret);
 	}
