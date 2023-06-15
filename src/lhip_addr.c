@@ -187,6 +187,9 @@ void __lhip_read_local_addresses (LHIP_VOID)
 #ifndef HAVE_MALLOC
 	int localaddr_found = 0;
 #endif
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_5
+	struct hostent_data hdata;
+#endif
 
 	__lhip_number_of_hostnames = 0;
 
@@ -214,12 +217,27 @@ void __lhip_read_local_addresses (LHIP_VOID)
 		ai_res = inet_aton (local_ip, &lhip_addr);
 		if ( ai_res != 0 )
 		{
-			ai_res = (*__lhip_real_gethostbyaddr_r_location ())
-					(&lhip_addr, sizeof (struct in_addr), AF_INET,
-					&__lhip_tmp,
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+			ai_res = 0;
+			hostent_res =
+#else
+			ai_res =
+#endif
+				(*__lhip_real_gethostbyaddr_r_location ())
+					(&lhip_addr, sizeof (struct in_addr), AF_INET, &__lhip_tmp,
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 					/* buffer: */
 					__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
 					&hostent_res, &lhip_errno);
+#else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
+# ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+					/* buffer: */
+					__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
+					&lhip_errno);
+# else
+					&hdata);
+# endif
+#endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
 			if ( (ai_res == 0) && (hostent_res != NULL) )
 			{
 				if ( __lhip_is_local_address (hostent_res) == 1 )
@@ -230,12 +248,27 @@ void __lhip_read_local_addresses (LHIP_VOID)
 		} /* ai_res != 0 */
 		/* IPv6: */
 		__lhip_set_ipv6_value (&lhip_addr6);
-		ai_res = (*__lhip_real_gethostbyaddr_r_location ())
-				(&lhip_addr6, sizeof (struct in6_addr), AF_INET6,
-				&__lhip_tmp,
-				/* buffer: */
-				__lhip_our_hostname_v6, sizeof (__lhip_our_hostname_v6),
-				&hostent_res, &lhip_errno);
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+			ai_res = 0;
+			hostent_res =
+#else
+			ai_res =
+#endif
+				(*__lhip_real_gethostbyaddr_r_location ())
+					(&lhip_addr6, sizeof (struct in6_addr), AF_INET6, &__lhip_tmp,
+#ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
+					/* buffer: */
+					__lhip_our_hostname_v6, sizeof (__lhip_our_hostname_v6),
+					&hostent_res, &lhip_errno);
+#else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
+# ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+					/* buffer: */
+					__lhip_our_hostname_v6, sizeof (__lhip_our_hostname_v6),
+					&lhip_errno);
+# else
+					&hdata);
+# endif
+#endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
 		if ( (ai_res == 0) && (hostent_res != NULL) )
 		{
 			if ( __lhip_is_local_address (hostent_res) == 1 )
@@ -266,11 +299,27 @@ void __lhip_read_local_addresses (LHIP_VOID)
 	{
 		if (__lhip_our_gethostname[0] != '\0')
 		{
-			ai_res = (*__lhip_real_gethostbyname_r_location ()) (__lhip_our_gethostname,
-				&__lhip_tmp,
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+			ai_res = 0;
+			hostent_res =
+#else
+			ai_res =
+#endif
+				(*__lhip_real_gethostbyname_r_location ()) (
+					__lhip_our_gethostname, &__lhip_tmp,
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 				/* buffer: */
 				__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
 				&hostent_res, &lhip_errno);
+#else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
+# ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+				/* buffer: */
+				__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
+				&lhip_errno);
+# else /* ! HAVE_FUNC_GETHOSTBYNAME_R_5 */
+				&hdata);
+# endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
+#endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
 			if ( (ai_res == 0) && (hostent_res != NULL) )
 			{
 				__lhip_add_local_address (hostent_res);
@@ -278,11 +327,27 @@ void __lhip_read_local_addresses (LHIP_VOID)
 		}
 		if ( __lhip_uname_res.nodename[0] != '\0' )
 		{
-			ai_res = (*__lhip_real_gethostbyname_r_location ()) (__lhip_uname_res.nodename,
-				&__lhip_tmp,
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+			ai_res = 0;
+			hostent_res =
+#else
+			ai_res =
+#endif
+				(*__lhip_real_gethostbyname_r_location ()) (
+					__lhip_uname_res.nodename, &__lhip_tmp,
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 				/* buffer: */
 				__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
 				&hostent_res, &lhip_errno);
+#else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
+# ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
+				/* buffer: */
+				__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
+				&lhip_errno);
+# else /* ! HAVE_FUNC_GETHOSTBYNAME_R_5 */
+				&hdata);
+# endif /* HAVE_FUNC_GETHOSTBYNAME_R_5 */
+#endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
 			if ( (ai_res == 0) && (hostent_res != NULL) )
 			{
 				__lhip_add_local_address (hostent_res);
@@ -315,11 +380,27 @@ void __lhip_read_local_addresses (LHIP_VOID)
 	{
 		do
 		{
-			ai_res = (*__lhip_real_gethostent_r_location ()) (
-				&__lhip_tmp,
+#ifdef HAVE_FUNC_GETHOSTENT_R_4
+			ai_res = 0;
+			hostent_res =
+#else
+			ai_res =
+#endif
+				(*__lhip_real_gethostent_r_location ()) (
+					&__lhip_tmp,
+#ifdef HAVE_FUNC_GETHOSTENT_R_5
 				/* buffer: */
 				__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
 				&hostent_res, &lhip_errno);
+#else /* ! HAVE_FUNC_GETHOSTENT_R_5 */
+# ifdef HAVE_FUNC_GETHOSTENT_R_4
+				/* buffer: */
+				__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
+				&lhip_errno);
+# else /* ! HAVE_FUNC_GETHOSTENT_R_4 */
+				&hdata);
+# endif /* HAVE_FUNC_GETHOSTENT_R_4 */
+#endif /* HAVE_FUNC_GETHOSTENT_R_5 */
 
 			if ( (ai_res == 0) && (hostent_res != NULL) )
 			{
