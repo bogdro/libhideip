@@ -205,12 +205,6 @@ extern int gethostent_r LHIP_PARAMS ((
                struct hostent *ret, char *buf, size_t buflen,
                struct hostent **result, int *h_errnop));
 #endif
-#ifndef HAVE_BINDRESVPORT
-extern int bindresvport LHIP_PARAMS ((int sockfd, struct sockaddr_in *sin));
-#endif
-#ifndef HAVE_BINDRESVPORT6
-extern int bindresvport6 LHIP_PARAMS ((int sockfd, struct sockaddr_in6 *sin));
-#endif
 
 #ifdef __cplusplus
 }
@@ -1806,27 +1800,30 @@ bind (
 
 /* =============================================================== */
 
-#ifdef TEST_COMPILE
-# undef LHIP_ANSIC
-#endif
+#if (defined HAVE_BINDRESVPORT) \
+	&& (!defined __sun) /* skip on SunOS - different arguments, subject to changes */
+
+# ifdef TEST_COMPILE
+#  undef LHIP_ANSIC
+# endif
 
 int
 bindresvport (
-#ifdef LHIP_ANSIC
+# ifdef LHIP_ANSIC
 	int sockfd, struct sockaddr_in *my_addr)
-#else
+# else
 	sockfd, my_addr)
 	int sockfd;
 	struct sockaddr_in *my_addr;
-#endif
+# endif
 {
 	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
-#ifdef LHIP_DEBUG
+# ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: bindresvport()\n");
 	fflush (stderr);
-#endif
+# endif
 
 	if ( __lhip_real_bindresvport_location () == NULL )
 	{
@@ -1859,26 +1856,30 @@ bindresvport (
 	}
 	return (*__lhip_real_bindresvport_location ()) (sockfd, my_addr);
 }
+#endif /* (defined HAVE_BINDRESVPORT) && (!defined __sun) */
 
 /* =============================================================== */
 
+#if (defined HAVE_BINDRESVPORT6) \
+	&& (!defined __sun) /* skip on SunOS, just like bindresvport() */
+
 int
 bindresvport6 (
-#ifdef LHIP_ANSIC
+# ifdef LHIP_ANSIC
 	int sockfd, struct sockaddr_in6 *my_addr)
-#else
+# else
 	sockfd, my_addr)
 	int sockfd;
 	struct sockaddr_in6 *my_addr;
-#endif
+# endif
 {
 	LHIP_MAKE_ERRNO_VAR(err);
 
 	__lhip_main ();
-#ifdef LHIP_DEBUG
+# ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: bindresvport6()\n");
 	fflush (stderr);
-#endif
+# endif
 
 	if ( __lhip_real_bindresvport6_location () == NULL )
 	{
@@ -1911,6 +1912,7 @@ bindresvport6 (
 	}
 	return (*__lhip_real_bindresvport6_location ()) (sockfd, my_addr);
 }
+#endif /* (defined HAVE_BINDRESVPORT6) && (!defined __sun) */
 
 /* =============================================================== */
 
