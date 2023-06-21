@@ -242,14 +242,14 @@ struct lifconf
 int
 ioctl (
 #ifdef LHIP_ANSIC
-	int d, unsigned long int request, ...)
+	int d, IOCTL_ARG2TYPE request, ...)
 #else
 	va_alist )
 	va_dcl /* no semicolons here! */
 	/*
 	d, request)
 	int d;
-	unsigned long int request;*/
+	IOCTL_ARG2TYPE request;*/
 #endif
 {
 	LHIP_MAKE_ERRNO_VAR(err);
@@ -257,7 +257,7 @@ ioctl (
 	va_list args;
 # ifndef LHIP_ANSIC
 	int d;
-	unsigned long int request;
+	IOCTL_ARG2TYPE request;
 # endif
 #endif
 	void * data1 = NULL;
@@ -288,7 +288,7 @@ ioctl (
 # else
 	va_start (args); /* cppcheck-suppress preprocessorErrorDirective */
 	d = va_arg (args, int);
-	request = va_arg (args, unsigned long int);
+	request = va_arg (args, IOCTL_ARG2TYPE);
 # endif
 	data1 = va_arg (args, void *);
 	data2 = va_arg (args, void *);

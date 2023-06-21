@@ -671,6 +671,7 @@ PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
 PCAP_FINDALLDEVS_EX_ARG1TYPE
+IOCTL_ARG2TYPE
 GETNAMEINFO_ARG7TYPE
 GETNAMEINFO_ARG6TYPE
 GETNAMEINFO_ARG4TYPE
@@ -15438,6 +15439,269 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 
 
    as_fn_error $? "getnameinfo unable to find a working combination" "$LINENO" 5
+ done
+
+
+
+
+fi
+
+
+
+ac_fn_c_check_func "$LINENO" "ioctl" "ac_cv_func_ioctl"
+if test "x$ac_cv_func_ioctl" = xyes
+then :
+
+printf "%s\n" "#define HAVE_IOCTL 1" >>confdefs.h
+
+
+
+
+ for i in 1
+ do
+
+
+
+
+
+
+
+
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking ioctl ARG2TYPE => unsigned long " >&5
+printf %s "checking ioctl ARG2TYPE => unsigned long ... " >&6; }
+     ac_save_CPPFLAGS="$CPPFLAGS"
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifdef HAVE_SYS_TYPES_H
+		#include <sys/types.h>
+		#endif
+		#ifdef HAVE_SYS_IOCTL_H
+		#include <sys/ioctl.h>
+		#endif
+		#ifdef HAVE_UNISTD_H
+		#include <unistd.h>
+		#endif
+
+int
+main (void)
+{
+int (*test) (int fd, unsigned long request, ...) = &ioctl;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+
+      CPPFLAGS="$ac_save_CPPFLAGS"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ok" >&5
+printf "%s\n" "ok" >&6; }
+      printf "%s\n" "#define IOCTL_ARG2TYPE unsigned long" >>confdefs.h
+
+	IOCTL_ARG2TYPE="unsigned long"
+
+
+      break;
+
+else $as_nop
+
+      CPPFLAGS="$ac_save_CPPFLAGS"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not ok" >&5
+printf "%s\n" "not ok" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+
+
+
+
+
+
+
+
+
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking ioctl ARG2TYPE => long " >&5
+printf %s "checking ioctl ARG2TYPE => long ... " >&6; }
+     ac_save_CPPFLAGS="$CPPFLAGS"
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifdef HAVE_SYS_TYPES_H
+		#include <sys/types.h>
+		#endif
+		#ifdef HAVE_SYS_IOCTL_H
+		#include <sys/ioctl.h>
+		#endif
+		#ifdef HAVE_UNISTD_H
+		#include <unistd.h>
+		#endif
+
+int
+main (void)
+{
+int (*test) (int fd, long request, ...) = &ioctl;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+
+      CPPFLAGS="$ac_save_CPPFLAGS"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ok" >&5
+printf "%s\n" "ok" >&6; }
+      printf "%s\n" "#define IOCTL_ARG2TYPE long" >>confdefs.h
+
+	IOCTL_ARG2TYPE="long"
+
+
+      break;
+
+else $as_nop
+
+      CPPFLAGS="$ac_save_CPPFLAGS"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not ok" >&5
+printf "%s\n" "not ok" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+
+
+
+
+
+
+
+
+
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking ioctl ARG2TYPE => unsigned int " >&5
+printf %s "checking ioctl ARG2TYPE => unsigned int ... " >&6; }
+     ac_save_CPPFLAGS="$CPPFLAGS"
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifdef HAVE_SYS_TYPES_H
+		#include <sys/types.h>
+		#endif
+		#ifdef HAVE_SYS_IOCTL_H
+		#include <sys/ioctl.h>
+		#endif
+		#ifdef HAVE_UNISTD_H
+		#include <unistd.h>
+		#endif
+
+int
+main (void)
+{
+int (*test) (int fd, unsigned int request, ...) = &ioctl;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+
+      CPPFLAGS="$ac_save_CPPFLAGS"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ok" >&5
+printf "%s\n" "ok" >&6; }
+      printf "%s\n" "#define IOCTL_ARG2TYPE unsigned int" >>confdefs.h
+
+	IOCTL_ARG2TYPE="unsigned int"
+
+
+      break;
+
+else $as_nop
+
+      CPPFLAGS="$ac_save_CPPFLAGS"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not ok" >&5
+printf "%s\n" "not ok" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+
+
+
+
+
+
+
+
+
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking ioctl ARG2TYPE => int " >&5
+printf %s "checking ioctl ARG2TYPE => int ... " >&6; }
+     ac_save_CPPFLAGS="$CPPFLAGS"
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifdef HAVE_SYS_TYPES_H
+		#include <sys/types.h>
+		#endif
+		#ifdef HAVE_SYS_IOCTL_H
+		#include <sys/ioctl.h>
+		#endif
+		#ifdef HAVE_UNISTD_H
+		#include <unistd.h>
+		#endif
+
+int
+main (void)
+{
+int (*test) (int fd, int request, ...) = &ioctl;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+
+      CPPFLAGS="$ac_save_CPPFLAGS"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ok" >&5
+printf "%s\n" "ok" >&6; }
+      printf "%s\n" "#define IOCTL_ARG2TYPE int" >>confdefs.h
+
+	IOCTL_ARG2TYPE="int"
+
+
+      break;
+
+else $as_nop
+
+      CPPFLAGS="$ac_save_CPPFLAGS"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not ok" >&5
+printf "%s\n" "not ok" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   as_fn_error $? "ioctl unable to find a working combination" "$LINENO" 5
  done
 
 

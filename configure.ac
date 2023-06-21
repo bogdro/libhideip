@@ -311,6 +311,26 @@ AC_CHECK_FUNC([getnameinfo], [AC_DEFINE(HAVE_GETNAMEINFO, [1], [Whether you have
 	ARG7TYPE, [int, unsigned int])
 	])
 
+AH_TEMPLATE([IOCTL_ARG2TYPE])
+AC_CHECK_FUNC([ioctl], [AC_DEFINE(HAVE_IOCTL, [1], [Whether you have the ioctl function])
+	AX_PROTOTYPE(ioctl,
+	[
+		#ifdef HAVE_SYS_TYPES_H
+		#include <sys/types.h>
+		#endif
+		#ifdef HAVE_SYS_IOCTL_H
+		#include <sys/ioctl.h>
+		#endif
+		#ifdef HAVE_UNISTD_H
+		#include <unistd.h>
+		#endif
+	],
+	[
+		int (*test) (int fd, ARG2TYPE request, ...) = &ioctl;
+	],
+	ARG2TYPE, [unsigned long, long, unsigned int, int])
+	])
+
 AX_FUNC_WHICH_GETHOSTBYADDR_R
 AX_FUNC_WHICH_GETHOSTBYNAME_R
 AX_FUNC_WHICH_GETHOSTENT_R

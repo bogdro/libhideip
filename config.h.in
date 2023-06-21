@@ -121,6 +121,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Whether you have the ioctl function */
+#undef HAVE_IOCTL
+
 /* Define to 1 if you have the `anl' library (-lanl). */
 #undef HAVE_LIBANL
 
@@ -282,6 +285,9 @@
 
 /* Whether you have the varargs.h header. */
 #undef HAVE_VARARGS_H
+
+/* */
+#undef IOCTL_ARG2TYPE
 
 /* Whether or not to enable additional ban files pointed to by environment
    variables. */

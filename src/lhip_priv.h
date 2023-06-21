@@ -328,7 +328,7 @@ typedef int (*i_i_cpp_cpp)			LHIP_PARAMS ((int fd, char *const argv[],
 typedef int (*i_i_cp_cpp_cpp_i)			LHIP_PARAMS ((int dirfd, const char *filename,
 							char *const argv[], char *const envp[], int flags));
 typedef int (*i_cp)				LHIP_PARAMS ((const char *command));
-typedef int (*i_i_i_va)				LHIP_PARAMS ((int d, unsigned long int request, ...));
+typedef int (*i_i_i_va)				LHIP_PARAMS ((int d, IOCTL_ARG2TYPE request, ...));
 typedef int (*i_i_i_i)				LHIP_PARAMS ((int domain, int type, int protocol));
 typedef ssize_t (*ss_i_smp_i)			LHIP_PARAMS ((int s, struct msghdr *msg, int flags));
 typedef ssize_t (*ss_i_csmp_i)			LHIP_PARAMS ((int s, const struct msghdr *msg, int flags));
