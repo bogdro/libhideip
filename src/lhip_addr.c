@@ -224,17 +224,19 @@ void __lhip_read_local_addresses (LHIP_VOID)
 			ai_res =
 #endif
 				(*__lhip_real_gethostbyaddr_r_location ())
-					(&lhip_addr, sizeof (struct in_addr), AF_INET, &__lhip_tmp,
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
+					(&lhip_addr, sizeof (struct in_addr), AF_INET, &__lhip_tmp,
 					/* buffer: */
 					__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
 					&hostent_res, &lhip_errno);
 #else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
 # ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
+					((char *)&lhip_addr, sizeof (struct in_addr), AF_INET, &__lhip_tmp,
 					/* buffer: */
 					__lhip_our_hostname_v4, sizeof (__lhip_our_hostname_v4),
 					&lhip_errno);
 # else
+					((char *)&lhip_addr, sizeof (struct in_addr), AF_INET, &__lhip_tmp,
 					&hdata);
 # endif
 #endif /* HAVE_FUNC_GETHOSTBYADDR_R_8 */
