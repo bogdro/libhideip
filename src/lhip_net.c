@@ -1801,7 +1801,7 @@ bind (
 /* =============================================================== */
 
 #if (defined HAVE_BINDRESVPORT) \
-	&& (!defined __sun) /* skip on SunOS - different arguments, subject to changes */
+	&& (!defined __sun) /* skip on SunOS - different arguments, "kRPC internal function. Not for general use. Subject to rapid change." */
 
 # ifdef TEST_COMPILE
 #  undef LHIP_ANSIC
