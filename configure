@@ -14811,7 +14811,9 @@ printf "%s\n" "#define HAVE_GETNAMEINFO 1" >>confdefs.h
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking getnameinfo ARG4TYPE => socklen_t ARG6TYPE => socklen_t ARG7TYPE => int " >&5
 printf %s "checking getnameinfo ARG4TYPE => socklen_t ARG6TYPE => socklen_t ARG7TYPE => int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -14877,7 +14879,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking getnameinfo ARG4TYPE => size_t ARG6TYPE => socklen_t ARG7TYPE => int " >&5
 printf %s "checking getnameinfo ARG4TYPE => size_t ARG6TYPE => socklen_t ARG7TYPE => int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -14961,7 +14965,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking getnameinfo ARG4TYPE => socklen_t ARG6TYPE => size_t ARG7TYPE => int " >&5
 printf %s "checking getnameinfo ARG4TYPE => socklen_t ARG6TYPE => size_t ARG7TYPE => int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -15027,7 +15033,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking getnameinfo ARG4TYPE => size_t ARG6TYPE => size_t ARG7TYPE => int " >&5
 printf %s "checking getnameinfo ARG4TYPE => size_t ARG6TYPE => size_t ARG7TYPE => int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -15129,7 +15137,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking getnameinfo ARG4TYPE => socklen_t ARG6TYPE => socklen_t ARG7TYPE => unsigned int " >&5
 printf %s "checking getnameinfo ARG4TYPE => socklen_t ARG6TYPE => socklen_t ARG7TYPE => unsigned int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -15195,7 +15205,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking getnameinfo ARG4TYPE => size_t ARG6TYPE => socklen_t ARG7TYPE => unsigned int " >&5
 printf %s "checking getnameinfo ARG4TYPE => size_t ARG6TYPE => socklen_t ARG7TYPE => unsigned int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -15279,7 +15291,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking getnameinfo ARG4TYPE => socklen_t ARG6TYPE => size_t ARG7TYPE => unsigned int " >&5
 printf %s "checking getnameinfo ARG4TYPE => socklen_t ARG6TYPE => size_t ARG7TYPE => unsigned int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -15345,7 +15359,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking getnameinfo ARG4TYPE => size_t ARG6TYPE => size_t ARG7TYPE => unsigned int " >&5
 printf %s "checking getnameinfo ARG4TYPE => size_t ARG6TYPE => size_t ARG7TYPE => unsigned int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -15470,7 +15486,9 @@ printf "%s\n" "#define HAVE_IOCTL 1" >>confdefs.h
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking ioctl ARG2TYPE => unsigned long " >&5
 printf %s "checking ioctl ARG2TYPE => unsigned long ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -15526,7 +15544,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking ioctl ARG2TYPE => long " >&5
 printf %s "checking ioctl ARG2TYPE => long ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -15582,7 +15602,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking ioctl ARG2TYPE => unsigned int " >&5
 printf %s "checking ioctl ARG2TYPE => unsigned int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -15638,7 +15660,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking ioctl ARG2TYPE => int " >&5
 printf %s "checking ioctl ARG2TYPE => int ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -16363,7 +16387,9 @@ printf "%s\n" "#define HAVE_PCAP_FINDALLDEVS_EX 1" >>confdefs.h
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking pcap_findalldevs_ex ARG1TYPE => char * " >&5
 printf %s "checking pcap_findalldevs_ex ARG1TYPE => char * ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -16418,7 +16444,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking pcap_findalldevs_ex ARG1TYPE => const char * " >&5
 printf %s "checking pcap_findalldevs_ex ARG1TYPE => const char * ... " >&6; }
      ac_save_CPPFLAGS="$CPPFLAGS"
-        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then CPPFLAGS="$CPPFLAGS -Werror" ; fi
+        if (test "x$GCC" = "xyes" || test "x$GXX" = "xyes" ); then
+          CPPFLAGS="$CPPFLAGS -Werror -Wno-unused-variable" ;
+        fi
 
      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
