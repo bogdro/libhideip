@@ -2,7 +2,7 @@
  * LibHideIP - A library for hiding local IP address.
  *	-- other unit tests.
  *
- * Copyright (C) 2015-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
+ * Copyright (C) 2015-2024 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * This program is free software; you can redistribute it and/or

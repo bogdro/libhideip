@@ -1,7 +1,7 @@
 /*
  * LibHideIP - A library for hiding local IP address.
  *
- * Copyright (C) 2008-2022 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
+ * Copyright (C) 2008-2024 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
  * Syntax example: export LD_PRELOAD=/usr/local/lib/libhideip.so
