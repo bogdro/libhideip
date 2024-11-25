@@ -69,7 +69,6 @@
 #define BANNING_MAKE_ERRNO_VAR(x) LHIP_MAKE_ERRNO_VAR(x)
 #define BANNING_MAXPATHLEN LHIP_MAXPATHLEN
 #define BANNING_PATH_SEP LHIP_PATH_SEP
-#define BANNING_MKNAME(x) __lhip ## x
 #define BANNING_PARAMS(x) LHIP_PARAMS(x)
 
 #ifndef HAVE_READLINK
@@ -114,7 +113,7 @@ __lhip_check_prog_ban (LHIP_VOID)
 
 	ret = __banning_is_banned ("libhideip.progban",
 		LHIP_BANNING_USERFILE, LHIP_BANNING_ENV,
-		__banning_exename);
+		__banning_exename, __lhip_real_fopen_location());
 #ifdef LHIP_DEBUG
 	fprintf (stderr, "libhideip: __lhip_check_prog_ban()=%d\n", ret);
 	fflush (stderr);
