@@ -938,7 +938,19 @@ __lhip_change_data (
 				LHIP_MIN (len+1, 10));
 			ret->h_name[len] = '\0';
 		}
-		ret->h_aliases = NULL;
+		if ( ret->h_aliases != NULL )
+		{
+			i = 0;
+			while ( ret->h_aliases[i] != NULL )
+			{
+				len = strlen (ret->h_aliases[i]);
+				LHIP_MEMSET (ret->h_aliases[i], 0, len);
+				strncpy (ret->h_aliases[i], "localhost",
+					LHIP_MIN (len+1, 10));
+				ret->h_aliases[i][len] = '\0';
+				i++;
+			}
+		}
 		if ( (ret->h_addrtype == AF_INET)
 			&& (ret->h_addr_list != NULL) )
 		{
