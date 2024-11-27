@@ -432,6 +432,7 @@ if (test "x$GCC" = "xyes" ); then
 	AX_C_CHECK_FLAG([-fstack-protector-all], [CFLAGS="$CFLAGS -fstack-protector-all"], [CFLAGS="$CFLAGS"])
 	AX_C_CHECK_FLAG([-O2], [CFLAGS="$CFLAGS -O2"], [CFLAGS="$CFLAGS"])
 	AX_C_CHECK_FLAG([-O3], [CFLAGS="$CFLAGS -O3"], [CFLAGS="$CFLAGS"])
+	#AX_C_CHECK_FLAG([-Os], [CFLAGS="$CFLAGS -O3"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Waggregate-return], [CFLAGS="$CFLAGS -Waggregate-return"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wwrite-strings], [CFLAGS="$CFLAGS -Wwrite-strings"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wchkp], [CFLAGS="$CFLAGS -Wchkp"], [CFLAGS="$CFLAGS"])
@@ -441,6 +442,10 @@ if (test "x$GCC" = "xyes" ); then
         AX_C_CHECK_FLAG([-Wno-nonnull-compare], [CFLAGS="$CFLAGS -Wno-nonnull-compare"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wstringop-truncation], [CFLAGS="$CFLAGS -Wstringop-truncation"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-Wduplicated-branches], [CFLAGS="$CFLAGS -Wduplicated-branches"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-Wnull-dereference], [CFLAGS="$CFLAGS -Wnull-dereference"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-Walloc-zero], [CFLAGS="$CFLAGS -Walloc-zero"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-Wunused-parameter], [CFLAGS="$CFLAGS -Wunused-parameter"], [CFLAGS="$CFLAGS"])
+        AX_C_CHECK_FLAG([-Wdangling-else], [CFLAGS="$CFLAGS -Wdangling-else"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-fstack-check], [CFLAGS="$CFLAGS -fstack-check"], [CFLAGS="$CFLAGS"])
         AX_C_CHECK_FLAG([-fanalyzer], [CFLAGS="$CFLAGS -fanalyzer"], [CFLAGS="$CFLAGS"])
 
