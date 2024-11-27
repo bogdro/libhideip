@@ -214,10 +214,10 @@
 /* Define to 1 if you have the `res_nquery' function. */
 #undef HAVE_RES_NQUERY
 
-/* Define to 1 if you have the <rpc.h> header file. */
+/* Whether you have the rpc.h header. */
 #undef HAVE_RPC_H
 
-/* Define to 1 if you have the <rpc/rpc.h> header file. */
+/* Whether you have the rpc/rpc.h header. */
 #undef HAVE_RPC_RPC_H
 
 /* Define to 1 if you have the `snprintf' function. */
