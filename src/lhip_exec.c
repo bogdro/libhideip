@@ -478,12 +478,17 @@ int __lhip_is_forbidden_file (
 	strncpy (__lhip_linkpath, __lhip_get_target_link_path (__lhip_linkpath), sizeof (__lhip_linkpath)-1);
 	__lhip_linkpath[sizeof (__lhip_linkpath) - 1] = '\0';
 #endif
-	for ( j = 0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
+#ifdef HAVE_MALLOC
+	if ( __lhip_linkpath != NULL )
+#endif
 	{
-		if ( strstr (__lhip_linkpath, __lhip_valuable_files[j]) != NULL )
+		for ( j = 0; j < sizeof (__lhip_valuable_files)/sizeof (__lhip_valuable_files[0]); j++)
 		{
-			ret = 1;
-			break;
+			if ( strstr (__lhip_linkpath, __lhip_valuable_files[j]) != NULL )
+			{
+				ret = 1;
+				break;
+			}
 		}
 	}
 #ifdef HAVE_MALLOC
@@ -737,13 +742,22 @@ static int __lhip_is_forbidden_program (
 				ret = 1;
 				break;
 			}
-			if ( strstr (__lhip_linkpath, programs[j]) != NULL )
+#ifdef HAVE_MALLOC
+			if ( __lhip_linkpath != NULL )
+#endif
 			{
-				ret = 1;
-				break;
+				if ( strstr (__lhip_linkpath, programs[j]) != NULL )
+				{
+					ret = 1;
+					break;
+				}
 			}
 		}
-		if ( (argv != NULL) && (ret == 0) )
+		if ( (argv != NULL) && (ret == 0)
+#ifdef HAVE_MALLOC
+			&& (__lhip_linkpath != NULL)
+#endif
+		)
 		{
 			/*
 			now check if the viewing programs aren't used to get the contents
@@ -773,7 +787,7 @@ static int __lhip_is_forbidden_program (
 		}
 	} /* if ( __lhip_linkpath != NULL && __lhip_newlinkpath != NULL ) */
 #ifdef HAVE_MALLOC
-	if ( (__lhip_linkpath != NULL) && (__lhip_linkpath != name) )
+	if ( __lhip_linkpath != NULL )
 	{
 		free ((void *)__lhip_linkpath);
 	}
