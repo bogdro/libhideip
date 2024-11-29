@@ -281,6 +281,23 @@ AC_TYPE_MODE_T
 AC_TYPE_SIZE_T
 AC_TYPE_SSIZE_T
 
+AC_CHECK_TYPES([off64_t, intptr_t],,,
+	[
+	#define _FILE_OFFSET_BITS 64
+	#define _LARGEFILE64_SOURCE
+	#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#ifdef HAVE_STDINT_H
+	#include <stdint.h>
+	#endif
+	#ifdef HAVE_STDDEF_H
+	#include <stddef.h>
+	#endif
+	#ifdef HAVE_INTTYPES_H
+	#include <inttypes.h>
+	#endif
+	])
 AC_CHECK_TYPES([socklen_t],,,
 	[
 	#ifdef HAVE_SYS_TYPES_H

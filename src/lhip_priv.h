@@ -201,6 +201,20 @@ struct utsname
 #  include <stdint.h>	/* intptr_t */
 # endif
 
+# if (!defined HAVE_OFF64_T) && (!defined LHIP_OFF64_T_DEFINED)
+#  ifdef HAVE_LONG_LONG_INT
+typedef long long int off64_t;
+#  else
+typedef long int off64_t;
+#  endif
+#  define LHIP_OFF64_T_DEFINED 1
+# endif
+
+# if (!defined HAVE_INTPTR_T) && (!defined LHIP_INTPTR_T_DEFINED)
+typedef unsigned int intptr_t;
+#  define LHIP_INTPTR_T_DEFINED 1
+# endif
+
 # ifdef HAVE_PCAP_H
 #  include <pcap.h>
 # else
@@ -211,7 +225,6 @@ struct utsname
 typedef void pcap_t;
 typedef void pcap_if_t;
 typedef unsigned int bpf_u_int32;
-/*typedef unsigned int intptr_t;*/
 #  endif
 # endif
 

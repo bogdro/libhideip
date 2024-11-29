@@ -118,6 +118,9 @@
 /* Define to 1 if you have the <ifaddrs.h> header file. */
 #undef HAVE_IFADDRS_H
 
+/* Define to 1 if the system has the type `intptr_t'. */
+#undef HAVE_INTPTR_T
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
@@ -180,6 +183,9 @@
 
 /* Whether you have the net/if.h header. */
 #undef HAVE_NET_IF_H
+
+/* Define to 1 if the system has the type `off64_t'. */
+#undef HAVE_OFF64_T
 
 /* Define to 1 if you have the `open64' function. */
 #undef HAVE_OPEN64

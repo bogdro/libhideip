@@ -66,6 +66,7 @@
 #  undef  HAVE_GETIPNODEBYADDR
 #  define HAVE_GETNAMEINFO		1
 #  define HAVE_IFADDRS_H		1
+#  define HAVE_INTPTR_T			1
 #  define HAVE_INTTYPES_H		1
 #  define HAVE_LIBANL			1
 #  define HAVE_LIBDL			1
@@ -86,6 +87,7 @@
 #  define HAVE_NET_IF_H			1
 #  define HAVE_NETDB_H			1
 #  define HAVE_NETINET_IN_H		1
+#  define HAVE_OFF64_T			1
 #  define HAVE_OPEN64			1
 #  define HAVE_OPENAT			1
 #  define HAVE_OPENAT64			1

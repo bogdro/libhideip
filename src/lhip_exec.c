@@ -236,12 +236,13 @@ static char * __lhip_get_target_link_path (
 	int res;
 	ssize_t lnk_res;
 	char * current_name;
-	off_t lsize;
 # ifdef HAVE_LSTAT64
 	struct stat64 st;
+	off64_t lsize;
 # else
 #  ifdef HAVE_LSTAT
 	struct stat st;
+	off_t lsize;
 #  endif
 # endif
 # ifdef HAVE_MALLOC
