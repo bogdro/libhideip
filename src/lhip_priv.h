@@ -25,7 +25,9 @@
 
 # include "lhip_cfg.h"
 
-# undef LHIP_ATTR
+# ifdef LHIP_ATTR
+#  undef LHIP_ATTR
+# endif
 # ifdef __GNUC__
 #  define LHIP_ATTR(x)	__attribute__(x)
 # else
@@ -51,7 +53,9 @@
 /* LHIP_PARAMS is a macro used to wrap function prototypes, so that
         compilers that don't understand ANSI C prototypes still work,
         and ANSI C compilers can issue warnings about type mismatches. */
-# undef LHIP_PARAMS
+# ifdef LHIP_PARAMS
+#  undef LHIP_PARAMS
+# endif
 # if defined (__STDC__) || defined (_AIX) \
 	|| (defined (__mips) && defined (_SYSTYPE_SVR4)) \
 	|| defined (WIN32) || defined (__cplusplus)

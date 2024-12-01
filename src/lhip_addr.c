@@ -129,7 +129,9 @@ static char __lhip_our_hostname_v6[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
 static char __lhip_our_gethostname[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
 static struct utsname __lhip_uname_res;
 
-#undef LHIP_HOST_INCREMENT
+#ifdef LHIP_HOST_INCREMENT
+# undef LHIP_HOST_INCREMENT
+#endif
 #define LHIP_HOST_INCREMENT 100
 #ifdef HAVE_MALLOC
 static struct hostent * __lhip_our_names_addr = NULL;

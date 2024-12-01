@@ -138,13 +138,14 @@ static pp_ipt_ui_cp			__lhip_real_pcap_hopen_offline_ts	= NULL;
 static i_ifpp_cp			__lhip_real_pcap_findalldevs		= NULL;
 static i_cp_rmtp_ifpp_cp		__lhip_real_pcap_findalldevs_ex		= NULL;
 
+#ifdef LHIP_CANT_USE_VERSIONED_FOPEN
+# undef LHIP_CANT_USE_VERSIONED_FOPEN
+#endif
 #if ((defined HAVE_DLSYM) || (defined HAVE_LIBDL_DLSYM))		\
 	&& (!defined HAVE_DLVSYM) && (!defined HAVE_LIBDL_DLVSYM)	\
 	|| (defined __GLIBC__ && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)))
 # define LHIP_CANT_USE_VERSIONED_FOPEN 1
 /*# warning Versioned fopen is unavailable, so LibHideIP may crash on some glibc versions.*/
-#else
-# undef LHIP_CANT_USE_VERSIONED_FOPEN
 #endif
 
 #ifdef TEST_COMPILE
