@@ -824,9 +824,9 @@ __lhip_is_local_addr (
 					while ( h->h_addr_list[j] != NULL )
 					{
 						if ( memcmp (
-							&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr),
+							&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr.s6_addr),
 							h->h_addr_list[j],
-							sizeof (struct in6_addr)) == 0 )
+							16) == 0 )
 						{
 							return 1;
 						}
@@ -1540,7 +1540,7 @@ __lhip_check_ipv6_value (
 	{
 		return 0;
 	}
-	if (memcmp (addr6,
+	if (memcmp (addr6->s6_addr,
 		__lhip_localhost_ipv6,
 		sizeof (__lhip_localhost_ipv6) ) == 0)
 	{

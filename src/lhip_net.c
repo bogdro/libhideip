@@ -1173,7 +1173,7 @@ getnameinfo (
 			h.h_addr_list[1] = NULL;
 			if ( (__lhip_check_ipv6_value ( &(((const struct sockaddr_in6 *)sa)->sin6_addr)) == 1)
 				||
-				(memcmp ( &(((const struct sockaddr_in6 *)sa)->sin6_addr),
+				(memcmp ( &(((const struct sockaddr_in6 *)sa)->sin6_addr.s6_addr),
 					__lhip_zeroaddr_ipv6,
 					sizeof (__lhip_zeroaddr_ipv6) ) == 0)
 				||
@@ -1786,7 +1786,7 @@ bind (
 	{
 		if ( (__lhip_check_ipv6_value ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr)) != 1)
 			&&
-			(memcmp ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr),
+			(memcmp ( &(((const struct sockaddr_in6 *)my_addr)->sin6_addr.s6_addr),
 				__lhip_zeroaddr_ipv6,
 				sizeof (__lhip_zeroaddr_ipv6) ) != 0) )
 		{
