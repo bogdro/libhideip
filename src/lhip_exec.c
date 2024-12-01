@@ -276,17 +276,21 @@ static char * __lhip_get_target_link_path (
 	current_name = LHIP_STRDUP (name);
 	if ( current_name != NULL )
 	{
+		do
+		{
 # ifdef HAVE_LSTAT64
-		res = lstat64 (current_name, &st);
+			res = lstat64 (current_name, &st);
 # else
 #  ifdef HAVE_LSTAT
-		res = lstat (current_name, &st);
+			res = lstat (current_name, &st);
 #  else
-		res = -1;
+			res = -1;
 #  endif
 # endif
-		while ( res >= 0 )
-		{
+			if ( res < 0 )
+			{
+				break;
+			}
 			if ( ! S_ISLNK (st.st_mode) )
 			{
 				break;
@@ -376,16 +380,7 @@ static char * __lhip_get_target_link_path (
 				/* the old and new names are the same - a link pointing to itself */
 				break;
 			}
-# ifdef HAVE_LSTAT64
-			res = lstat64 (current_name, &st);
-# else
-#  ifdef HAVE_LSTAT
-			res = lstat (current_name, &st);
-#  else
-			res = -1;
-#  endif
-# endif
-		} /* while ( res >= 0 ) */
+		} while ( current_name != NULL );
 		return current_name;
 	}
 	else
