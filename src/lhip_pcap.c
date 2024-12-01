@@ -115,7 +115,7 @@ pcap_lookupdev (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_lookupdev_location () == NULL )
+	if ( __lhip_r_pcap_lookupdev_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -123,7 +123,7 @@ pcap_lookupdev (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_lookupdev_location ()) (errbuf);
+		return (*__lhip_r_pcap_lookupdev_loc ()) (errbuf);
 	}
 
 	return NULL;
@@ -151,7 +151,7 @@ pcap_lookupnet (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_lookupnet_location () == NULL )
+	if ( __lhip_r_pcap_lookupnet_loc () == NULL )
 	{
 		return -1;
 	}
@@ -159,7 +159,7 @@ pcap_lookupnet (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_lookupnet_location ()) (device, netp, maskp, errbuf);
+		return (*__lhip_r_pcap_lookupnet_loc ()) (device, netp, maskp, errbuf);
 	}
 
 	return -1;
@@ -184,7 +184,7 @@ pcap_create (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_create_location () == NULL )
+	if ( __lhip_r_pcap_create_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -192,7 +192,7 @@ pcap_create (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_create_location ()) (source, errbuf);
+		return (*__lhip_r_pcap_create_loc ()) (source, errbuf);
 	}
 
 	return NULL;
@@ -217,7 +217,7 @@ pcap_open_dead (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_open_dead_location () == NULL )
+	if ( __lhip_r_pcap_open_dead_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -225,7 +225,7 @@ pcap_open_dead (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_open_dead_location ()) (linktype, snaplen);
+		return (*__lhip_r_pcap_open_dead_loc ()) (linktype, snaplen);
 	}
 
 	return NULL;
@@ -252,7 +252,7 @@ pcap_open_dead_with_tstamp_precision (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_o_d_tstamp_location () == NULL )
+	if ( __lhip_r_pcap_o_d_tstamp_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -260,7 +260,7 @@ pcap_open_dead_with_tstamp_precision (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_o_d_tstamp_location ()) (linktype, snaplen ,t);
+		return (*__lhip_r_pcap_o_d_tstamp_loc ()) (linktype, snaplen ,t);
 	}
 
 	return NULL;
@@ -289,7 +289,7 @@ pcap_open_live (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_open_live_location () == NULL )
+	if ( __lhip_r_pcap_open_live_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -297,7 +297,7 @@ pcap_open_live (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_open_live_location ()) (device, snaplen, promisc, to_ms, errbuf);
+		return (*__lhip_r_pcap_open_live_loc ()) (device, snaplen, promisc, to_ms, errbuf);
 	}
 
 	return NULL;
@@ -322,7 +322,7 @@ pcap_open_offline (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_open_offline_location () == NULL )
+	if ( __lhip_r_pcap_open_off_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -330,7 +330,7 @@ pcap_open_offline (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_open_offline_location ()) (fname, errbuf);
+		return (*__lhip_r_pcap_open_off_loc ()) (fname, errbuf);
 	}
 
 	return NULL;
@@ -357,7 +357,7 @@ pcap_open_offline_with_tstamp_precision (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_open_offline_ts_location () == NULL )
+	if ( __lhip_r_pcap_open_off_ts_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -365,7 +365,7 @@ pcap_open_offline_with_tstamp_precision (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_open_offline_ts_location ()) (fname, t, errbuf);
+		return (*__lhip_r_pcap_open_off_ts_loc ()) (fname, t, errbuf);
 	}
 
 	return NULL;
@@ -390,7 +390,7 @@ pcap_fopen_offline (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_fopen_offline_location () == NULL )
+	if ( __lhip_r_pcap_fopen_off_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -398,7 +398,7 @@ pcap_fopen_offline (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_fopen_offline_location ()) (fp, errbuf);
+		return (*__lhip_r_pcap_fopen_off_loc ()) (fp, errbuf);
 	}
 
 	return NULL;
@@ -425,7 +425,7 @@ pcap_fopen_offline_with_tstamp_precision (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_fopen_offline_ts_location () == NULL )
+	if ( __lhip_r_pcap_fopen_off_ts_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -433,7 +433,7 @@ pcap_fopen_offline_with_tstamp_precision (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_fopen_offline_ts_location ()) (fp, t, errbuf);
+		return (*__lhip_r_pcap_fopen_off_ts_loc ()) (fp, t, errbuf);
 	}
 
 	return NULL;
@@ -458,7 +458,7 @@ pcap_hopen_offline (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_hopen_offline_location () == NULL )
+	if ( __lhip_r_pcap_hopen_off_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -466,7 +466,7 @@ pcap_hopen_offline (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_hopen_offline_location ()) (a, errbuf);
+		return (*__lhip_r_pcap_hopen_off_loc ()) (a, errbuf);
 	}
 
 	return NULL;
@@ -493,7 +493,7 @@ pcap_hopen_offline_with_tstamp_precision (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_hopen_offline_ts_location () == NULL )
+	if ( __lhip_r_pcap_hopen_off_ts_loc () == NULL )
 	{
 		return NULL;
 	}
@@ -501,7 +501,7 @@ pcap_hopen_offline_with_tstamp_precision (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_hopen_offline_ts_location ()) (a, t, errbuf);
+		return (*__lhip_r_pcap_hopen_off_ts_loc ()) (a, t, errbuf);
 	}
 
 	return NULL;
@@ -526,7 +526,7 @@ pcap_findalldevs (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_pcap_findalldevs_location () == NULL )
+	if ( __lhip_r_pcap_findalldevs_loc () == NULL )
 	{
 		return -1;
 	}
@@ -534,7 +534,7 @@ pcap_findalldevs (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_findalldevs_location ()) (devs, errbuf);
+		return (*__lhip_r_pcap_findalldevs_loc ()) (devs, errbuf);
 	}
 
 	return -1;
@@ -565,7 +565,7 @@ pcap_findalldevs_ex (
 	fflush (stderr);
 # endif
 
-	if ( __lhip_real_pcap_findalldevs_ex_location () == NULL )
+	if ( __lhip_r_pcap_findalldevs_ex_l () == NULL )
 	{
 		return -1;
 	}
@@ -573,7 +573,7 @@ pcap_findalldevs_ex (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_pcap_findalldevs_ex_location ()) (source, auth, alldevs, errbuf);
+		return (*__lhip_r_pcap_findalldevs_ex_l ()) (source, auth, alldevs, errbuf);
 	}
 
 	return -1;

@@ -123,20 +123,20 @@ static i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery		= NULL;
 static r_i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_nmkquery	= NULL;
 
 /* libpcap functions: */
-static cp_cp				__lhip_real_pcap_lookupdev		= NULL;
-static i_ccp_uip_uip_cp			__lhip_real_pcap_lookupnet		= NULL;
-static pp_ccp_cp			__lhip_real_pcap_create			= NULL;
-static pp_i_i				__lhip_real_pcap_open_dead		= NULL;
-static pp_i_i_ui			__lhip_real_pcap_open_dead_ts		= NULL;
-static pp_ccp_i_i_i_cp			__lhip_real_pcap_open_live		= NULL;
-static pp_ccp_cp			__lhip_real_pcap_open_offline		= NULL;
-static pp_ccp_ui_cp			__lhip_real_pcap_open_offline_ts	= NULL;
-static pp_Fp_cp				__lhip_real_pcap_fopen_offline		= NULL;
-static pp_Fp_ui_cp			__lhip_real_pcap_fopen_offline_ts	= NULL;
-static pp_ipt_cp			__lhip_real_pcap_hopen_offline		= NULL;
-static pp_ipt_ui_cp			__lhip_real_pcap_hopen_offline_ts	= NULL;
-static i_ifpp_cp			__lhip_real_pcap_findalldevs		= NULL;
-static i_cp_rmtp_ifpp_cp		__lhip_real_pcap_findalldevs_ex		= NULL;
+static cp_cp				__lhip_r_pcap_lookupdev		= NULL;
+static i_ccp_uip_uip_cp			__lhip_r_pcap_lookupnet		= NULL;
+static pp_ccp_cp			__lhip_r_pcap_create		= NULL;
+static pp_i_i				__lhip_r_pcap_open_dead		= NULL;
+static pp_i_i_ui			__lhip_r_pcap_open_dead_ts	= NULL;
+static pp_ccp_i_i_i_cp			__lhip_r_pcap_open_live		= NULL;
+static pp_ccp_cp			__lhip_r_pcap_open_offline	= NULL;
+static pp_ccp_ui_cp			__lhip_r_pcap_open_offline_ts	= NULL;
+static pp_Fp_cp				__lhip_r_pcap_fopen_offline	= NULL;
+static pp_Fp_ui_cp			__lhip_r_pcap_fopen_offline_ts	= NULL;
+static pp_ipt_cp			__lhip_r_pcap_hopen_offline	= NULL;
+static pp_ipt_ui_cp			__lhip_r_pcap_hopen_offline_ts	= NULL;
+static i_ifpp_cp			__lhip_r_pcap_findalldevs	= NULL;
+static i_cp_rmtp_ifpp_cp		__lhip_r_pcap_findalldevs_ex	= NULL;
 
 #ifdef LHIP_CANT_USE_VERSIONED_FOPEN
 # undef LHIP_CANT_USE_VERSIONED_FOPEN
@@ -364,20 +364,20 @@ __lhip_main (LHIP_VOID)
 						__lhip_handle_resolv, "res_nmkquery", LHIP_RES_FUNC2(res_nmkquery));
 
 		/* libpcap functions: */
-		*(void **) (&__lhip_real_pcap_lookupdev)        = dlsym  (RTLD_NEXT, "pcap_lookupdev");
-		*(void **) (&__lhip_real_pcap_lookupnet)        = dlsym  (RTLD_NEXT, "pcap_lookupnet");
-		*(void **) (&__lhip_real_pcap_create)           = dlsym  (RTLD_NEXT, "pcap_create");
-		*(void **) (&__lhip_real_pcap_open_dead)        = dlsym  (RTLD_NEXT, "pcap_open_dead");
-		*(void **) (&__lhip_real_pcap_open_dead_ts)     = dlsym  (RTLD_NEXT, "pcap_open_dead_with_tstamp_precision");
-		*(void **) (&__lhip_real_pcap_open_live)        = dlsym  (RTLD_NEXT, "pcap_open_live");
-		*(void **) (&__lhip_real_pcap_open_offline)     = dlsym  (RTLD_NEXT, "pcap_open_offline");
-		*(void **) (&__lhip_real_pcap_open_offline_ts)  = dlsym  (RTLD_NEXT, "pcap_open_offline_with_tstamp_precision");
-		*(void **) (&__lhip_real_pcap_fopen_offline)    = dlsym  (RTLD_NEXT, "pcap_fopen_offline");
-		*(void **) (&__lhip_real_pcap_fopen_offline_ts) = dlsym  (RTLD_NEXT, "pcap_fopen_offline_with_tstamp_precision");
-		*(void **) (&__lhip_real_pcap_hopen_offline)    = dlsym  (RTLD_NEXT, "pcap_hopen_offline");
-		*(void **) (&__lhip_real_pcap_hopen_offline_ts) = dlsym  (RTLD_NEXT, "pcap_hopen_offline_with_tstamp_precision");
-		*(void **) (&__lhip_real_pcap_findalldevs)      = dlsym  (RTLD_NEXT, "pcap_findalldevs");
-		*(void **) (&__lhip_real_pcap_findalldevs_ex)   = dlsym  (RTLD_NEXT, "pcap_findalldevs_ex");
+		*(void **) (&__lhip_r_pcap_lookupdev)        = dlsym  (RTLD_NEXT, "pcap_lookupdev");
+		*(void **) (&__lhip_r_pcap_lookupnet)        = dlsym  (RTLD_NEXT, "pcap_lookupnet");
+		*(void **) (&__lhip_r_pcap_create)           = dlsym  (RTLD_NEXT, "pcap_create");
+		*(void **) (&__lhip_r_pcap_open_dead)        = dlsym  (RTLD_NEXT, "pcap_open_dead");
+		*(void **) (&__lhip_r_pcap_open_dead_ts)     = dlsym  (RTLD_NEXT, "pcap_open_dead_with_tstamp_precision");
+		*(void **) (&__lhip_r_pcap_open_live)        = dlsym  (RTLD_NEXT, "pcap_open_live");
+		*(void **) (&__lhip_r_pcap_open_offline)     = dlsym  (RTLD_NEXT, "pcap_open_offline");
+		*(void **) (&__lhip_r_pcap_open_offline_ts)  = dlsym  (RTLD_NEXT, "pcap_open_offline_with_tstamp_precision");
+		*(void **) (&__lhip_r_pcap_fopen_offline)    = dlsym  (RTLD_NEXT, "pcap_fopen_offline");
+		*(void **) (&__lhip_r_pcap_fopen_offline_ts) = dlsym  (RTLD_NEXT, "pcap_fopen_offline_with_tstamp_precision");
+		*(void **) (&__lhip_r_pcap_hopen_offline)    = dlsym  (RTLD_NEXT, "pcap_hopen_offline");
+		*(void **) (&__lhip_r_pcap_hopen_offline_ts) = dlsym  (RTLD_NEXT, "pcap_hopen_offline_with_tstamp_precision");
+		*(void **) (&__lhip_r_pcap_findalldevs)      = dlsym  (RTLD_NEXT, "pcap_findalldevs");
+		*(void **) (&__lhip_r_pcap_findalldevs_ex)   = dlsym  (RTLD_NEXT, "pcap_findalldevs_ex");
 
 #if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
 		*(void **) (&__lhip_real_getaddrinfo_a)         = dlsym  (RTLD_NEXT, "getaddrinfo_a");
@@ -748,100 +748,100 @@ r_i_ccp_i_i_cucp_i_cucp_ucp_i __lhip_real_res_nmkquery_location (LHIP_VOID)
 
 /* =============================================================== */
 
-cp_cp __lhip_real_pcap_lookupdev_location (LHIP_VOID)
+cp_cp __lhip_r_pcap_lookupdev_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_lookupdev;
+	return __lhip_r_pcap_lookupdev;
 }
 
 /* =============================================================== */
 
-i_ccp_uip_uip_cp __lhip_real_pcap_lookupnet_location (LHIP_VOID)
+i_ccp_uip_uip_cp __lhip_r_pcap_lookupnet_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_lookupnet;
+	return __lhip_r_pcap_lookupnet;
 }
 
 /* =============================================================== */
 
-pp_ccp_cp __lhip_real_pcap_create_location (LHIP_VOID)
+pp_ccp_cp __lhip_r_pcap_create_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_create;
+	return __lhip_r_pcap_create;
 }
 
 /* =============================================================== */
 
-pp_i_i __lhip_real_pcap_open_dead_location (LHIP_VOID)
+pp_i_i __lhip_r_pcap_open_dead_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_open_dead;
+	return __lhip_r_pcap_open_dead;
 }
 
 /* =============================================================== */
 
-pp_i_i_ui __lhip_real_pcap_o_d_tstamp_location (LHIP_VOID)
+pp_i_i_ui __lhip_r_pcap_o_d_tstamp_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_open_dead_ts;
+	return __lhip_r_pcap_open_dead_ts;
 }
 
 /* =============================================================== */
 
-pp_ccp_i_i_i_cp __lhip_real_pcap_open_live_location (LHIP_VOID)
+pp_ccp_i_i_i_cp __lhip_r_pcap_open_live_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_open_live;
+	return __lhip_r_pcap_open_live;
 }
 
 /* =============================================================== */
 
-pp_ccp_cp __lhip_real_pcap_open_offline_location (LHIP_VOID)
+pp_ccp_cp __lhip_r_pcap_open_off_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_open_offline;
+	return __lhip_r_pcap_open_offline;
 }
 
 /* =============================================================== */
 
-pp_ccp_ui_cp __lhip_real_pcap_open_offline_ts_location (LHIP_VOID)
+pp_ccp_ui_cp __lhip_r_pcap_open_off_ts_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_open_offline_ts;
+	return __lhip_r_pcap_open_offline_ts;
 }
 
 /* =============================================================== */
 
-pp_Fp_cp __lhip_real_pcap_fopen_offline_location (LHIP_VOID)
+pp_Fp_cp __lhip_r_pcap_fopen_off_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_fopen_offline;
+	return __lhip_r_pcap_fopen_offline;
 }
 
 /* =============================================================== */
 
-pp_Fp_ui_cp __lhip_real_pcap_fopen_offline_ts_location (LHIP_VOID)
+pp_Fp_ui_cp __lhip_r_pcap_fopen_off_ts_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_fopen_offline_ts;
+	return __lhip_r_pcap_fopen_offline_ts;
 }
 
 /* =============================================================== */
 
-pp_ipt_cp __lhip_real_pcap_hopen_offline_location (LHIP_VOID)
+pp_ipt_cp __lhip_r_pcap_hopen_off_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_hopen_offline;
+	return __lhip_r_pcap_hopen_offline;
 }
 
 /* =============================================================== */
 
-pp_ipt_ui_cp __lhip_real_pcap_hopen_offline_ts_location (LHIP_VOID)
+pp_ipt_ui_cp __lhip_r_pcap_hopen_off_ts_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_hopen_offline_ts;
+	return __lhip_r_pcap_hopen_offline_ts;
 }
 
 /* =============================================================== */
 
-i_ifpp_cp __lhip_real_pcap_findalldevs_location (LHIP_VOID)
+i_ifpp_cp __lhip_r_pcap_findalldevs_loc (LHIP_VOID)
 {
-	return __lhip_real_pcap_findalldevs;
+	return __lhip_r_pcap_findalldevs;
 }
 
 /* =============================================================== */
 
-i_cp_rmtp_ifpp_cp __lhip_real_pcap_findalldevs_ex_location (LHIP_VOID)
+i_cp_rmtp_ifpp_cp __lhip_r_pcap_findalldevs_ex_l (LHIP_VOID)
 {
-	return __lhip_real_pcap_findalldevs_ex;
+	return __lhip_r_pcap_findalldevs_ex;
 }
 
 /* =============================================================== */

@@ -479,20 +479,20 @@ extern GCC_WARN_UNUSED_RESULT i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquer
 extern GCC_WARN_UNUSED_RESULT r_i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_nmkquery_location LHIP_PARAMS ((void));
 
 /* libpcap functions: */
-extern GCC_WARN_UNUSED_RESULT cp_cp				__lhip_real_pcap_lookupdev_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_ccp_uip_uip_cp			__lhip_real_pcap_lookupnet_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_create_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_i_i				__lhip_real_pcap_open_dead_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_i_i_ui				__lhip_real_pcap_o_d_tstamp_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_ccp_i_i_i_cp			__lhip_real_pcap_open_live_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_real_pcap_open_offline_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_ccp_ui_cp			__lhip_real_pcap_open_offline_ts_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_Fp_cp				__lhip_real_pcap_fopen_offline_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_Fp_ui_cp			__lhip_real_pcap_fopen_offline_ts_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_ipt_cp				__lhip_real_pcap_hopen_offline_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT pp_ipt_ui_cp			__lhip_real_pcap_hopen_offline_ts_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_ifpp_cp				__lhip_real_pcap_findalldevs_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_rmtp_ifpp_cp			__lhip_real_pcap_findalldevs_ex_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT cp_cp				__lhip_r_pcap_lookupdev_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ccp_uip_uip_cp			__lhip_r_pcap_lookupnet_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_r_pcap_create_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_i_i				__lhip_r_pcap_open_dead_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_i_i_ui				__lhip_r_pcap_o_d_tstamp_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_i_i_i_cp			__lhip_r_pcap_open_live_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_cp				__lhip_r_pcap_open_off_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ccp_ui_cp			__lhip_r_pcap_open_off_ts_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_Fp_cp				__lhip_r_pcap_fopen_off_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_Fp_ui_cp			__lhip_r_pcap_fopen_off_ts_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ipt_cp				__lhip_r_pcap_hopen_off_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT pp_ipt_ui_cp			__lhip_r_pcap_hopen_off_ts_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ifpp_cp				__lhip_r_pcap_findalldevs_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_rmtp_ifpp_cp			__lhip_r_pcap_findalldevs_ex_l LHIP_PARAMS ((void));
 
 /* The library functions: */
 extern int							__lhip_main LHIP_PARAMS ((void));
