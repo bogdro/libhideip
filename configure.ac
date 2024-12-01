@@ -330,7 +330,7 @@ AC_CHECK_FUNCS([memcpy memset readlink getipnodebyname getipnodebyaddr \
 	getenv gethostbyname2_r openat openat64 realloc symlink lstat \
 	res_nquery execveat fexecve snprintf strdup stat stat64 lstat64 \
 	realpath canonicalize_file_name fopen64 freopen64 open64 \
-	bindresvport bindresvport6])
+	bindresvport bindresvport6 getpid])
 
 AH_TEMPLATE([GETNAMEINFO_ARG4TYPE])
 AH_TEMPLATE([GETNAMEINFO_ARG6TYPE])

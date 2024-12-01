@@ -68,6 +68,10 @@ static int errno = -1;
 # include <string.h>
 #endif
 
+#ifdef HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+
 #ifdef HAVE_NETDB_H
 # include <netdb.h>
 #else
@@ -966,36 +970,40 @@ START_TEST(test_bind_banned6)
 	forbids any other method to get the IP address. The user's address
 	must be hardcoded in the test.
 	*/
-	ipv6_file = fopen ("/proc/net/if_inet6", "r");
-	if ( ipv6_file == NULL )
+	struct stat st;
+	if ( stat ("/proc/net/if_inet6", &st) == 0 )
 	{
-		return;
-	}
-	do
-	{
-		fgets (line, sizeof (line), ipv6_file);
-		if ( strstr (line, "lo") != NULL )
+		ipv6_file = fopen ("/proc/net/if_inet6", "r");
+		if ( ipv6_file == NULL )
 		{
-			/* the loopback line - skip */
-			continue;
+			return;
 		}
-		/* not the loopback line - read the IP address */
-		a = sscanf (line, "%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx %*x %*x %*x %*x %*s ",
-			&addr_ipv6[0],  &addr_ipv6[1],  &addr_ipv6[2],  &addr_ipv6[3],
-			&addr_ipv6[4],  &addr_ipv6[5],  &addr_ipv6[6],  &addr_ipv6[7],
-			&addr_ipv6[8],  &addr_ipv6[9],  &addr_ipv6[10], &addr_ipv6[11],
-			&addr_ipv6[12], &addr_ipv6[13], &addr_ipv6[14], &addr_ipv6[15]);
-		if ( a != 16 )
+		do
 		{
-			continue;
+			fgets (line, sizeof (line), ipv6_file);
+			if ( strstr (line, "lo") != NULL )
+			{
+				/* the loopback line - skip */
+				continue;
+			}
+			/* not the loopback line - read the IP address */
+			a = sscanf (line, "%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx %*x %*x %*x %*x %*s ",
+				&addr_ipv6[0],  &addr_ipv6[1],  &addr_ipv6[2],  &addr_ipv6[3],
+				&addr_ipv6[4],  &addr_ipv6[5],  &addr_ipv6[6],  &addr_ipv6[7],
+				&addr_ipv6[8],  &addr_ipv6[9],  &addr_ipv6[10], &addr_ipv6[11],
+				&addr_ipv6[12], &addr_ipv6[13], &addr_ipv6[14], &addr_ipv6[15]);
+			if ( a != 16 )
+			{
+				continue;
+			}
+			got_addr = 1;
+			break;
+		} while ( ! feof (ipv6_file) );
+		fclose (ipv6_file);
+		if ( got_addr == 0 )
+		{
+			return;
 		}
-		got_addr = 1;
-		break;
-	} while ( ! feof (ipv6_file) );
-	fclose (ipv6_file);
-	if ( got_addr == 0 )
-	{
-		return;
 	}
 #endif
 	sock = socket (AF_INET6, SOCK_STREAM, 0);

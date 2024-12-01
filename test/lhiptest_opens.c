@@ -70,6 +70,10 @@ static int errno = -1;
 # define O_TRUNC	01000
 #endif
 
+#ifdef HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -255,16 +259,20 @@ END_TEST
 START_TEST(test_fopen_proc)
 {
 	FILE * f;
+	struct stat st;
 
 	LHIP_PROLOG_FOR_TEST();
-	f = fopen("/proc/cpuinfo", "r");
-	if (f != NULL)
+	if ( stat ("/proc/cpuinfo", &st) == 0 )
 	{
-		fclose(f);
-	}
-	else
-	{
-		fail("test_fopen_proc: file not opened: errno=%d\n", errno);
+		f = fopen("/proc/cpuinfo", "r");
+		if (f != NULL)
+		{
+			fclose(f);
+		}
+		else
+		{
+			fail("test_fopen_proc: file not opened: errno=%d\n", errno);
+		}
 	}
 }
 END_TEST

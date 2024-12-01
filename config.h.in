@@ -115,6 +115,9 @@
 /* Whether you have the getnameinfo function */
 #undef HAVE_GETNAMEINFO
 
+/* Define to 1 if you have the `getpid' function. */
+#undef HAVE_GETPID
+
 /* Define to 1 if you have the <ifaddrs.h> header file. */
 #undef HAVE_IFADDRS_H
 

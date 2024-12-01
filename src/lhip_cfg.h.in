@@ -65,6 +65,7 @@
 #  undef  HAVE_GETIPNODEBYNAME
 #  undef  HAVE_GETIPNODEBYADDR
 #  define HAVE_GETNAMEINFO		1
+#  define HAVE_GETPID			1
 #  define HAVE_IFADDRS_H		1
 #  define HAVE_INTPTR_T			1
 #  define HAVE_INTTYPES_H		1
