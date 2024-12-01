@@ -322,10 +322,11 @@ static char * __lhip_get_target_link_path (
 				break;
 			}
 			LHIP_MEMSET (__lhip_newlinkpath, 0, dirname_len + 1 + (size_t)lsize + 1);
+			lnk_res = readlink (current_name, __lhip_newlinkpath, (size_t)lsize);
 # else /* ! HAVE_MALLOC */
 			LHIP_MEMSET (__lhip_newlinkpath, 0, sizeof (__lhip_newlinkpath));
+			lnk_res = readlink (current_name, __lhip_newlinkpath, sizeof (__lhip_newlinkpath) - 1);
 # endif /* HAVE_MALLOC */
-			lnk_res = readlink (current_name, __lhip_newlinkpath, (size_t)lsize);
 			if ( (lnk_res < 0) || (lnk_res > lsize) )
 			{
 # ifdef HAVE_MALLOC
