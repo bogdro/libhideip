@@ -314,9 +314,9 @@ static char * __lhip_get_target_link_path (
 				dirname_len = 0;
 			}
 # ifdef HAVE_MALLOC
-			__lhip_newlinkpath = (char *) malloc ((size_t)(
+			__lhip_newlinkpath = (char *) malloc (
 				dirname_len + 1
-				+ (size_t)lsize + 1));
+				+ (size_t)lsize + 1);
 			if ( __lhip_newlinkpath == NULL )
 			{
 				break;
@@ -341,9 +341,9 @@ static char * __lhip_get_target_link_path (
 				different directory (there was a slash in the original path)
 				- append the link's directory name */
 # ifdef HAVE_MALLOC
-				__lhip_newlinkdir = (char *) malloc ((size_t)(
+				__lhip_newlinkdir = (char *) malloc (
 					dirname_len + 1
-					+ (size_t)lsize + 1));
+					+ (size_t)lsize + 1);
 				if ( __lhip_newlinkdir == NULL )
 				{
 					free (__lhip_newlinkpath);

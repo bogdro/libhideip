@@ -345,7 +345,7 @@ ioctl (
 					req_index = 0;
 					while ( buf_index <= (unsigned int)cfg->ifc_len )
 					{
-						addrs = (struct ifreq *) &(cfg->ifc_req[req_index]);
+						addrs = &(cfg->ifc_req[req_index]);
 						if ( addrs != NULL )
 						{
 							if ( addrs->ifr_ifru.ifru_addr.sa_family == AF_INET )
