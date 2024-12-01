@@ -1208,8 +1208,8 @@ getaddrinfo (
 	int ret;
 	int j;
 	struct addrinfo *tmp;
-	struct hostent * our_name_ipv4;
-	struct hostent * our_name_ipv6;
+	const struct hostent * our_name_ipv4;
+	const struct hostent * our_name_ipv6;
 	size_t namelen;
 
 	__lhip_main ();

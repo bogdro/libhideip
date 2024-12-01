@@ -215,7 +215,7 @@ static char __lhip_newlinkdir[LHIP_MAXPATHLEN + 1];
 
 #ifndef LHIP_ANSIC
 static char * __lhip_get_target_link_path
-	LHIP_PARAMS ((char * const name));
+	LHIP_PARAMS ((const char * const name));
 #endif
 
 /**
@@ -226,10 +226,10 @@ static char * __lhip_get_target_link_path
  */
 static char * __lhip_get_target_link_path (
 #ifdef LHIP_ANSIC
-	char * const name)
+	const char * const name)
 #else
 	name)
-	char * const name;
+	const char * const name;
 #endif
 {
 #if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
@@ -249,7 +249,7 @@ static char * __lhip_get_target_link_path (
 	char * __lhip_newlinkpath;
 	char * __lhip_newlinkdir;
 # endif
-	char * last_slash;
+	const char * last_slash;
 	size_t dirname_len;
 
 	if ( name == NULL )
@@ -599,7 +599,7 @@ static int __lhip_is_forbidden_program (
 # endif
 	char *first_char;
 # if (defined HAVE_GETENV) && (defined HAVE_SYS_STAT_H)
-	char *path;
+	const char *path;
 	size_t path_len;
 	size_t new_path_len;
 #  ifdef HAVE_MALLOC
