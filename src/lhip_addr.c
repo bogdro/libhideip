@@ -612,7 +612,8 @@ __lhip_check_hostent_match (
 	const struct hostent * const host2;
 #endif
 {
-	int i, j;
+	int i;
+	int j;
 
 	if ( (host1 == NULL) && (host2 == NULL) )
 	{
@@ -701,7 +702,8 @@ __lhip_is_local_addr (
 	const struct hostent * const h;
 #endif
 {
-	int i, j;
+	int i;
+	int j;
 	unsigned int hi;
 	struct addrinfo *tmp;
 
@@ -1043,7 +1045,8 @@ __lhip_check_hostname_match (
 void __lhip_free_local_addresses (LHIP_VOID)
 {
 #ifdef HAVE_MALLOC
-	size_t i, j;
+	size_t i;
+	size_t j;
 
 	if ( __lhip_our_names_addr != NULL )
 	{
@@ -1106,7 +1109,8 @@ __lhip_add_local_address (
 #endif
 {
 #ifdef HAVE_MALLOC
-	size_t i, j;
+	size_t i;
+	size_t j;
 # ifdef HAVE_REALLOC
 	struct hostent * lhip_new_array;
 # endif

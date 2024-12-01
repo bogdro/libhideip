@@ -127,7 +127,8 @@ static int __lhip_is_forbidden_name (
 #endif
 {
 	struct hostent h;
-	size_t i, j;
+	size_t i;
+	size_t j;
 	const char * forbidden_names[] =
 		{ "127.0.0.1", "::1", "0.0.0.0", "::0",
 		"localhost", "localhost6", "localhost.", "localhost6." };
