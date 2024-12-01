@@ -773,8 +773,9 @@ static int __lhip_is_forbidden_program (
 			now check if the viewing programs aren't used to get the contents
 			of valuable files like /etc/hosts
 			*/
-			for ( i = 0; (ret == 0)
-				&& (i < sizeof (viewing_programs)/sizeof (viewing_programs[0])); i++)
+			for ( i = 0;
+				i < sizeof (viewing_programs)/sizeof (viewing_programs[0]);
+				i++)
 			{
 				if ( strstr (__lhip_linkpath, viewing_programs[i]) != NULL )
 				{
@@ -788,6 +789,10 @@ static int __lhip_is_forbidden_program (
 						}
 						k++;
 					}
+				}
+				if ( ret == 1 )
+				{
+					break;
 				}
 			}
 		}
