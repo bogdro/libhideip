@@ -333,7 +333,7 @@ res_nsearch (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_res_nsearch_location () == NULL )
+	if ( __lhip_real_res_nsearch_loc () == NULL )
 	{
 		return -1;
 	}
@@ -341,7 +341,7 @@ res_nsearch (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_res_nsearch_location ()) (statep, dname, class, type, answer, anslen);
+		return (*__lhip_real_res_nsearch_loc ()) (statep, dname, class, type, answer, anslen);
 	}
 
 	if ( __lhip_is_forbidden_name (dname) != 0 )
@@ -349,7 +349,7 @@ res_nsearch (
 		return -1;
 	}
 
-	return (*__lhip_real_res_nsearch_location ()) (statep, dname, class, type, answer, anslen);
+	return (*__lhip_real_res_nsearch_loc ()) (statep, dname, class, type, answer, anslen);
 }
 
 /* =============================================================== */
@@ -375,7 +375,7 @@ res_querydomain (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_res_querydomain_location () == NULL )
+	if ( __lhip_real_res_querydomain_loc () == NULL )
 	{
 		return -1;
 	}
@@ -383,7 +383,7 @@ res_querydomain (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_res_querydomain_location ()) (name, domain, class, type, answer, anslen);
+		return (*__lhip_real_res_querydomain_loc ()) (name, domain, class, type, answer, anslen);
 	}
 
 	if ( __lhip_is_forbidden_name (name) != 0 )
@@ -391,7 +391,7 @@ res_querydomain (
 		return -1;
 	}
 
-	return (*__lhip_real_res_querydomain_location ()) (name, domain, class, type, answer, anslen);
+	return (*__lhip_real_res_querydomain_loc ()) (name, domain, class, type, answer, anslen);
 }
 
 /* =============================================================== */
@@ -418,7 +418,7 @@ res_nquerydomain (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_res_nquerydomain_location () == NULL )
+	if ( __lhip_real_res_nquerydomain_loc () == NULL )
 	{
 		return -1;
 	}
@@ -426,7 +426,7 @@ res_nquerydomain (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_res_nquerydomain_location ()) (statep, name, domain, class, type, answer, anslen);
+		return (*__lhip_real_res_nquerydomain_loc ()) (statep, name, domain, class, type, answer, anslen);
 	}
 
 	if ( __lhip_is_forbidden_name (name) != 0 )
@@ -434,7 +434,7 @@ res_nquerydomain (
 		return -1;
 	}
 
-	return (*__lhip_real_res_nquerydomain_location ()) (statep, name, domain, class, type, answer, anslen);
+	return (*__lhip_real_res_nquerydomain_loc ()) (statep, name, domain, class, type, answer, anslen);
 }
 
 /* =============================================================== */
@@ -463,7 +463,7 @@ res_mkquery (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_res_mkquery_location () == NULL )
+	if ( __lhip_real_res_mkquery_loc () == NULL )
 	{
 		return -1;
 	}
@@ -471,7 +471,7 @@ res_mkquery (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_res_mkquery_location ())
+		return (*__lhip_real_res_mkquery_loc ())
 			(op, dname, class, type, data, datalen, newrr, buf, buflen);
 	}
 
@@ -480,7 +480,7 @@ res_mkquery (
 		return -1;
 	}
 
-	return (*__lhip_real_res_mkquery_location ())
+	return (*__lhip_real_res_mkquery_loc ())
 		(op, dname, class, type, data, datalen, newrr, buf, buflen);
 }
 
@@ -512,7 +512,7 @@ res_nmkquery (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_res_nmkquery_location () == NULL )
+	if ( __lhip_real_res_nmkquery_loc () == NULL )
 	{
 		return -1;
 	}
@@ -520,7 +520,7 @@ res_nmkquery (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_res_nmkquery_location ())
+		return (*__lhip_real_res_nmkquery_loc ())
 			(statep, op, dname, class, type, data, datalen, newrr, buf, buflen);
 	}
 
@@ -529,7 +529,7 @@ res_nmkquery (
 		return -1;
 	}
 
-	return (*__lhip_real_res_nmkquery_location ())
+	return (*__lhip_real_res_nmkquery_loc ())
 		(statep, op, dname, class, type, data, datalen, newrr, buf, buflen);
 }
 
@@ -555,7 +555,7 @@ getaddrinfo_a(
 	fprintf (stderr, "libhideip: getaddrinfo_a(%d, 0x%lx, %d, 0x%lx)\n", mode, list, nitems, sevp);
 	fflush (stderr);
 # endif
-	if ( __lhip_real_getaddrinfo_a_location () == NULL )
+	if ( __lhip_real_getaddrinfo_a_loc () == NULL )
 	{
 		return EAI_MEMORY;
 	}
@@ -564,7 +564,7 @@ getaddrinfo_a(
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED)
 		|| (list == NULL) )
 	{
-		return (*__lhip_real_getaddrinfo_a_location ()) (mode, list, nitems, sevp);
+		return (*__lhip_real_getaddrinfo_a_loc ()) (mode, list, nitems, sevp);
 	}
 
 	for ( i = 0; i < nitems; i++ )
@@ -575,6 +575,6 @@ getaddrinfo_a(
 		}
 	}
 
-	return (*__lhip_real_getaddrinfo_a_location ()) (mode, list, nitems, sevp);
+	return (*__lhip_real_getaddrinfo_a_loc ()) (mode, list, nitems, sevp);
 }
 #endif /* HAVE_GETADDRINFO_A */

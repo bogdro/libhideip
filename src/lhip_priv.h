@@ -423,19 +423,19 @@ extern "C" {
 # endif
 
 /* network-related functions: */
-extern GCC_WARN_UNUSED_RESULT shp_vp_sl_i			__lhip_real_gethostbyaddr_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_vp_sl_i_shp_cp_s_shpp_ip	__lhip_real_gethostbyaddr_r_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT shp_cp				__lhip_real_gethostbyname_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_shp_cp_s_shpp_ip		__lhip_real_gethostbyname_r_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT shp_cp_i				__lhip_real_gethostbyname2_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_i_shp_cp_s_shpp_i		__lhip_real_gethostbyname2_r_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_vp_sl_i			__lhip_real_gethostbyaddr_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_vp_sl_i_shp_cp_s_shpp_ip	__lhip_real_gethostbyaddr_r_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_cp				__lhip_real_gethostbyname_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_shp_cp_s_shpp_ip		__lhip_real_gethostbyname_r_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_cp_i				__lhip_real_gethostbyname2_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_i_shp_cp_s_shpp_i		__lhip_real_gethostbyname2_r_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT shp_v				__lhip_real_gethostent_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_shp_cp_s_shpp_ip		__lhip_real_gethostent_r_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT shp_cp_s_i_ip			__lhip_real_getipnodebyaddr_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT shp_cp_i_i_ip			__lhip_real_getipnodebyname_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_shp_cp_s_shpp_ip		__lhip_real_gethostent_r_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_cp_s_i_ip			__lhip_real_getipnodebyaddr_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT shp_cp_i_i_ip			__lhip_real_getipnodebyname_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_sipp				__lhip_real_getifaddrs_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_ssp_sl_cp_s_cp_s_i		__lhip_real_getnameinfo_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_cp_sap_sapp			__lhip_real_getaddrinfo_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ssp_sl_cp_s_cp_s_i		__lhip_real_getnameinfo_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_cp_sap_sapp			__lhip_real_getaddrinfo_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_cp_cpp_cpp			__lhip_real_execve_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_i_cpp_cpp			__lhip_real_fexecve_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_i_cp_cpp_cpp_i			__lhip_real_execveat_location LHIP_PARAMS ((void));
@@ -444,18 +444,18 @@ extern GCC_WARN_UNUSED_RESULT i_i_i_va				__lhip_real_ioctl_location LHIP_PARAMS
 extern GCC_WARN_UNUSED_RESULT i_i_i_i				__lhip_real_socket_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT ss_i_smp_i			__lhip_real_recvmsg_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT ss_i_csmp_i			__lhip_real_sendmsg_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_s				__lhip_real_gethostname_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_s				__lhip_real_gethostname_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_sup				__lhip_real_uname_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_i_i_vp_slp			__lhip_real_getsockopt_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_i_i_cvp_sl			__lhip_real_setsockopt_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_ssp_slp				__lhip_real_getsockname_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ssp_slp				__lhip_real_getsockname_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_cssp_sl				__lhip_real_bind_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_i_ia2				__lhip_real_socketpair_location LHIP_PARAMS ((void));
 # if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
-extern GCC_WARN_UNUSED_RESULT i_i_sgpp_i_ssp			__lhip_real_getaddrinfo_a_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_sgpp_i_ssp			__lhip_real_getaddrinfo_a_loc LHIP_PARAMS ((void));
 # endif
-extern GCC_WARN_UNUSED_RESULT i_i_ssa				__lhip_real_bindresvport_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_i_ssa6				__lhip_real_bindresvport6_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_ssa				__lhip_real_bindresvport_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_i_ssa6				__lhip_real_bindresvport6_loc LHIP_PARAMS ((void));
 
 /* file-related functions: */
 extern GCC_WARN_UNUSED_RESULT fp_cp_cp				__lhip_real_fopen64_location LHIP_PARAMS ((void));
@@ -472,11 +472,11 @@ extern GCC_WARN_UNUSED_RESULT i_i_cp_i_				__lhip_real_openat_location LHIP_PARA
 extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_query_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT r_ccp_i_ucp_i			__lhip_real_res_nquery_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_search_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT r_ccp_i_ucp_i			__lhip_real_res_nsearch_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT ccp_cpp_i_ucp_i			__lhip_real_res_querydomain_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT r_ccp_cpp_i_ucp_i			__lhip_real_res_nquerydomain_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery_location LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT r_i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_nmkquery_location LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT r_ccp_i_ucp_i			__lhip_real_res_nsearch_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT ccp_cpp_i_ucp_i			__lhip_real_res_querydomain_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT r_ccp_cpp_i_ucp_i			__lhip_real_res_nquerydomain_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT r_i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_nmkquery_loc LHIP_PARAMS ((void));
 
 /* libpcap functions: */
 extern GCC_WARN_UNUSED_RESULT cp_cp				__lhip_r_pcap_lookupdev_loc LHIP_PARAMS ((void));

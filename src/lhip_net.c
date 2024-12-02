@@ -258,7 +258,7 @@ gethostbyaddr (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_gethostbyaddr_location () == NULL )
+	if ( __lhip_real_gethostbyaddr_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return NULL;
@@ -267,17 +267,17 @@ gethostbyaddr (
 	if ( addr == NULL )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyaddr_location ()) (addr, len, type);
+		return (*__lhip_real_gethostbyaddr_loc ()) (addr, len, type);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyaddr_location ()) (addr, len, type);
+		return (*__lhip_real_gethostbyaddr_loc ()) (addr, len, type);
 	}
 
-	ret = (*__lhip_real_gethostbyaddr_location ()) (addr, len, type);
+	ret = (*__lhip_real_gethostbyaddr_loc ()) (addr, len, type);
 	if ( ret != NULL )
 	{
 		__lhip_change_data (ret);
@@ -359,7 +359,7 @@ gethostbyaddr_r (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_gethostbyaddr_r_location () == NULL )
+	if ( __lhip_real_gethostbyaddr_r_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_7
@@ -372,7 +372,7 @@ gethostbyaddr_r (
 	if ( (addr == NULL) || (ret == NULL) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyaddr_r_location ())
+		return (*__lhip_real_gethostbyaddr_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 			(addr, len, type, ret, buf, buflen, result, h_errnop);
 #else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
@@ -392,7 +392,7 @@ gethostbyaddr_r (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyaddr_r_location ())
+		return (*__lhip_real_gethostbyaddr_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 			(addr, len, type, ret, buf, buflen, result, h_errnop);
 #else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
@@ -407,7 +407,7 @@ gethostbyaddr_r (
 #else
 #endif
 	}
-	my_ret = (*__lhip_real_gethostbyaddr_r_location ())
+	my_ret = (*__lhip_real_gethostbyaddr_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 		(addr, len, type, ret, buf, buflen, result, h_errnop);
 #else /* ! HAVE_FUNC_GETHOSTBYADDR_R_8 */
@@ -448,7 +448,7 @@ gethostbyname (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_gethostbyname_location () == NULL )
+	if ( __lhip_real_gethostbyname_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return NULL;
@@ -457,17 +457,17 @@ gethostbyname (
 	if ( name == NULL )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname_location ()) (name);
+		return (*__lhip_real_gethostbyname_loc ()) (name);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname_location ()) (name);
+		return (*__lhip_real_gethostbyname_loc ()) (name);
 	}
 
-	ret = (*__lhip_real_gethostbyname_location ()) (name);
+	ret = (*__lhip_real_gethostbyname_loc ()) (name);
 	if ( ret != NULL )
 	{
 		__lhip_change_data (ret);
@@ -542,7 +542,7 @@ gethostbyname_r (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_gethostbyname_r_location () == NULL )
+	if ( __lhip_real_gethostbyname_r_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 #ifdef HAVE_FUNC_GETHOSTBYNAME_R_5
@@ -555,7 +555,7 @@ gethostbyname_r (
 	if ( (name == NULL) || (ret == NULL) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname_r_location ())
+		return (*__lhip_real_gethostbyname_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 			(name, ret, buf, buflen, result, h_errnop);
 #else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
@@ -571,7 +571,7 @@ gethostbyname_r (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname_r_location ())
+		return (*__lhip_real_gethostbyname_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 			(name, ret, buf, buflen, result, h_errnop);
 #else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
@@ -583,7 +583,7 @@ gethostbyname_r (
 #endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
 	}
 
-	my_ret = (*__lhip_real_gethostbyname_r_location ())
+	my_ret = (*__lhip_real_gethostbyname_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 		(name, ret, buf, buflen, result, h_errnop);
 #else /* ! HAVE_FUNC_GETHOSTBYNAME_R_6 */
@@ -625,7 +625,7 @@ gethostbyname2 (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_gethostbyname2_location () == NULL )
+	if ( __lhip_real_gethostbyname2_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return NULL;
@@ -634,17 +634,17 @@ gethostbyname2 (
 	if ( name == NULL )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname2_location ()) (name, af);
+		return (*__lhip_real_gethostbyname2_loc ()) (name, af);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname2_location ()) (name, af);
+		return (*__lhip_real_gethostbyname2_loc ()) (name, af);
 	}
 
-	ret = (*__lhip_real_gethostbyname2_location ()) (name, af);
+	ret = (*__lhip_real_gethostbyname2_loc ()) (name, af);
 	if ( ret != NULL )
 	{
 		__lhip_change_data (ret);
@@ -680,7 +680,7 @@ gethostbyname2_r (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_gethostbyname2_r_location () == NULL )
+	if ( __lhip_real_gethostbyname2_r_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return -1;
@@ -689,7 +689,7 @@ gethostbyname2_r (
 	if ( (name == NULL) || (ret == NULL) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname2_r_location ())
+		return (*__lhip_real_gethostbyname2_r_loc ())
 			(name, af, ret, buf, buflen, result, h_errnop);
 	}
 
@@ -697,11 +697,11 @@ gethostbyname2_r (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname2_r_location ())
+		return (*__lhip_real_gethostbyname2_r_loc ())
 			(name, af, ret, buf, buflen, result, h_errnop);
 	}
 
-	my_ret = (*__lhip_real_gethostbyname2_r_location ())
+	my_ret = (*__lhip_real_gethostbyname2_r_loc ())
 		(name, af, ret, buf, buflen, result, h_errnop);
 	if ( my_ret == 0 )
 	{
@@ -811,7 +811,7 @@ gethostent_r (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_gethostent_r_location () == NULL )
+	if ( __lhip_real_gethostent_r_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 #ifdef HAVE_FUNC_GETHOSTENT_R_4
@@ -824,7 +824,7 @@ gethostent_r (
 	if ( ret == NULL )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostent_r_location ())
+		return (*__lhip_real_gethostent_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTENT_R_5
 			(ret, buf, buflen, result, h_errnop);
 #else /* ! HAVE_FUNC_GETHOSTENT_R_5 */
@@ -840,7 +840,7 @@ gethostent_r (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostent_r_location ())
+		return (*__lhip_real_gethostent_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTENT_R_5
 			(ret, buf, buflen, result, h_errnop);
 #else /* ! HAVE_FUNC_GETHOSTENT_R_5 */
@@ -852,7 +852,7 @@ gethostent_r (
 #endif /* HAVE_FUNC_GETHOSTENT_R_5 */
 	}
 
-	my_ret = (*__lhip_real_gethostent_r_location ())
+	my_ret = (*__lhip_real_gethostent_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTENT_R_5
 		(ret, buf, buflen, result, h_errnop);
 #else /* ! HAVE_FUNC_GETHOSTENT_R_5 */
@@ -896,7 +896,7 @@ getipnodebyaddr (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_getipnodebyaddr_location () == NULL )
+	if ( __lhip_real_getipnodebyaddr_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return NULL;
@@ -905,7 +905,7 @@ getipnodebyaddr (
 	if ( addr == NULL )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getipnodebyaddr_location ())
+		return (*__lhip_real_getipnodebyaddr_loc ())
 			(addr, len, af, error_num);
 	}
 
@@ -913,11 +913,11 @@ getipnodebyaddr (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getipnodebyaddr_location ())
+		return (*__lhip_real_getipnodebyaddr_loc ())
 			(addr, len, af, error_num);
 	}
 
-	ret = (*__lhip_real_getipnodebyaddr_location ())
+	ret = (*__lhip_real_getipnodebyaddr_loc ())
 		(addr, len, af, error_num);
 	if ( ret != NULL )
 	{
@@ -949,7 +949,7 @@ getipnodebyname (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_getipnodebyname_location () == NULL )
+	if ( __lhip_real_getipnodebyname_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return NULL;
@@ -958,7 +958,7 @@ getipnodebyname (
 	if ( name == NULL )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getipnodebyname_location ())
+		return (*__lhip_real_getipnodebyname_loc ())
 			(name, af, flags, error_num);
 	}
 
@@ -966,11 +966,11 @@ getipnodebyname (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getipnodebyname_location ())
+		return (*__lhip_real_getipnodebyname_loc ())
 			(name, af, flags, error_num);
 	}
 
-	ret = (*__lhip_real_getipnodebyname_location ())
+	ret = (*__lhip_real_getipnodebyname_loc ())
 		(name, af, flags, error_num);
 	if ( ret != NULL )
 	{
@@ -1108,7 +1108,7 @@ getnameinfo (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_getnameinfo_location () == NULL )
+	if ( __lhip_real_getnameinfo_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return -1;
@@ -1117,7 +1117,7 @@ getnameinfo (
 	if ( (sa == NULL) || (host == NULL) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getnameinfo_location ())
+		return (*__lhip_real_getnameinfo_loc ())
 			(sa, salen, host, hostlen, serv, servlen, flags);
 	}
 
@@ -1125,11 +1125,11 @@ getnameinfo (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getnameinfo_location ())
+		return (*__lhip_real_getnameinfo_loc ())
 			(sa, salen, host, hostlen, serv, servlen, flags);
 	}
 
-	ret = (*__lhip_real_getnameinfo_location ()) (sa, salen, host, hostlen, serv, servlen, flags);
+	ret = (*__lhip_real_getnameinfo_loc ()) (sa, salen, host, hostlen, serv, servlen, flags);
 	if ( ret == 0 )
 	{
 		if ( salen == sizeof (struct sockaddr_in) )
@@ -1218,7 +1218,7 @@ getaddrinfo (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_getaddrinfo_location () == NULL )
+	if ( __lhip_real_getaddrinfo_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return -1;
@@ -1227,17 +1227,17 @@ getaddrinfo (
 	if ( (node == NULL) || (res == NULL) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getaddrinfo_location ()) (node, service, hints, res);
+		return (*__lhip_real_getaddrinfo_loc ()) (node, service, hints, res);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_getaddrinfo_location ()) (node, service, hints, res);
+		return (*__lhip_real_getaddrinfo_loc ()) (node, service, hints, res);
 	}
 
-	ret = (*__lhip_real_getaddrinfo_location ()) (node, service, hints, res);
+	ret = (*__lhip_real_getaddrinfo_loc ()) (node, service, hints, res);
 	if ( (ret == 0) && (*res != NULL) )
 	{
 		our_name_ipv4 = __lhip_get_our_name_ipv4 ();
@@ -1529,7 +1529,7 @@ gethostname (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_gethostname_location () == NULL )
+	if ( __lhip_real_gethostname_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return -1;
@@ -1539,21 +1539,21 @@ gethostname (
 	if ( ( name == NULL ) || ( len == 0 ) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_gethostname_location ()) (name, len);
+		return (*__lhip_real_gethostname_loc ()) (name, len);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_gethostname_location ()) (name, len);
+		return (*__lhip_real_gethostname_loc ()) (name, len);
 	}
 
 	LHIP_MEMSET (name, 0, len);
 	strncpy (name, local_name, len-1);
 	return 0;
 #else /* ! LHIP_ENABLE_GUI_APPS */
-	return (*__lhip_real_gethostname_location ()) (name, len);
+	return (*__lhip_real_gethostname_loc ()) (name, len);
 #endif /* LHIP_ENABLE_GUI_APPS */
 }
 
@@ -1693,7 +1693,7 @@ getsockname (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_getsockname_location () == NULL )
+	if ( __lhip_real_getsockname_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return -1;
@@ -1702,17 +1702,17 @@ getsockname (
 	if ( (name == NULL) || (namelen == NULL) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_getsockname_location ()) (s, name, namelen);
+		return (*__lhip_real_getsockname_loc ()) (s, name, namelen);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_getsockname_location ()) (s, name, namelen);
+		return (*__lhip_real_getsockname_loc ()) (s, name, namelen);
 	}
 
-	res = (*__lhip_real_getsockname_location ()) (s, name, namelen);
+	res = (*__lhip_real_getsockname_loc ()) (s, name, namelen);
 	if ( res == 0 )
 	{
 		if ( name->sa_family == AF_INET )
@@ -1825,7 +1825,7 @@ bindresvport (
 	fflush (stderr);
 # endif
 
-	if ( __lhip_real_bindresvport_location () == NULL )
+	if ( __lhip_real_bindresvport_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return -1;
@@ -1834,14 +1834,14 @@ bindresvport (
 	if ( my_addr == NULL )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_bindresvport_location ()) (sockfd, my_addr);
+		return (*__lhip_real_bindresvport_loc ()) (sockfd, my_addr);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_bindresvport_location ()) (sockfd, my_addr);
+		return (*__lhip_real_bindresvport_loc ()) (sockfd, my_addr);
 	}
 
 	if ( (__lhip_check_ipv4_value (&(my_addr->sin_addr)) != 1)
@@ -1854,7 +1854,7 @@ bindresvport (
 		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
-	return (*__lhip_real_bindresvport_location ()) (sockfd, my_addr);
+	return (*__lhip_real_bindresvport_loc ()) (sockfd, my_addr);
 }
 #endif /* (defined HAVE_BINDRESVPORT) && (!defined __sun) */
 
@@ -1881,7 +1881,7 @@ bindresvport6 (
 	fflush (stderr);
 # endif
 
-	if ( __lhip_real_bindresvport6_location () == NULL )
+	if ( __lhip_real_bindresvport6_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return -1;
@@ -1890,14 +1890,14 @@ bindresvport6 (
 	if ( my_addr == NULL )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_bindresvport6_location ()) (sockfd, my_addr);
+		return (*__lhip_real_bindresvport6_loc ()) (sockfd, my_addr);
 	}
 
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO (err);
-		return (*__lhip_real_bindresvport6_location ()) (sockfd, my_addr);
+		return (*__lhip_real_bindresvport6_loc ()) (sockfd, my_addr);
 	}
 
 	if ( (__lhip_check_ipv6_value (&(my_addr->sin6_addr)) != 1)
@@ -1910,7 +1910,7 @@ bindresvport6 (
 		LHIP_SET_ERRNO_PERM();
 		return -1;
 	}
-	return (*__lhip_real_bindresvport6_location ()) (sockfd, my_addr);
+	return (*__lhip_real_bindresvport6_loc ()) (sockfd, my_addr);
 }
 #endif /* (defined HAVE_BINDRESVPORT6) && (!defined __sun) */
 

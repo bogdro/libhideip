@@ -196,9 +196,9 @@ void __lhip_read_local_addresses (LHIP_VOID)
 	__lhip_number_of_hostnames = 0;
 
 	/* Get our host's addresses and names/aliases: */
-	if ( __lhip_real_gethostname_location () != NULL )
+	if ( __lhip_real_gethostname_loc () != NULL )
 	{
-		ai_res = (*__lhip_real_gethostname_location ()) (__lhip_our_gethostname,
+		ai_res = (*__lhip_real_gethostname_loc ()) (__lhip_our_gethostname,
 			sizeof (__lhip_our_gethostname) );
 		if ( ai_res != 0 )
 		{
@@ -214,7 +214,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 		}
 	}
 #ifdef HAVE_ARPA_INET_H
-	if ( __lhip_real_gethostbyaddr_r_location () != NULL )
+	if ( __lhip_real_gethostbyaddr_r_loc () != NULL )
 	{
 		ai_res = inet_aton (local_ip, &lhip_addr);
 		if ( ai_res != 0 )
@@ -225,7 +225,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 #else
 			ai_res =
 #endif
-				(*__lhip_real_gethostbyaddr_r_location ())
+				(*__lhip_real_gethostbyaddr_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 					(&lhip_addr, sizeof (struct in_addr), AF_INET, &__lhip_tmp,
 					/* buffer: */
@@ -258,7 +258,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 #else
 			ai_res =
 #endif
-				(*__lhip_real_gethostbyaddr_r_location ())
+				(*__lhip_real_gethostbyaddr_r_loc ())
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_8
 					(&lhip_addr6, sizeof (struct in6_addr), AF_INET6, &__lhip_tmp,
 					/* buffer: */
@@ -283,25 +283,25 @@ void __lhip_read_local_addresses (LHIP_VOID)
 			}
 		} /* ai_res == 0 ... */
 	}
-	else if ( __lhip_real_gethostbyaddr_location () != NULL )
+	else if ( __lhip_real_gethostbyaddr_loc () != NULL )
 	{
 		ai_res = inet_aton (local_ip, &lhip_addr);
 		if ( ai_res != 0 )
 		{
 			/* don't pass directly, we need the variable */
-			__lhip_our_real_name_ipv4 = (*__lhip_real_gethostbyaddr_location ())
+			__lhip_our_real_name_ipv4 = (*__lhip_real_gethostbyaddr_loc ())
 				(&lhip_addr, sizeof (struct in_addr), AF_INET);
 			__lhip_add_local_address (__lhip_our_real_name_ipv4);
 		}
 		__lhip_set_ipv6_value (&lhip_addr6);
 		/* don't pass directly, we need the variable */
-		__lhip_our_real_name_ipv6 = (*__lhip_real_gethostbyaddr_location ())
+		__lhip_our_real_name_ipv6 = (*__lhip_real_gethostbyaddr_loc ())
 			(&lhip_addr6, sizeof (struct in6_addr), AF_INET6);
 		__lhip_add_local_address (__lhip_our_real_name_ipv6);
 	}
 
 #endif	/* HAVE_ARPA_INET_H */
-	if ( __lhip_real_gethostbyname_r_location () != NULL )
+	if ( __lhip_real_gethostbyname_r_loc () != NULL )
 	{
 		if (__lhip_our_gethostname[0] != '\0')
 		{
@@ -311,7 +311,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 #else
 			ai_res =
 #endif
-				(*__lhip_real_gethostbyname_r_location ()) (
+				(*__lhip_real_gethostbyname_r_loc ()) (
 					__lhip_our_gethostname, &__lhip_tmp,
 #ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 				/* buffer: */
@@ -339,7 +339,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 #else
 			ai_res =
 #endif
-				(*__lhip_real_gethostbyname_r_location ()) (
+				(*__lhip_real_gethostbyname_r_loc ()) (
 					__lhip_uname_res.nodename, &__lhip_tmp,
 #ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
 				/* buffer: */
@@ -360,21 +360,21 @@ void __lhip_read_local_addresses (LHIP_VOID)
 			}
 		}
 	}
-	else if ( __lhip_real_gethostbyname_location () != NULL )
+	else if ( __lhip_real_gethostbyname_loc () != NULL )
 	{
 		if ( __lhip_our_gethostname[0] != '\0' )
 		{
 			__lhip_add_local_address (
-				(*__lhip_real_gethostbyname_location ()) (__lhip_our_gethostname));
+				(*__lhip_real_gethostbyname_loc ()) (__lhip_our_gethostname));
 		}
 		if ( __lhip_uname_res.nodename[0] != '\0' )
 		{
 			__lhip_add_local_address (
-				(*__lhip_real_gethostbyname_location ()) (__lhip_uname_res.nodename));
+				(*__lhip_real_gethostbyname_loc ()) (__lhip_uname_res.nodename));
 		}
 	}
 
-	if ( __lhip_real_getaddrinfo_location () != NULL )
+	if ( __lhip_real_getaddrinfo_loc () != NULL )
 	{
 		__lhip_ai_all = NULL;
 		__lhip_get_address_info (local_ip);
@@ -382,7 +382,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 		__lhip_get_address_info (__lhip_our_gethostname);
 	}
 
-	if ( __lhip_real_gethostent_r_location () != NULL )
+	if ( __lhip_real_gethostent_r_loc () != NULL )
 	{
 		do
 		{
@@ -392,7 +392,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 #else
 			ai_res =
 #endif
-				(*__lhip_real_gethostent_r_location ()) (
+				(*__lhip_real_gethostent_r_loc ()) (
 					&__lhip_tmp,
 #ifdef HAVE_FUNC_GETHOSTENT_R_5
 				/* buffer: */
@@ -461,11 +461,11 @@ void __lhip_read_local_addresses (LHIP_VOID)
 			);
 	}
 
-	if ( __lhip_real_getnameinfo_location () != NULL )
+	if ( __lhip_real_getnameinfo_loc () != NULL )
 	{
 		addr_ipv4.sin_family = AF_INET;
 		__lhip_set_ipv4_value (&(addr_ipv4.sin_addr));
-		ai_res = (*__lhip_real_getnameinfo_location ()) ((struct sockaddr *)&addr_ipv4,
+		ai_res = (*__lhip_real_getnameinfo_loc ()) ((struct sockaddr *)&addr_ipv4,
 			sizeof (struct sockaddr_in), __lhip_our_hostname_v4,
 			sizeof (__lhip_our_hostname_v4), NULL, 0, 0);
 		if ( ai_res != 0 )
@@ -474,7 +474,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 		}
 		addr_ipv6.sin6_family = AF_INET6;
 		__lhip_set_ipv6_value (&(addr_ipv6.sin6_addr));
-		ai_res = (*__lhip_real_getnameinfo_location ()) ((struct sockaddr *)&addr_ipv6,
+		ai_res = (*__lhip_real_getnameinfo_loc ()) ((struct sockaddr *)&addr_ipv6,
 			sizeof (struct sockaddr_in6), __lhip_our_hostname_v6,
 			sizeof (__lhip_our_hostname_v6), NULL, 0, 0);
 		if ( ai_res != 0 )
@@ -1331,7 +1331,7 @@ __lhip_get_address_info (
 	struct addrinfo * tmp;
 	int ai_res;
 
-	if ( (host == NULL) || (__lhip_real_getaddrinfo_location () == NULL) )
+	if ( (host == NULL) || (__lhip_real_getaddrinfo_loc () == NULL) )
 	{
 		return;
 	}
@@ -1349,7 +1349,7 @@ __lhip_get_address_info (
 	ai_hints.ai_addr = NULL;
 	ai_hints.ai_canonname = NULL;
 	ai_hints.ai_next = NULL;
-	ai_res = (*__lhip_real_getaddrinfo_location ()) (host,
+	ai_res = (*__lhip_real_getaddrinfo_loc ()) (host,
 		NULL /* service */, &ai_hints, &__lhip_ai_all_tmp);
 	if ( (ai_res == 0) && (__lhip_ai_all_tmp != NULL) )
 	{

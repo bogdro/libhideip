@@ -426,42 +426,42 @@ int __lhip_get_init_stage (LHIP_VOID)
 
 /* =============================================================== */
 
-shp_vp_sl_i __lhip_real_gethostbyaddr_location (LHIP_VOID)
+shp_vp_sl_i __lhip_real_gethostbyaddr_loc (LHIP_VOID)
 {
 	return __lhip_real_gethostbyaddr;
 }
 
 /* =============================================================== */
 
-i_vp_sl_i_shp_cp_s_shpp_ip __lhip_real_gethostbyaddr_r_location (LHIP_VOID)
+i_vp_sl_i_shp_cp_s_shpp_ip __lhip_real_gethostbyaddr_r_loc (LHIP_VOID)
 {
 	return __lhip_real_gethostbyaddr_r;
 }
 
 /* =============================================================== */
 
-shp_cp __lhip_real_gethostbyname_location (LHIP_VOID)
+shp_cp __lhip_real_gethostbyname_loc (LHIP_VOID)
 {
 	return __lhip_real_gethostbyname;
 }
 
 /* =============================================================== */
 
-i_cp_shp_cp_s_shpp_ip __lhip_real_gethostbyname_r_location (LHIP_VOID)
+i_cp_shp_cp_s_shpp_ip __lhip_real_gethostbyname_r_loc (LHIP_VOID)
 {
 	return __lhip_real_gethostbyname_r;
 }
 
 /* =============================================================== */
 
-shp_cp_i __lhip_real_gethostbyname2_location (LHIP_VOID)
+shp_cp_i __lhip_real_gethostbyname2_loc (LHIP_VOID)
 {
 	return __lhip_real_gethostbyname2;
 }
 
 /* =============================================================== */
 
-i_cp_i_shp_cp_s_shpp_i __lhip_real_gethostbyname2_r_location (LHIP_VOID)
+i_cp_i_shp_cp_s_shpp_i __lhip_real_gethostbyname2_r_loc (LHIP_VOID)
 {
 	return __lhip_real_gethostbyname2_r;
 }
@@ -475,21 +475,21 @@ shp_v __lhip_real_gethostent_location (LHIP_VOID)
 
 /* =============================================================== */
 
-i_shp_cp_s_shpp_ip __lhip_real_gethostent_r_location (LHIP_VOID)
+i_shp_cp_s_shpp_ip __lhip_real_gethostent_r_loc (LHIP_VOID)
 {
 	return __lhip_real_gethostent_r;
 }
 
 /* =============================================================== */
 
-shp_cp_s_i_ip __lhip_real_getipnodebyaddr_location (LHIP_VOID)
+shp_cp_s_i_ip __lhip_real_getipnodebyaddr_loc (LHIP_VOID)
 {
 	return __lhip_real_getipnodebyaddr;
 }
 
 /* =============================================================== */
 
-shp_cp_i_i_ip __lhip_real_getipnodebyname_location (LHIP_VOID)
+shp_cp_i_i_ip __lhip_real_getipnodebyname_loc (LHIP_VOID)
 {
 	return __lhip_real_getipnodebyname;
 }
@@ -503,14 +503,14 @@ i_sipp __lhip_real_getifaddrs_location (LHIP_VOID)
 
 /* =============================================================== */
 
-i_ssp_sl_cp_s_cp_s_i __lhip_real_getnameinfo_location (LHIP_VOID)
+i_ssp_sl_cp_s_cp_s_i __lhip_real_getnameinfo_loc (LHIP_VOID)
 {
 	return __lhip_real_getnameinfo;
 }
 
 /* =============================================================== */
 
-i_cp_cp_sap_sapp __lhip_real_getaddrinfo_location (LHIP_VOID)
+i_cp_cp_sap_sapp __lhip_real_getaddrinfo_loc (LHIP_VOID)
 {
 	return __lhip_real_getaddrinfo;
 }
@@ -573,7 +573,7 @@ ss_i_csmp_i __lhip_real_sendmsg_location (LHIP_VOID)
 
 /* =============================================================== */
 
-i_cp_s __lhip_real_gethostname_location (LHIP_VOID)
+i_cp_s __lhip_real_gethostname_loc (LHIP_VOID)
 {
 	return __lhip_real_gethostname;
 }
@@ -657,7 +657,7 @@ i_i_i_cvp_sl __lhip_real_setsockopt_location (LHIP_VOID)
 
 /* =============================================================== */
 
-i_ssp_slp __lhip_real_getsockname_location (LHIP_VOID)
+i_ssp_slp __lhip_real_getsockname_loc (LHIP_VOID)
 {
 	return __lhip_real_getsockname;
 }
@@ -671,14 +671,14 @@ i_cssp_sl __lhip_real_bind_location (LHIP_VOID)
 
 /* =============================================================== */
 
-i_i_ssa __lhip_real_bindresvport_location (LHIP_VOID)
+i_i_ssa __lhip_real_bindresvport_loc (LHIP_VOID)
 {
 	return __lhip_real_bindresvport;
 }
 
 /* =============================================================== */
 
-i_i_ssa6 __lhip_real_bindresvport6_location (LHIP_VOID)
+i_i_ssa6 __lhip_real_bindresvport6_loc (LHIP_VOID)
 {
 	return __lhip_real_bindresvport6;
 }
@@ -713,35 +713,35 @@ ccp_i_ucp_i __lhip_real_res_search_location (LHIP_VOID)
 
 /* =============================================================== */
 
-r_ccp_i_ucp_i __lhip_real_res_nsearch_location (LHIP_VOID)
+r_ccp_i_ucp_i __lhip_real_res_nsearch_loc (LHIP_VOID)
 {
 	return __lhip_real_res_nsearch;
 }
 
 /* =============================================================== */
 
-ccp_cpp_i_ucp_i __lhip_real_res_querydomain_location (LHIP_VOID)
+ccp_cpp_i_ucp_i __lhip_real_res_querydomain_loc (LHIP_VOID)
 {
 	return __lhip_real_res_querydomain;
 }
 
 /* =============================================================== */
 
-r_ccp_cpp_i_ucp_i __lhip_real_res_nquerydomain_location (LHIP_VOID)
+r_ccp_cpp_i_ucp_i __lhip_real_res_nquerydomain_loc (LHIP_VOID)
 {
 	return __lhip_real_res_nquerydomain;
 }
 
 /* =============================================================== */
 
-i_ccp_i_i_cucp_i_cucp_ucp_i __lhip_real_res_mkquery_location (LHIP_VOID)
+i_ccp_i_i_cucp_i_cucp_ucp_i __lhip_real_res_mkquery_loc (LHIP_VOID)
 {
 	return __lhip_real_res_mkquery;
 }
 
 /* =============================================================== */
 
-r_i_ccp_i_i_cucp_i_cucp_ucp_i __lhip_real_res_nmkquery_location (LHIP_VOID)
+r_i_ccp_i_i_cucp_i_cucp_ucp_i __lhip_real_res_nmkquery_loc (LHIP_VOID)
 {
 	return __lhip_real_res_nmkquery;
 }
@@ -847,7 +847,7 @@ i_cp_rmtp_ifpp_cp __lhip_r_pcap_findalldevs_ex_l (LHIP_VOID)
 /* =============================================================== */
 
 #if (defined HAVE_GETADDRINFO_A) || (defined HAVE_LIBANL)
-i_i_sgpp_i_ssp __lhip_real_getaddrinfo_a_location (LHIP_VOID)
+i_i_sgpp_i_ssp __lhip_real_getaddrinfo_a_loc (LHIP_VOID)
 {
 	return __lhip_real_getaddrinfo_a;
 }
