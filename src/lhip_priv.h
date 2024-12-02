@@ -547,6 +547,9 @@ extern char * __lhip_duplicate_string LHIP_PARAMS ((const char src[]));
 #  define LHIP_STRDUP __lhip_duplicate_string
 # endif
 
+extern void __lhip_copy_string LHIP_PARAMS ((char * const dest,
+	const char src[], const size_t len));			/* lhip_main.c */
+
 
 # ifdef __cplusplus
 }

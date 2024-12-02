@@ -163,15 +163,13 @@ static int __lhip_is_forbidden_name (
 	new_name = (char *) malloc ( j + 1 );
 	if ( new_name != NULL )
 	{
-		strncpy (new_name, name, j+1);
-		new_name[j] = '\0';
+		__lhip_copy_string (new_name, name, j);
 		h.h_name = new_name;
 	}
 	else
 #endif
 	{
-		strncpy (__lhip_name_copy, name, LHIP_MIN (j + 1, LHIP_MAXPATHLEN-1));
-		__lhip_name_copy[LHIP_MAXPATHLEN-1] = '\0';
+		__lhip_copy_string (__lhip_name_copy, name, LHIP_MIN (j + 1, LHIP_MAXPATHLEN-1));
 		h.h_name = __lhip_name_copy;
 	}
 	h.h_aliases = NULL;

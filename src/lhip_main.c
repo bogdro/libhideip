@@ -157,6 +157,40 @@ static i_cp_rmtp_ifpp_cp		__lhip_r_pcap_findalldevs_ex	= NULL;
 
 /* =============================================================== */
 
+void __lhip_copy_string (
+#ifdef LHIP_ANSIC
+	char * const dest, const char src[], const size_t len)
+#else
+	dest, src, len)
+	char * const dest;
+	const char src[];
+	const size_t len;
+#endif
+{
+#ifndef HAVE_STRING_H
+	size_t i;
+#endif
+	if ( (src == NULL) || (dest == NULL) )
+	{
+		return;
+	}
+#ifdef HAVE_STRING_H
+	strncpy (dest, src, len);
+#else
+	for ( i = 0; i < len; i++ )
+	{
+		if ( src[i] == '\0' )
+		{
+			break;
+		}
+		dest[i] = src[i];
+	}
+#endif
+	dest[len] = '\0';
+}
+
+/* =============================================================== */
+
 #ifndef HAVE_STRDUP
 char * __lhip_duplicate_string (
 # ifdef LHIP_ANSIC

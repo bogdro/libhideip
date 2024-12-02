@@ -1154,8 +1154,7 @@ getnameinfo (
 				(__lhip_is_local_addr (&h) != 0) )
 			{
 				LHIP_MEMSET (host, 0, (size_t)hostlen);
-				strncpy (host, local_name, hostlen - 1);
-				host[hostlen-1] = '\0';
+				__lhip_copy_string (host, local_name, hostlen - 1);
 			}
 		}
 		else if ( salen == sizeof (struct sockaddr_in6) )
@@ -1180,8 +1179,7 @@ getnameinfo (
 				(__lhip_is_local_addr (&h) != 0) )
 			{
 				LHIP_MEMSET (host, 0, (size_t)hostlen);
-				strncpy (host, local_name, hostlen - 1);
-				host[hostlen-1] = '\0';
+				__lhip_copy_string (host, local_name, hostlen - 1);
 			}
 		}
 	}
@@ -1263,7 +1261,7 @@ getaddrinfo (
 					{
 						namelen = strlen (tmp->ai_canonname);
 						LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
-						strncpy (tmp->ai_canonname, local_name, namelen + 1 );
+						__lhip_copy_string (tmp->ai_canonname, local_name, namelen);
 					}
 
 					tmp = tmp->ai_next;
@@ -1293,7 +1291,7 @@ getaddrinfo (
 							{
 								namelen = strlen (tmp->ai_canonname);
 								LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
-								strncpy (tmp->ai_canonname, local_name, namelen + 1 );
+								__lhip_copy_string (tmp->ai_canonname, local_name, namelen);
 							}
 
 							tmp = tmp->ai_next;
@@ -1324,7 +1322,7 @@ getaddrinfo (
 					{
 						namelen = strlen (tmp->ai_canonname);
 						LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
-						strncpy (tmp->ai_canonname, local_name, namelen + 1 );
+						__lhip_copy_string (tmp->ai_canonname, local_name, namelen);
 					}
 
 					tmp = tmp->ai_next;
@@ -1354,7 +1352,7 @@ getaddrinfo (
 							{
 								namelen = strlen (tmp->ai_canonname);
 								LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
-								strncpy (tmp->ai_canonname, local_name, namelen + 1 );
+								__lhip_copy_string (tmp->ai_canonname, local_name, namelen);
 							}
 
 							tmp = tmp->ai_next;
@@ -1550,7 +1548,7 @@ gethostname (
 	}
 
 	LHIP_MEMSET (name, 0, len);
-	strncpy (name, local_name, len-1);
+	__lhip_copy_string (name, local_name, len-1);
 	return 0;
 #else /* ! LHIP_ENABLE_GUI_APPS */
 	return (*__lhip_real_gethostname_loc ()) (name, len);

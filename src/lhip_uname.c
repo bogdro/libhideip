@@ -104,8 +104,7 @@ uname (
 	if ( ret >= 0 )
 	{
 		LHIP_MEMSET (&(buf->nodename), 0, sizeof (buf->nodename));
-		strncpy (buf->nodename, "localhost", LHIP_MIN (sizeof (buf->nodename), 9)+1);
-		buf->nodename[sizeof (buf->nodename)-1] = '\0';
+		__lhip_copy_string (buf->nodename, "localhost", LHIP_MIN (sizeof (buf->nodename), 9));
 	}
 	return ret;
 }

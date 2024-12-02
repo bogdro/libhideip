@@ -356,10 +356,8 @@ static char * __lhip_get_target_link_path (
 					(size_t)lsize + 1);
 				__lhip_newlinkdir[dirname_len + 1
 					+ (size_t)lsize] = '\0';
-				strncpy (__lhip_newlinkpath, __lhip_newlinkdir,
+				__lhip_copy_string (__lhip_newlinkpath, __lhip_newlinkdir,
 					dirname_len + 1 + (size_t)lsize + 1);
-				__lhip_newlinkpath[dirname_len + 1 +
-					(size_t)lsize] = '\0';
 # ifdef HAVE_MALLOC
 				free (__lhip_newlinkdir);
 # endif /* HAVE_MALLOC */
@@ -481,10 +479,8 @@ int __lhip_is_forbidden_file (
 	}
 	__lhip_linkpath = __lhip_get_target_link_path (name_copy);
 #else
-	strncpy (__lhip_linkpath, name, sizeof (__lhip_linkpath)-1);
-	__lhip_linkpath[sizeof (__lhip_linkpath) - 1] = '\0';
-	strncpy (__lhip_linkpath, __lhip_get_target_link_path (__lhip_linkpath), sizeof (__lhip_linkpath)-1);
-	__lhip_linkpath[sizeof (__lhip_linkpath) - 1] = '\0';
+	__lhip_copy_string (__lhip_linkpath, name, sizeof (__lhip_linkpath)-1);
+	__lhip_copy_string (__lhip_linkpath, _lhip_get_target_link_path (__lhip_linkpath), sizeof (__lhip_linkpath)-1);
 #endif
 #ifdef HAVE_MALLOC
 	if ( __lhip_linkpath != NULL )
@@ -626,9 +622,7 @@ static int __lhip_is_forbidden_program (
 #endif
 	{
 		LHIP_MEMSET (__lhip_linkpath, 0, j + 1);
-
-		strncpy (__lhip_linkpath, name, j + 1);
-		__lhip_linkpath[j] = '\0';
+		__lhip_copy_string (__lhip_linkpath, name, j);
 #if (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK)
 		if ( is_system )
 		{
@@ -639,9 +633,7 @@ static int __lhip_is_forbidden_program (
 			if ( first_char != NULL )
 			{
 				/* space found - copy everything before it as the program name */
-				strncpy (__lhip_linkpath, name,
-					LHIP_MIN ((size_t)(first_char - name), j));
-				__lhip_linkpath[LHIP_MIN ((size_t)(first_char - name), j)] = '\0';
+				__lhip_copy_string (__lhip_linkpath, name, LHIP_MIN ((size_t)(first_char - name), j));
 			}
 			__lhip_linkpath[j] = '\0';
 			if ( strncmp (__lhip_linkpath, LHIP_PATH_SEP, strlen(LHIP_PATH_SEP)) != 0 )
@@ -662,10 +654,8 @@ static int __lhip_is_forbidden_program (
 
 							do
 							{
-								strncpy (path_dir, path,
+								__lhip_copy_string (path_dir, path,
 									LHIP_MIN ((size_t)(first_char - path), j));
-								path_dir[LHIP_MIN ((size_t)(first_char - path), j)]
-									= '\0';
 								__lhip_append_path (path_dir, __lhip_linkpath, j);
 								path_dir[j] = '\0';
 #   ifdef HAVE_STAT64
@@ -695,8 +685,8 @@ static int __lhip_is_forbidden_program (
 							path_len + 1 + new_path_len + 1);
 						if ( path_dir != NULL )
 						{
-							strncpy (path_dir, path, path_len + 1);
-							path_dir[path_len + 1] = '\0';
+							__lhip_copy_string (path_dir, path,
+								path_len);
 							__lhip_append_path (path_dir, __lhip_linkpath, j);
 							path_dir[path_len + 1 + new_path_len] = '\0';
 						}
@@ -704,24 +694,21 @@ static int __lhip_is_forbidden_program (
 					/* path_dir, if not NULL, contains "PATH/name" */
 					if ( path_dir != NULL )
 					{
-						strncpy (__lhip_linkpath, path_dir, j);
-						__lhip_linkpath[j] = '\0';
+						__lhip_copy_string (__lhip_linkpath,
+							path_dir, j);
 						free (path_dir);
 					}
 #  else /* ! HAVE_MALLOC */
 					if ( first_char != NULL )
 					{
-						strncpy (__lhip_newlinkpath, path,
-							LHIP_MIN ((size_t)(first_char - path),
-							sizeof (__lhip_newlinkpath) - 1));
-						__lhip_newlinkpath[LHIP_MIN ((size_t)(first_char - path),
-							sizeof (__lhip_newlinkpath) - 1)] = '\0';
+						__lhip_copy_string (__lhip_newlinkpath,
+							path, LHIP_MIN ((size_t)(first_char - path),
+								sizeof (__lhip_newlinkpath) - 1));
 					}
 					else
 					{
-						strncpy (__lhip_newlinkpath, path,
-							sizeof (__lhip_newlinkpath) - 1);
-						__lhip_newlinkpath[sizeof (__lhip_newlinkpath) - 1] = '\0';
+						__lhip_copy_string (__lhip_newlinkpath,
+							path, sizeof (__lhip_newlinkpath) - 1);
 					}
 					__lhip_append_path (__lhip_newlinkpath,
 						__lhip_linkpath, sizeof (__lhip_newlinkpath));
@@ -739,9 +726,9 @@ static int __lhip_is_forbidden_program (
 		free ((void *)__lhip_linkpath);
 		__lhip_linkpath = first_char;
 # else
-		strncpy (__lhip_linkpath, __lhip_get_target_link_path (__lhip_linkpath),
-			sizeof (__lhip_linkpath)-1);
-		__lhip_linkpath[sizeof (__lhip_linkpath) - 1] = '\0';
+		__lhip_copy_string (__lhip_linkpath,
+			__lhip_get_target_link_path (__lhip_linkpath),
+			sizeof (__lhip_linkpath) - 1);
 # endif
 #endif /* (defined HAVE_SYS_STAT_H) && (defined HAVE_READLINK) */
 		for ( j = 0; j < sizeof (programs)/sizeof (programs[0]); j++)

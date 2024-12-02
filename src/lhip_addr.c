@@ -938,9 +938,7 @@ __lhip_change_data (
 		{
 			len = strlen (ret->h_name);
 			LHIP_MEMSET (ret->h_name, 0, len);
-			strncpy (ret->h_name, "localhost",
-				LHIP_MIN (len+1, 10));
-			ret->h_name[len] = '\0';
+			__lhip_copy_string (ret->h_name, "localhost", len);
 		}
 		if ( ret->h_aliases != NULL )
 		{
@@ -949,9 +947,8 @@ __lhip_change_data (
 			{
 				len = strlen (ret->h_aliases[i]);
 				LHIP_MEMSET (ret->h_aliases[i], 0, len);
-				strncpy (ret->h_aliases[i], "localhost",
-					LHIP_MIN (len+1, 10));
-				ret->h_aliases[i][len] = '\0';
+				__lhip_copy_string (ret->h_aliases[i],
+					"localhost", len);
 				i++;
 			}
 		}
