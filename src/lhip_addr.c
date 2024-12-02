@@ -187,7 +187,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 	int lhip_errno = 0;
 	size_t i;
 #ifndef HAVE_MALLOC
-	int localaddr_found = 0;
+	int localaddr_found;
 #endif
 #ifdef HAVE_FUNC_GETHOSTBYADDR_R_5
 	struct hostent_data hdata;
