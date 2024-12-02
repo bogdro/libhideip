@@ -276,21 +276,17 @@ static char * __lhip_get_target_link_path (
 	current_name = LHIP_STRDUP (name);
 	if ( current_name != NULL )
 	{
-		do
-		{
 # ifdef HAVE_LSTAT64
-			res = lstat64 (current_name, &st);
+		res = lstat64 (current_name, &st);
 # else
 #  ifdef HAVE_LSTAT
-			res = lstat (current_name, &st);
+		res = lstat (current_name, &st);
 #  else
-			res = -1;
+		res = -1;
 #  endif
 # endif
-			if ( res < 0 )
-			{
-				break;
-			}
+		while ( res >= 0 )
+		{
 			if ( ! S_ISLNK (st.st_mode) )
 			{
 				break;
@@ -338,7 +334,6 @@ static char * __lhip_get_target_link_path (
 # endif /* HAVE_MALLOC */
 				break;
 			}
-			__lhip_newlinkpath[lnk_res] = '\0';
 			if ( (__lhip_newlinkpath[0] != '/') && (dirname_len > 0) )
 			{
 				/* The link's target is a relative path (no slash) in a
@@ -380,7 +375,16 @@ static char * __lhip_get_target_link_path (
 				/* the old and new names are the same - a link pointing to itself */
 				break;
 			}
-		} while ( current_name != NULL );
+# ifdef HAVE_LSTAT64
+			res = lstat64 (current_name, &st);
+# else
+#  ifdef HAVE_LSTAT
+			res = lstat (current_name, &st);
+#  else
+			res = -1;
+#  endif
+# endif
+		} /* while ( res >= 0 ); */
 		return current_name;
 	}
 	else
