@@ -2,6 +2,8 @@
  * LibHideIP - A library for hiding local IP address.
  *	-- public interface file.
  *
+ * @configure_input@
+ *
  * Copyright (C) 2012-2024 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
  * License: GNU General Public License, v3+
  *
