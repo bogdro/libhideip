@@ -22,6 +22,69 @@
 #ifndef LHIPTEST_COMMON_HEADER
 # define LHIPTEST_COMMON_HEADER 1
 
+# define _POSIX_C_SOURCE 200112L	/* posix_memalign() */
+# define _XOPEN_SOURCE 600	/* brk(), sbrk() */
+# define _LARGEFILE64_SOURCE 1
+# define _GNU_SOURCE	1	/* fallocate() */
+# define _ATFILE_SOURCE 1
+# define _GNU_SOURCE	1
+# define _DEFAULT_SOURCE
+# define _ISOC11_SOURCE		/* aligned_alloc() */
+
+# ifdef HAVE_CONFIG_H
+#  include <config.h>
+# endif
+
+# include <stdio.h>
+
+#ifdef HAVE_STRING_H
+# if (!defined STDC_HEADERS) && (defined HAVE_MEMORY_H)
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+
+# ifdef HAVE_MALLOC_H
+#  include <malloc.h>
+# endif
+
+# ifdef HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+
+# ifdef HAVE_ERRNO_H
+#  include <errno.h>
+# else
+static int errno = -1;
+# endif
+# ifndef ENODEV
+#  define ENODEV 19
+# endif
+
+# ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+# endif
+
+# ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+# endif
+
+# ifdef HAVE_SYS_STAT_H
+#  include <sys/stat.h>
+# else
+#  define S_IRUSR 0600
+#  define S_IWUSR 0400
+# endif
+
+# ifdef HAVE_FCNTL_H
+#  include <fcntl.h>
+# else
+#  define O_RDONLY	0
+#  define O_WRONLY	1
+#  define O_RDWR		2
+#  define O_TRUNC	01000
+# endif
+
 # include <check.h>
 
 /* compatibility with older check versions */

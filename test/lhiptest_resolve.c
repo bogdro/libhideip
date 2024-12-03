@@ -19,23 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define _POSIX_C_SOURCE 200112L
-#define _XOPEN_SOURCE 600
-#define _LARGEFILE64_SOURCE 1
-#define _BSD_SOURCE 1
-#define _SVID_SOURCE 1
-#define _DEFAULT_SOURCE 1
-#define _GNU_SOURCE 1		/* getaddrinfo_a */
-
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-#include "libhideip.h"
-#include <check.h>
 #include "lhiptest_common.h"
-
-#include <stdio.h>
+#include "libhideip.h"
 
 #ifdef HAVE_NETINET_IN_H
 # include <netinet/in.h>
@@ -51,14 +36,6 @@
 
 #ifdef HAVE_NETDB_H
 # include <netdb.h>
-#endif
-
-#ifdef HAVE_MALLOC_H
-# include <malloc.h>
-#endif
-
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
 #endif
 
 static char buf[LHIP_MAXHOSTLEN] LHIP_ALIGN(8);
