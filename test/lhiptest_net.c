@@ -157,7 +157,7 @@ static void verify_addrinfo (struct addrinfo * ai)
 					     canonname_len) != 0)
 			)
 			{
-				fail("tmpa->ai_canonname contains something else than 'localhost', '127.0.0.1' and '::1': '%s'\n",
+				ck_abort_msg("tmpa->ai_canonname contains something else than 'localhost', '127.0.0.1' and '::1': '%s'\n",
 					tmpa->ai_canonname);
 			}
 		}
@@ -194,7 +194,7 @@ static void verify_hostent(struct hostent * h)
 			&& (strncmp (h->h_name, "::1", strlen (h->h_name)) != 0)
 		)
 		{
-			fail("h->h_name contains something else than a local hostname or IP: '%s'\n", h->h_name);
+			ck_abort_msg("h->h_name contains something else than a local hostname or IP: '%s'\n", h->h_name);
 		}
 	}
 	if (h->h_aliases != NULL)
@@ -208,7 +208,7 @@ static void verify_hostent(struct hostent * h)
 				&& (strncmp (h->h_aliases[i], "::1", strlen (h->h_aliases[i])) != 0)
 			)
 			{
-				fail("h->h_aliases[%d] contains something else than a local hostname or IP: '%s'\n",
+				ck_abort_msg("h->h_aliases[%d] contains something else than a local hostname or IP: '%s'\n",
 				     i, h->h_aliases[i]);
 			}
 			i++;
@@ -542,7 +542,7 @@ START_TEST(test_getnameinfo)
 	ck_assert_int_eq(a, 0);
 	if (strncmp (buf, "localhost", strlen (buf)) != 0)
 	{
-		fail("buf contains something else than 'localhost': '%s'\n", buf);
+		ck_abort_msg("buf contains something else than 'localhost': '%s'\n", buf);
 	}
 }
 END_TEST
@@ -669,7 +669,7 @@ START_TEST(test_socket_inet)
 	}
 	else
 	{
-		fail("test_socket_inet: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_socket_inet: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -686,7 +686,7 @@ START_TEST(test_socket_unix)
 	}
 	else
 	{
-		fail("test_socket_unix: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_socket_unix: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -703,7 +703,7 @@ START_TEST(test_socket_inet6)
 	}
 	else
 	{
-		fail("test_socket_inet6: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_socket_inet6: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -717,7 +717,7 @@ START_TEST(test_socket_banned_netlink)
 	if ( a >= 0 )
 	{
 		close (a);
-		fail("test_socket_banned_netlink: socket opened, but shouldn't have been\n");
+		ck_abort_msg("test_socket_banned_netlink: socket opened, but shouldn't have been\n");
 	}
 # ifdef HAVE_ERRNO_H
 	ck_assert_int_eq(errno, EPERM);
@@ -734,7 +734,7 @@ START_TEST(test_socket_banned_raw)
 	if ( a >= 0 )
 	{
 		close (a);
-		fail("test_socket_banned_raw: socket opened, but shouldn't have been\n");
+		ck_abort_msg("test_socket_banned_raw: socket opened, but shouldn't have been\n");
 	}
 # ifdef HAVE_ERRNO_H
 	ck_assert_int_eq(errno, EPERM);
@@ -751,7 +751,7 @@ START_TEST(test_socket_banned_raw6)
 	if ( a >= 0 )
 	{
 		close (a);
-		fail("test_socket_banned_raw6: socket opened, but shouldn't have been\n");
+		ck_abort_msg("test_socket_banned_raw6: socket opened, but shouldn't have been\n");
 	}
 # ifdef HAVE_ERRNO_H
 	ck_assert_int_eq(errno, EPERM);
@@ -767,7 +767,7 @@ START_TEST(test_recvmsg)
 	a = recvmsg (1, NULL, 0);
 	if ( a >= 0 )
 	{
-		fail("test_recvmsg: data received, but shouldn't have been\n");
+		ck_abort_msg("test_recvmsg: data received, but shouldn't have been\n");
 	}
 # ifdef HAVE_ERRNO_H
 	ck_assert_int_eq(errno, EPERM);
@@ -783,7 +783,7 @@ START_TEST(test_sendmsg)
 	a = sendmsg (1, NULL, 0);
 	if ( a >= 0 )
 	{
-		fail("test_sendmsg: data sent, but shouldn't have been\n");
+		ck_abort_msg("test_sendmsg: data sent, but shouldn't have been\n");
 	}
 # ifdef HAVE_ERRNO_H
 	ck_assert_int_eq(errno, EPERM);
@@ -817,12 +817,12 @@ START_TEST(test_getsockname)
 		}
 		else
 		{
-			fail("test_getsockname: socket name not read\n");
+			ck_abort_msg("test_getsockname: socket name not read\n");
 		}
 	}
 	else
 	{
-		fail("test_getsockname: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_getsockname: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -853,12 +853,12 @@ START_TEST(test_getsockname6)
 		}
 		else
 		{
-			fail("test_getsockname6: socket name not read\n");
+			ck_abort_msg("test_getsockname6: socket name not read\n");
 		}
 	}
 	else
 	{
-		fail("test_getsockname6: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_getsockname6: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -881,12 +881,12 @@ START_TEST(test_bind)
 		close (sock);
 		if ( a < 0 )
 		{
-			fail("test_bind: socket not bound, but should have been: errno=%d\n", err);
+			ck_abort_msg("test_bind: socket not bound, but should have been: errno=%d\n", err);
 		}
 	}
 	else
 	{
-		fail("test_bind: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_bind: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -913,12 +913,12 @@ START_TEST(test_bind6)
 		close (sock);
 		if ( a < 0 )
 		{
-			fail("test_bind6: socket not bound, but should have been: errno=%d\n", err);
+			ck_abort_msg("test_bind6: socket not bound, but should have been: errno=%d\n", err);
 		}
 	}
 	else
 	{
-		fail("test_bind6: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_bind6: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -946,12 +946,12 @@ START_TEST(test_bind_banned)
 		close (sock);
 		if ( a >= 0 )
 		{
-			fail("test_bind_banned: socket bound, but shouldn't have been\n");
+			ck_abort_msg("test_bind_banned: socket bound, but shouldn't have been\n");
 		}
 	}
 	else
 	{
-		fail("test_bind_banned: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_bind_banned: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1019,12 +1019,12 @@ START_TEST(test_bind_banned6)
 		close (sock);
 		if ( a >= 0 )
 		{
-			fail("test_bind_banned6: socket bound, but shouldn't have been\n");
+			ck_abort_msg("test_bind_banned6: socket bound, but shouldn't have been\n");
 		}
 	}
 	else
 	{
-		fail("test_bind_banned6: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_bind_banned6: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1049,12 +1049,12 @@ START_TEST(test_bindresvport)
 		close (sock);
 		if ( a < 0 )
 		{
-			fail("test_bindresvport: socket not bound, but should have been: errno=%d\n", err);
+			ck_abort_msg("test_bindresvport: socket not bound, but should have been: errno=%d\n", err);
 		}
 	}
 	else
 	{
-		fail("test_bindresvport: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_bindresvport: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1081,12 +1081,12 @@ START_TEST(test_bindresvport_banned)
 		close (sock);
 		if ( a >= 0 )
 		{
-			fail("test_bindresvport_banned: socket bound, but shouldn't have been\n");
+			ck_abort_msg("test_bindresvport_banned: socket bound, but shouldn't have been\n");
 		}
 	}
 	else
 	{
-		fail("test_bindresvport_banned: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_bindresvport_banned: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1115,12 +1115,12 @@ START_TEST(test_bindresvport6)
 		close (sock);
 		if ( a < 0 )
 		{
-			fail("test_bindresvport6: socket not bound, but should have been: errno=%d\n", err);
+			ck_abort_msg("test_bindresvport6: socket not bound, but should have been: errno=%d\n", err);
 		}
 	}
 	else
 	{
-		fail("test_bindresvport6: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_bindresvport6: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1145,12 +1145,12 @@ START_TEST(test_bindresvport6_banned)
 		close (sock);
 		if ( a >= 0 )
 		{
-			fail("test_bindresvport6_banned: socket bound, but shouldn't have been\n");
+			ck_abort_msg("test_bindresvport6_banned: socket bound, but shouldn't have been\n");
 		}
 	}
 	else
 	{
-		fail("test_bindresvport6_banned: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_bindresvport6_banned: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1170,7 +1170,7 @@ START_TEST(test_socketpair)
 	}
 	else
 	{
-		fail("test_socket_banned: socketpair not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_socket_banned: socketpair not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1186,12 +1186,12 @@ START_TEST(test_socketpair_banned_netlink)
 	{
 		close (twosocks[0]);
 		close (twosocks[1]);
-		fail("test_socketpair_banned_netlink: socketpair opened, but shouldn't have been\n");
+		ck_abort_msg("test_socketpair_banned_netlink: socketpair opened, but shouldn't have been\n");
 	}
 # ifdef HAVE_ERRNO_H
 	if (errno != EPERM)
 	{
-		fail("test_socketpair_banned_netlink: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
+		ck_abort_msg("test_socketpair_banned_netlink: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
 	}
 # endif
 }
@@ -1208,12 +1208,12 @@ START_TEST(test_socketpair_banned_raw)
 	{
 		close (twosocks[0]);
 		close (twosocks[1]);
-		fail("test_socketpair_banned_raw: socketpair opened, but shouldn't have been\n");
+		ck_abort_msg("test_socketpair_banned_raw: socketpair opened, but shouldn't have been\n");
 	}
 # ifdef HAVE_ERRNO_H
 	if (errno != EPERM)
 	{
-		fail("test_socketpair_banned_raw: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
+		ck_abort_msg("test_socketpair_banned_raw: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
 	}
 # endif
 }
@@ -1231,12 +1231,12 @@ START_TEST(test_socketpair_banned_packet)
 	{
 		close (twosocks[0]);
 		close (twosocks[1]);
-		fail("test_socketpair_banned_packet: socketpair opened, but shouldn't have been\n");
+		ck_abort_msg("test_socketpair_banned_packet: socketpair opened, but shouldn't have been\n");
 	}
 #  ifdef HAVE_ERRNO_H
 	if (errno != EPERM)
 	{
-		fail("test_socketpair_banned_packet: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
+		ck_abort_msg("test_socketpair_banned_packet: socketpair not opened, but errno not EPERM: errno=%d\n", errno);
 	}
 #  endif
 # endif /* SOCK_PACKET */
@@ -1254,7 +1254,7 @@ static void run_getsockopt_on_socket (int sock_fd)
 	close (sock_fd);
 	if ( a < 0 )
 	{
-		fail("socket option not read, but should have been: errno=%d\n", err);
+		ck_abort_msg("socket option not read, but should have been: errno=%d\n", err);
 	}
 }
 
@@ -1270,7 +1270,7 @@ START_TEST(test_getsockopt)
 	}
 	else
 	{
-		fail("test_getsockopt: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_getsockopt: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1287,7 +1287,7 @@ START_TEST(test_getsockopt6)
 	}
 	else
 	{
-		fail("test_getsockopt6: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_getsockopt6: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1308,12 +1308,12 @@ START_TEST(test_getsockopt_banned)
 		close (sock);
 		if ( a >= 0 )
 		{
-			fail("test_getsockopt_banned: socket option read, but shouldn't have been\n");
+			ck_abort_msg("test_getsockopt_banned: socket option read, but shouldn't have been\n");
 		}
 	}
 	else
 	{
-		fail("test_getsockopt_banned: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_getsockopt_banned: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1333,12 +1333,12 @@ START_TEST(test_getsockopt_banned6)
 		close (sock);
 		if ( a >= 0 )
 		{
-			fail("test_getsockopt_banned6: socket option read, but shouldn't have been\n");
+			ck_abort_msg("test_getsockopt_banned6: socket option read, but shouldn't have been\n");
 		}
 	}
 	else
 	{
-		fail("test_getsockopt_banned6: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_getsockopt_banned6: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1353,7 +1353,7 @@ static void run_setsockopt_on_socket (int sock_fd)
 	close (sock_fd);
 	if ( a < 0 )
 	{
-		fail("socket option not set, but should have been: errno=%d\n", err);
+		ck_abort_msg("socket option not set, but should have been: errno=%d\n", err);
 	}
 }
 
@@ -1369,7 +1369,7 @@ START_TEST(test_setsockopt)
 	}
 	else
 	{
-		fail("test_setsockopt: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_setsockopt: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1386,7 +1386,7 @@ START_TEST(test_setsockopt6)
 	}
 	else
 	{
-		fail("test_setsockopt6: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_setsockopt6: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1406,12 +1406,12 @@ START_TEST(test_setsockopt_banned)
 		close (sock);
 		if ( a >= 0 )
 		{
-			fail("test_setsockopt_banned: socket option set, but shouldn't have been\n");
+			ck_abort_msg("test_setsockopt_banned: socket option set, but shouldn't have been\n");
 		}
 	}
 	else
 	{
-		fail("test_setsockopt_banned: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_setsockopt_banned: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1431,12 +1431,12 @@ START_TEST(test_setsockopt_banned6)
 		close (sock);
 		if ( a >= 0 )
 		{
-			fail("test_setsockopt_banned6: socket option set, but shouldn't have been\n");
+			ck_abort_msg("test_setsockopt_banned6: socket option set, but shouldn't have been\n");
 		}
 	}
 	else
 	{
-		fail("test_setsockopt_banned6: socket not opened, but should have been: errno=%d\n", errno);
+		ck_abort_msg("test_setsockopt_banned6: socket not opened, but should have been: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -1453,7 +1453,7 @@ START_TEST(test_gethostname)
 	ck_assert_int_eq(a, 0);
 	if (strncmp (buf, "localhost", strlen (buf)) != 0)
 	{
-		fail("test_gethostname: buf contains something else than 'localhost': '%s'\n", buf);
+		ck_abort_msg("test_gethostname: buf contains something else than 'localhost': '%s'\n", buf);
 	}
 }
 END_TEST

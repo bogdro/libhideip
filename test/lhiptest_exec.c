@@ -113,7 +113,7 @@ START_TEST(test_execve)
 	args[0] = progname;
 	args[1] = fname;
 	execve (progname, args, envp);
-	fail("test_execve: the program didn't run, but it should have: errno=%d\n", errno); /* should never be reached */
+	ck_abort_msg("test_execve: the program didn't run, but it should have: errno=%d\n", errno); /* should never be reached */
 }
 END_TEST
 
@@ -152,11 +152,11 @@ START_TEST(test_execveat)
 		execveat (dirfd, progname, args, envp, 0);
 		err = errno;
 		close (dirfd);
-		fail("test_execveat: the program didn't run, but it should have: errno=%d\n", err); /* should never be reached */
+		ck_abort_msg("test_execveat: the program didn't run, but it should have: errno=%d\n", err); /* should never be reached */
 	}
 	else
 	{
-		fail("test_execveat: directory not opened: errno=%d\n", errno);
+		ck_abort_msg("test_execveat: directory not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -185,7 +185,7 @@ START_TEST(test_execveat_banned)
 	}
 	else
 	{
-		fail("test_execveat_banned: directory not opened: errno=%d\n", errno);
+		ck_abort_msg("test_execveat_banned: directory not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -203,7 +203,7 @@ START_TEST(test_execveat_banned_link)
 	a = symlink (IFCONFIG_DIR "/ifconfig", LHIP_LINK_FILENAME);
 	if (a != 0)
 	{
-		fail("test_execveat_banned_link: link could not have been created: errno=%d, res=%d\n", errno, a);
+		ck_abort_msg("test_execveat_banned_link: link could not have been created: errno=%d, res=%d\n", errno, a);
 	}
 	dirfd = open (".", O_DIRECTORY | O_PATH);
 	if ( dirfd >= 0 )
@@ -220,7 +220,7 @@ START_TEST(test_execveat_banned_link)
 	}
 	else
 	{
-		fail("test_execveat_banned_link: directory not opened: errno=%d\n", errno);
+		ck_abort_msg("test_execveat_banned_link: directory not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -250,7 +250,7 @@ START_TEST(test_execveat_banned_empty_path)
 	}
 	else
 	{
-		fail("test_execveat_banned_empty_path: directory not opened: errno=%d\n", errno);
+		ck_abort_msg("test_execveat_banned_empty_path: directory not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -268,7 +268,7 @@ START_TEST(test_execveat_banned_empty_path_link)
 	a = symlink (IFCONFIG_DIR "/ifconfig", LHIP_LINK_FILENAME);
 	if (a != 0)
 	{
-		fail("test_execveat_banned_empty_path_link: link could not have been created: errno=%d, res=%d\n", errno, a);
+		ck_abort_msg("test_execveat_banned_empty_path_link: link could not have been created: errno=%d, res=%d\n", errno, a);
 	}
 	fd = open (LHIP_LINK_FILENAME, O_RDONLY);
 	if ( fd >= 0 )
@@ -285,7 +285,7 @@ START_TEST(test_execveat_banned_empty_path_link)
 	}
 	else
 	{
-		fail("test_execveat_banned_empty_path_link: directory not opened: errno=%d\n", errno);
+		ck_abort_msg("test_execveat_banned_empty_path_link: directory not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -312,11 +312,11 @@ START_TEST(test_fexecve)
 		fexecve (prog_fd, args, envp);
 		err = errno;
 		close (prog_fd);
-		fail("test_fexecve: the program didn't run, but it should have: errno=%d\n", err); /* should never be reached */
+		ck_abort_msg("test_fexecve: the program didn't run, but it should have: errno=%d\n", err); /* should never be reached */
 	}
 	else
 	{
-		fail("test_fexecve: program not opened: errno=%d\n", errno);
+		ck_abort_msg("test_fexecve: program not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -346,7 +346,7 @@ START_TEST(test_fexecve_banned)
 	}
 	else
 	{
-		fail("test_fexecve_banned: program not opened: errno=%d\n", errno);
+		ck_abort_msg("test_fexecve_banned: program not opened: errno=%d\n", errno);
 	}
 }
 END_TEST

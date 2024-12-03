@@ -75,7 +75,7 @@ START_TEST(test_res_query)
 	a = res_query("www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
-		fail("test_res_query: query failed, but shouldn't have\n");
+		ck_abort_msg("test_res_query: query failed, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -89,7 +89,7 @@ START_TEST(test_res_query_banned)
 	a = res_query("localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
-		fail("test_res_query_banned: query succeeded, but shouldn't have\n");
+		ck_abort_msg("test_res_query_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -103,7 +103,7 @@ START_TEST(test_res_search)
 	a = res_search("www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
-		fail("test_res_search: query failed, but shouldn't have\n");
+		ck_abort_msg("test_res_search: query failed, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -117,7 +117,7 @@ START_TEST(test_res_search_banned)
 	a = res_search("localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
-		fail("test_res_search_banned: query succeeded, but shouldn't have\n");
+		ck_abort_msg("test_res_search_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -131,7 +131,7 @@ START_TEST(test_res_querydomain)
 	a = res_querydomain("www", "google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
-		fail("test_res_querydomain: query failed, but shouldn't have\n");
+		ck_abort_msg("test_res_querydomain: query failed, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -145,7 +145,7 @@ START_TEST(test_res_querydomain_banned)
 	a = res_querydomain("localhost", "localdomain", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
-		fail("test_res_querydomain_banned: query succeeded, but shouldn't have\n");
+		ck_abort_msg("test_res_querydomain_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -159,7 +159,7 @@ START_TEST(test_res_mkquery)
 	a = res_mkquery(QUERY, "www.google.com", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
-		fail("test_res_mkquery: query failed, but shouldn't have\n");
+		ck_abort_msg("test_res_mkquery: query failed, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -173,7 +173,7 @@ START_TEST(test_res_mkquery_banned)
 	a = res_mkquery(QUERY, "localhost", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
-		fail("test_res_mkquery_banned: query succeeded, but shouldn't have\n");
+		ck_abort_msg("test_res_mkquery_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -189,7 +189,7 @@ START_TEST(test_res_nquery)
 	a = res_nquery(&state, "www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
-		fail("test_res_nquery: query failed, but shouldn't have\n");
+		ck_abort_msg("test_res_nquery: query failed, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -204,7 +204,7 @@ START_TEST(test_res_nquery_banned)
 	a = res_nquery(&state, "localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
-		fail("test_res_nquery_banned: query succeeded, but shouldn't have\n");
+		ck_abort_msg("test_res_nquery_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -219,7 +219,7 @@ START_TEST(test_res_nsearch)
 	a = res_nsearch(&state, "www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
-		fail("test_res_nsearch: query failed, but shouldn't have\n");
+		ck_abort_msg("test_res_nsearch: query failed, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -234,7 +234,7 @@ START_TEST(test_res_nsearch_banned)
 	a = res_nsearch(&state, "localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
-		fail("test_res_nsearch_banned: query succeeded, but shouldn't have\n");
+		ck_abort_msg("test_res_nsearch_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -249,7 +249,7 @@ START_TEST(test_res_nquerydomain)
 	a = res_nquerydomain(&state, "www", "google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
-		fail("test_res_nquerydomain: query failed, but shouldn't have\n");
+		ck_abort_msg("test_res_nquerydomain: query failed, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -264,7 +264,7 @@ START_TEST(test_res_nquerydomain_banned)
 	a = res_nquerydomain(&state, "localhost", "localdomain", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
-		fail("test_res_nquerydomain_banned: query succeeded, but shouldn't have\n");
+		ck_abort_msg("test_res_nquerydomain_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -279,7 +279,7 @@ START_TEST(test_res_nmkquery)
 	a = res_nmkquery(&state, QUERY, "www.google.com", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
-		fail("test_res_nmkquery: query failed, but shouldn't have\n");
+		ck_abort_msg("test_res_nmkquery: query failed, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -294,7 +294,7 @@ START_TEST(test_res_nmkquery_banned)
 	a = res_nmkquery(&state, QUERY, "localhost", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
-		fail("test_res_nmkquery_banned: query succeeded, but shouldn't have\n");
+		ck_abort_msg("test_res_nmkquery_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST
@@ -343,7 +343,7 @@ START_TEST(test_getaddrinfo_a)
 	free (reqs[0]);
 	if ( a < 0 )
 	{
-		fail("test_getaddrinfo_a: query failed, but shouldn't have. Return=%d (%s)\n", a, gai_strerror (a));
+		ck_abort_msg("test_getaddrinfo_a: query failed, but shouldn't have. Return=%d (%s)\n", a, gai_strerror (a));
 	}
 }
 END_TEST
@@ -371,7 +371,7 @@ START_TEST(test_getaddrinfo_a_banned)
 	free (reqs[0]);
 	if ( a >= 0 )
 	{
-		fail("test_getaddrinfo_a_banned: query succeeded, but shouldn't have\n");
+		ck_abort_msg("test_getaddrinfo_a_banned: query succeeded, but shouldn't have\n");
 	}
 }
 END_TEST

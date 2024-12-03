@@ -55,7 +55,7 @@ START_TEST(test_uname)
 	{
 		if (strncmp (u.nodename, "localhost", strlen (u.nodename)) != 0)
 		{
-			fail("u.nodename contains something else than 'localhost': '%s'\n", u.nodename);
+			ck_abort_msg("u.nodename contains something else than 'localhost': '%s'\n", u.nodename);
 		}
 	}
 }

@@ -100,7 +100,7 @@ void verify_ipv4(void * addr4)
 	{
 		return;
 	}
-	fail("IPv4 address contains something else than '127.0.0.1': '0x%x'\n", *((int *)addr4));
+	ck_abort_msg("IPv4 address contains something else than '127.0.0.1': '0x%x'\n", *((int *)addr4));
 }
 
 /**
@@ -117,7 +117,7 @@ void verify_ipv6(void * addr_ip6)
 	{
 		return;
 	}
-	fail("IPv6 address contains something else than '::1': '0x%x'\n", *((int *)addr_ip6));
+	ck_abort_msg("IPv6 address contains something else than '::1': '0x%x'\n", *((int *)addr_ip6));
 }
 
 

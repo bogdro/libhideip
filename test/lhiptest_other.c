@@ -76,7 +76,7 @@ START_TEST(test_symb_func)
 	ptr = dlsym (RTLD_NEXT, "generic_fopen");
 	if (ptr != NULL)
 	{
-		fail("test_symb_func: symbol found\n");
+		ck_abort_msg("test_symb_func: symbol found\n");
 	}
 }
 END_TEST
@@ -91,7 +91,7 @@ START_TEST(test_symb_var)
 	ptr = dlsym (RTLD_NEXT, "__lhip_our_real_name_ipv4");
 	if (ptr != NULL)
 	{
-		fail("test_symb_var: symbol found\n");
+		ck_abort_msg("test_symb_var: symbol found\n");
 	}
 }
 END_TEST

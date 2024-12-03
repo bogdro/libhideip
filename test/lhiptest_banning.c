@@ -104,7 +104,7 @@ START_TEST(test_banned_in_userfile_prog)
 		+ strlen (LHIP_BANNING_USERFILE) + 1);
 	if ( user_ban_file_name == NULL )
 	{
-		fail("test_banned_in_userfile_prog: cannot allocate memory: errno=%d\n", errno);
+		ck_abort_msg("test_banned_in_userfile_prog: cannot allocate memory: errno=%d\n", errno);
 	}
 	strcpy (user_ban_file_name, home_env);
 	strcat (user_ban_file_name, "/");
@@ -115,7 +115,7 @@ START_TEST(test_banned_in_userfile_prog)
 	{
 		err = errno;
 		free (user_ban_file_name);
-		fail("test_banned_in_userfile_prog: cannot open user file: errno=%d\n", err);
+		ck_abort_msg("test_banned_in_userfile_prog: cannot open user file: errno=%d\n", err);
 	}
 
 	fseek (user_ban_file, 0, SEEK_END);
@@ -140,7 +140,7 @@ START_TEST(test_banned_in_userfile_prog)
 	else
 	{
 		free (user_ban_file_name);
-		fail("test_banned_in_userfile_prog: file not opened: errno=%d\n", err);
+		ck_abort_msg("test_banned_in_userfile_prog: file not opened: errno=%d\n", err);
 	}
 	free (user_ban_file_name);
 }
@@ -162,14 +162,14 @@ START_TEST(test_banned_in_env_prog)
 	res = setenv(LHIP_BANNING_ENV, env_ban_file_name, 1);
 	if ( res != 0 )
 	{
-		fail("test_banned_in_env_prog: cannot set environment: errno=%d\n", errno);
+		ck_abort_msg("test_banned_in_env_prog: cannot set environment: errno=%d\n", errno);
 	}
 
 	env_ban_file = fopen (env_ban_file_name, "a+");
 	if ( env_ban_file == NULL )
 	{
 		unsetenv(LHIP_BANNING_ENV);
-		fail("test_banned_in_env_prog: cannot open user file: errno=%d\n", errno);
+		ck_abort_msg("test_banned_in_env_prog: cannot open user file: errno=%d\n", errno);
 	}
 
 	fseek (env_ban_file, 0, SEEK_END);
@@ -194,7 +194,7 @@ START_TEST(test_banned_in_env_prog)
 	else
 	{
 		unsetenv(LHIP_BANNING_ENV);
-		fail("test_banned_in_env_prog: file not opened: errno=%d\n", err);
+		ck_abort_msg("test_banned_in_env_prog: file not opened: errno=%d\n", err);
 	}
 }
 END_TEST

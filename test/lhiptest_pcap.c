@@ -91,7 +91,7 @@ START_TEST(test_pcap_create)
 	if (ret != NULL)
 	{
 		pcap_close(ret);
-		fail("test_pcap_create: capture created, but shouldn't have been\n");
+		ck_abort_msg("test_pcap_create: capture created, but shouldn't have been\n");
 	}
 }
 END_TEST
@@ -105,7 +105,7 @@ START_TEST(test_pcap_open_dead)
 	if (ret != NULL)
 	{
 		pcap_close(ret);
-		fail("test_pcap_open_dead: capture opened, but shouldn't have been\n");
+		ck_abort_msg("test_pcap_open_dead: capture opened, but shouldn't have been\n");
 	}
 }
 END_TEST
@@ -119,7 +119,7 @@ START_TEST(test_pcap_open_dead_with_ts)
 	if (ret != NULL)
 	{
 		pcap_close(ret);
-		fail("test_pcap_open_dead_with_ts: capture opened, but shouldn't have been\n");
+		ck_abort_msg("test_pcap_open_dead_with_ts: capture opened, but shouldn't have been\n");
 	}
 }
 END_TEST
@@ -133,7 +133,7 @@ START_TEST(test_pcap_open_live)
 	if (ret != NULL)
 	{
 		pcap_close(ret);
-		fail("test_pcap_open_live: capture opened, but shouldn't have been\n");
+		ck_abort_msg("test_pcap_open_live: capture opened, but shouldn't have been\n");
 	}
 }
 END_TEST
@@ -147,7 +147,7 @@ START_TEST(test_pcap_open_offline)
 	if (ret != NULL)
 	{
 		pcap_close(ret);
-		fail("test_pcap_open_offline: capture opened, but shouldn't have been\n");
+		ck_abort_msg("test_pcap_open_offline: capture opened, but shouldn't have been\n");
 	}
 }
 END_TEST
@@ -161,7 +161,7 @@ START_TEST(test_pcap_open_offline_with_ts)
 	if (ret != NULL)
 	{
 		pcap_close(ret);
-		fail("test_pcap_open_offline_with_ts: capture opened, but shouldn't have been\n");
+		ck_abort_msg("test_pcap_open_offline_with_ts: capture opened, but shouldn't have been\n");
 	}
 }
 END_TEST
@@ -181,14 +181,14 @@ START_TEST(test_pcap_fopen_offline)
 			pcap_close(ret);
 			fclose(f);
 			unlink (LHIP_TEST_FILENAME);
-			fail("test_pcap_fopen_offline: capture opened, but shouldn't have been\n");
+			ck_abort_msg("test_pcap_fopen_offline: capture opened, but shouldn't have been\n");
 		}
 		fclose(f);
 		unlink (LHIP_TEST_FILENAME);
 	}
 	else
 	{
-		fail("test_pcap_fopen_offline: file not opened: errno=%d\n", errno);
+		ck_abort_msg("test_pcap_fopen_offline: file not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -208,14 +208,14 @@ START_TEST(test_pcap_fopen_offline_with_ts)
 			pcap_close(ret);
 			fclose(f);
 			unlink (LHIP_TEST_FILENAME);
-			fail("test_pcap_fopen_offline_with_ts: capture opened, but shouldn't have been\n");
+			ck_abort_msg("test_pcap_fopen_offline_with_ts: capture opened, but shouldn't have been\n");
 		}
 		fclose(f);
 		unlink (LHIP_TEST_FILENAME);
 	}
 	else
 	{
-		fail("test_pcap_fopen_offline_with_ts: file not opened: errno=%d\n", errno);
+		ck_abort_msg("test_pcap_fopen_offline_with_ts: file not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -230,7 +230,7 @@ START_TEST(test_pcap_hopen_offline)
 	if (ret != NULL)
 	{
 		pcap_close(ret);
-		fail("test_pcap_hopen_offline: capture opened, but shouldn't have been\n");
+		ck_abort_msg("test_pcap_hopen_offline: capture opened, but shouldn't have been\n");
 	}
 }
 END_TEST
@@ -244,7 +244,7 @@ START_TEST(test_pcap_hopen_offline_with_ts)
 	if (ret != NULL)
 	{
 		pcap_close(ret);
-		fail("test_pcap_hopen_offline_with_ts: capture opened, but shouldn't have been\n");
+		ck_abort_msg("test_pcap_hopen_offline_with_ts: capture opened, but shouldn't have been\n");
 	}
 }
 #endif /* WIN32 */
@@ -259,7 +259,7 @@ START_TEST(test_pcap_findalldevs)
 	if ( (a == 0) && (devs != NULL) )
 	{
 		pcap_freealldevs (devs);
-		fail("test_pcap_findalldevs: device list read, but shouldn't have been\n");
+		ck_abort_msg("test_pcap_findalldevs: device list read, but shouldn't have been\n");
 	}
 }
 END_TEST

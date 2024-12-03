@@ -166,7 +166,7 @@ static void verify_mac(void * macaddr)
 	{
 		return;
 	}
-	fail("MAC address contains something else than '01:02:03:04:05:06': '0x%x'\n", *((int *)macaddr));
+	ck_abort_msg("MAC address contains something else than '01:02:03:04:05:06': '0x%x'\n", *((int *)macaddr));
 }
 
 /* ====================== I/O CTL functions */
@@ -187,12 +187,12 @@ START_TEST(test_ioctl)
 		close(fd);
 		if ( a < 0 )
 		{
-			fail("test_ioctl: ioctl not performed, but should have been: errno=%d\n", err);
+			ck_abort_msg("test_ioctl: ioctl not performed, but should have been: errno=%d\n", err);
 		}
 	}
 	else
 	{
-		fail("test_ioctl: device not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl: device not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -217,7 +217,7 @@ START_TEST(test_ioctl_banned1)
 		{
 			err = errno;
 			close(fd);
-			fail("test_ioctl_banned1: SIOCGIFADDR: ioctl not performed, but should have been: dev=%s errno=%d\n",
+			ck_abort_msg("test_ioctl_banned1: SIOCGIFADDR: ioctl not performed, but should have been: dev=%s errno=%d\n",
 				reqs.ifr_name, err);
 		}
 		if ( reqs.ifr_ifru.ifru_addr.sa_family == AF_INET )
@@ -234,7 +234,7 @@ START_TEST(test_ioctl_banned1)
 	}
 	else
 	{
-		fail("test_ioctl_banned1: SIOCGIFADDR: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned1: SIOCGIFADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -264,7 +264,7 @@ a = setsockopt(fd, IPPROTO_IPV6, IPV6_RECVPKTINFO, &err, sizeof(err));
 		{
 			err = errno;
 			close(fd);
-			fail("test_ioctl_banned1_ipv6: SIOCGIFADDR: ioctl not performed, but should have been: errno=%d\n", err);
+			ck_abort_msg("test_ioctl_banned1_ipv6: SIOCGIFADDR: ioctl not performed, but should have been: errno=%d\n", err);
 		}
 		if ( reqs.ifr_ifru.ifru_addr.sa_family == AF_INET )
 		{
@@ -280,7 +280,7 @@ a = setsockopt(fd, IPPROTO_IPV6, IPV6_RECVPKTINFO, &err, sizeof(err));
 	}
 	else
 	{
-		fail("test_ioctl_banned1_ipv6: SIOCGIFADDR: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned1_ipv6: SIOCGIFADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -308,7 +308,7 @@ static void run_siocgifconf_on_socket (int sock_fd)
 			err = errno;
 			close (sock_fd);
 			free (cfg.ifc_req);
-			fail ("SIOCGIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
+			ck_abort_msg("SIOCGIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
 		}
 		if ( cfg.ifc_len > 0 )
 		{
@@ -344,7 +344,7 @@ static void run_siocgifconf_on_socket (int sock_fd)
 	else
 	{
 		close (sock_fd);
-		fail ("SIOCGIFCONF: memory NOT allocated\n");
+		ck_abort_msg("SIOCGIFCONF: memory NOT allocated\n");
 	}
 
 }
@@ -361,7 +361,7 @@ START_TEST(test_ioctl_banned2)
 	}
 	else
 	{
-		fail("test_ioctl_banned2: SIOCGIFCONF: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned2: SIOCGIFCONF: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -378,7 +378,7 @@ START_TEST(test_ioctl_banned2_ipv6)
 	}
 	else
 	{
-		fail("test_ioctl_banned2_ipv6: SIOCGIFCONF: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned2_ipv6: SIOCGIFCONF: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -399,7 +399,7 @@ static void run_siocgifhwaddr_on_socket (int sock_fd)
 	{
 		err = errno;
 		close(sock_fd);
-		fail("SIOCGIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
+		ck_abort_msg("SIOCGIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
 	}
 	close(sock_fd);
 	verify_mac (&(reqs.ifr_addr.sa_data));
@@ -417,7 +417,7 @@ START_TEST(test_ioctl_banned3)
 	}
 	else
 	{
-		fail("test_ioctl_banned3: SIOCGIFHWADDR: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned3: SIOCGIFHWADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -434,7 +434,7 @@ START_TEST(test_ioctl_banned3_ipv6)
 	}
 	else
 	{
-		fail("test_ioctl_banned3_ipv6: SIOCGIFHWADDR: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned3_ipv6: SIOCGIFHWADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -505,7 +505,7 @@ static void run_siocglifaddr_on_socket (int sock_fd)
 	{
 		err = errno;
 		close (sock_fd);
-		fail ("SIOCGLIFADDR: ioctl not performed, but should have been: errno=%d\n", err);
+		ck_abort_msg("SIOCGLIFADDR: ioctl not performed, but should have been: errno=%d\n", err);
 	}
 	if ( lreqs.lifr_addr.sa_family == AF_INET )
 	{
@@ -532,7 +532,7 @@ START_TEST(test_ioctl_banned4)
 	}
 	else
 	{
-		fail("test_ioctl_banned4: SIOCGLIFADDR: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned4: SIOCGLIFADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -552,7 +552,7 @@ START_TEST(test_ioctl_banned4_ipv6)
 	}
 	else
 	{
-		fail("test_ioctl_banned4_ipv6: SIOCGLIFADDR: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned4_ipv6: SIOCGLIFADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -578,7 +578,7 @@ static void run_siocglifconf_on_socket (int sock_fd)
 		{
 			err = errno;
 			close (sock_fd);
-			fail("SIOCGLIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
+			ck_abort_msg("SIOCGLIFCONF: ioctl not performed, but should have been: errno=%d\n", err);
 		}
 		if ( lcfg.lifc_len > 0 )
 		{
@@ -614,7 +614,7 @@ static void run_siocglifconf_on_socket (int sock_fd)
 	else
 	{
 		close (sock_fd);
-		fail("SIOCGIFCONF: memory NOT allocated\n");
+		ck_abort_msg("SIOCGIFCONF: memory NOT allocated\n");
 	}
 }
 
@@ -630,7 +630,7 @@ START_TEST(test_ioctl_banned5)
 	}
 	else
 	{
-		fail("test_ioctl_banned5: SIOCGLIFCONF: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned5: SIOCGLIFCONF: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -653,7 +653,7 @@ START_TEST(test_ioctl_banned5_ipv6)
 	}
 	else
 	{
-		fail("test_ioctl_banned5_ipv6: SIOCGLIFCONF: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned5_ipv6: SIOCGLIFCONF: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -670,7 +670,7 @@ static void run_siocglifhwaddr_on_socket (int sock_fd)
 	{
 		err = errno;
 		close (sock_fd);
-		fail("SIOCGLIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
+		ck_abort_msg("SIOCGLIFHWADDR: ioctl not performed, but should have been: errno=%d\n", err);
 	}
 	close (sock_fd);
 	verify_mac (&(lreqs.lifr_addr.sa_data));
@@ -691,7 +691,7 @@ START_TEST(test_ioctl_banned6)
 	}
 	else
 	{
-		fail("test_ioctl_banned6: SIOCGLIFHWADDR: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned6: SIOCGLIFHWADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -711,7 +711,7 @@ START_TEST(test_ioctl_banned6_ipv6)
 	}
 	else
 	{
-		fail("test_ioctl_banned6_ipv6: SIOCGLIFHWADDR: socket not opened: errno=%d\n", errno);
+		ck_abort_msg("test_ioctl_banned6_ipv6: SIOCGLIFHWADDR: socket not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
