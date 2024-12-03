@@ -26,6 +26,7 @@
 
 AC_PREREQ([2.71])
 AC_INIT([LibHideIP],[2.2],[bogdro@users.sourceforge.net], [libhideip], [https://libhideip.sourceforge.io])
+AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
 	libhideip.spec src/lhip_cfg.h src/libhideip.h src/lhip_public.c
