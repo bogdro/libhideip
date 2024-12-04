@@ -56,8 +56,10 @@ jobs:
       - name: Prepare environment
         run: |
           ls -l -d /usr /usr/bin
-          ls -l /usr/bin/ifconfig || true
+          ls -l /usr/bin/ifconfig /usr/sbin/ifconfig || true
+          which ifconfig || true
           sudo chmod u+w /usr/bin
+          sudo touch /usr/bin/ifconfig
           sudo echo -e '#!/bin/bash\nexit 0' > /usr/bin/ifconfig
           sudo chmod a+x /usr/bin/ifconfig
       - name: Install sonar-scanner and build-wrapper
