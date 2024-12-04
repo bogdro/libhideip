@@ -428,7 +428,7 @@ extern GCC_WARN_UNUSED_RESULT i_vp_sl_i_shp_cp_s_shpp_ip	__lhip_real_gethostbyad
 extern GCC_WARN_UNUSED_RESULT shp_cp				__lhip_real_gethostbyname_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_cp_shp_cp_s_shpp_ip		__lhip_real_gethostbyname_r_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT shp_cp_i				__lhip_real_gethostbyname2_loc LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT i_cp_i_shp_cp_s_shpp_i		__lhip_real_gethostbyname2_r_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT i_cp_i_shp_cp_s_shpp_i		__lhip_r_gethostbyname2_r_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT shp_v				__lhip_real_gethostent_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_shp_cp_s_shpp_ip		__lhip_real_gethostent_r_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT shp_cp_s_i_ip			__lhip_real_getipnodebyaddr_loc LHIP_PARAMS ((void));
@@ -474,7 +474,7 @@ extern GCC_WARN_UNUSED_RESULT r_ccp_i_ucp_i			__lhip_real_res_nquery_location LH
 extern GCC_WARN_UNUSED_RESULT ccp_i_ucp_i			__lhip_real_res_search_location LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT r_ccp_i_ucp_i			__lhip_real_res_nsearch_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT ccp_cpp_i_ucp_i			__lhip_real_res_querydomain_loc LHIP_PARAMS ((void));
-extern GCC_WARN_UNUSED_RESULT r_ccp_cpp_i_ucp_i			__lhip_real_res_nquerydomain_loc LHIP_PARAMS ((void));
+extern GCC_WARN_UNUSED_RESULT r_ccp_cpp_i_ucp_i			__lhip_r_res_nquerydomain_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_mkquery_loc LHIP_PARAMS ((void));
 extern GCC_WARN_UNUSED_RESULT r_i_ccp_i_i_cucp_i_cucp_ucp_i	__lhip_real_res_nmkquery_loc LHIP_PARAMS ((void));
 

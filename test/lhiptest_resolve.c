@@ -49,7 +49,7 @@ START_TEST(test_res_query)
 
 	LHIP_PROLOG_FOR_TEST();
 	res_init();
-	a = res_query("www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	a = res_query("libhideip.sourceforge.io", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
 		ck_abort_msg("test_res_query: query failed, but shouldn't have\n");
@@ -77,7 +77,7 @@ START_TEST(test_res_search)
 
 	LHIP_PROLOG_FOR_TEST();
 	res_init();
-	a = res_search("www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	a = res_search("libhideip.sourceforge.io", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
 		ck_abort_msg("test_res_search: query failed, but shouldn't have\n");
@@ -105,7 +105,7 @@ START_TEST(test_res_querydomain)
 
 	LHIP_PROLOG_FOR_TEST();
 	res_init();
-	a = res_querydomain("www", "google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	a = res_querydomain("libhideip", "sourceforge.io", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
 		ck_abort_msg("test_res_querydomain: query failed, but shouldn't have\n");
@@ -133,7 +133,7 @@ START_TEST(test_res_mkquery)
 
 	LHIP_PROLOG_FOR_TEST();
 	res_init();
-	a = res_mkquery(QUERY, "www.google.com", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
+	a = res_mkquery(QUERY, "libhideip.sourceforge.io", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
 	if ( a < 0 )
 	{
 		ck_abort_msg("test_res_mkquery: query failed, but shouldn't have\n");
@@ -163,7 +163,8 @@ START_TEST(test_res_nquery)
 
 	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
-	a = res_nquery(&state, "www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	a = res_nquery(&state, "libhideip.sourceforge.io", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	res_nclose(&state);
 	if ( a < 0 )
 	{
 		ck_abort_msg("test_res_nquery: query failed, but shouldn't have\n");
@@ -179,6 +180,7 @@ START_TEST(test_res_nquery_banned)
 	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nquery(&state, "localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	res_nclose(&state);
 	if ( a >= 0 )
 	{
 		ck_abort_msg("test_res_nquery_banned: query succeeded, but shouldn't have\n");
@@ -193,7 +195,8 @@ START_TEST(test_res_nsearch)
 
 	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
-	a = res_nsearch(&state, "www.google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	a = res_nsearch(&state, "libhideip.sourceforge.io", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	res_nclose(&state);
 	if ( a < 0 )
 	{
 		ck_abort_msg("test_res_nsearch: query failed, but shouldn't have\n");
@@ -208,6 +211,7 @@ START_TEST(test_res_nsearch_banned)
 
 	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
+	res_nclose(&state);
 	a = res_nsearch(&state, "localhost", C_ANY, T_A, (u_char *)buf, sizeof (buf));
 	if ( a >= 0 )
 	{
@@ -223,7 +227,8 @@ START_TEST(test_res_nquerydomain)
 
 	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
-	a = res_nquerydomain(&state, "www", "google.com", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	a = res_nquerydomain(&state, "libhideip", "sourceforge.io", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	res_nclose(&state);
 	if ( a < 0 )
 	{
 		ck_abort_msg("test_res_nquerydomain: query failed, but shouldn't have\n");
@@ -239,6 +244,7 @@ START_TEST(test_res_nquerydomain_banned)
 	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nquerydomain(&state, "localhost", "localdomain", C_ANY, T_A, (u_char *)buf, sizeof (buf));
+	res_nclose(&state);
 	if ( a >= 0 )
 	{
 		ck_abort_msg("test_res_nquerydomain_banned: query succeeded, but shouldn't have\n");
@@ -253,7 +259,8 @@ START_TEST(test_res_nmkquery)
 
 	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
-	a = res_nmkquery(&state, QUERY, "www.google.com", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
+	a = res_nmkquery(&state, QUERY, "libhideip.sourceforge.io", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
+	res_nclose(&state);
 	if ( a < 0 )
 	{
 		ck_abort_msg("test_res_nmkquery: query failed, but shouldn't have\n");
@@ -269,6 +276,7 @@ START_TEST(test_res_nmkquery_banned)
 	LHIP_PROLOG_FOR_TEST();
 	res_ninit(&state);
 	a = res_nmkquery(&state, QUERY, "localhost", C_ANY, T_A, NULL, 0, NULL, (u_char *)buf, sizeof (buf));
+	res_nclose(&state);
 	if ( a >= 0 )
 	{
 		ck_abort_msg("test_res_nmkquery_banned: query succeeded, but shouldn't have\n");
@@ -309,7 +317,7 @@ START_TEST(test_getaddrinfo_a)
 		return;
 	}
 	memset (reqs[0], 0, sizeof (struct gaicb));
-	reqs[0]->ar_name = "www.google.com";
+	reqs[0]->ar_name = "libhideip.sourceforge.io";
 	reqs[0]->ar_request = prepare_hints (&ai_hints);
 	a = getaddrinfo_a (GAI_WAIT, reqs, 1, NULL);
 

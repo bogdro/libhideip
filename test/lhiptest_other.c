@@ -46,7 +46,7 @@ START_TEST(test_symb_func)
 	void * ptr;
 
 	LHIP_PROLOG_FOR_TEST();
-	ptr = dlsym (RTLD_NEXT, "generic_fopen");
+	ptr = dlsym (RTLD_NEXT, "__lhip_check_hostent_match");
 	if (ptr != NULL)
 	{
 		ck_abort_msg("test_symb_func: symbol found\n");

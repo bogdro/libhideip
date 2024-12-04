@@ -416,7 +416,7 @@ res_nquerydomain (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_res_nquerydomain_loc () == NULL )
+	if ( __lhip_r_res_nquerydomain_loc () == NULL )
 	{
 		return -1;
 	}
@@ -424,7 +424,7 @@ res_nquerydomain (
 	if ( (__lhip_check_prog_ban () != 0)
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
-		return (*__lhip_real_res_nquerydomain_loc ()) (statep, name, domain, class, type, answer, anslen);
+		return (*__lhip_r_res_nquerydomain_loc ()) (statep, name, domain, class, type, answer, anslen);
 	}
 
 	if ( __lhip_is_forbidden_name (name) != 0 )
@@ -432,7 +432,7 @@ res_nquerydomain (
 		return -1;
 	}
 
-	return (*__lhip_real_res_nquerydomain_loc ()) (statep, name, domain, class, type, answer, anslen);
+	return (*__lhip_r_res_nquerydomain_loc ()) (statep, name, domain, class, type, answer, anslen);
 }
 
 /* =============================================================== */

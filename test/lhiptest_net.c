@@ -250,7 +250,7 @@ START_TEST(test_gethostbyname)
 	struct hostent * h;
 
 	LHIP_PROLOG_FOR_TEST();
-	h = gethostbyname ("www.google.com");
+	h = gethostbyname ("libhideip.sourceforge.io");
 	fail_if(h == NULL);
 	/*freehostent (h);*/
 }
@@ -278,7 +278,7 @@ START_TEST(test_gethostbyname_r)
 
 	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
-	a = gethostbyname_r ("www.google.com",
+	a = gethostbyname_r ("libhideip.sourceforge.io",
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
 	/*freehostent (&res);*/
@@ -308,7 +308,7 @@ START_TEST(test_gethostbyname2)
 	struct hostent * h;
 
 	LHIP_PROLOG_FOR_TEST();
-	h = gethostbyname2 ("www.google.com", AF_INET);
+	h = gethostbyname2 ("libhideip.sourceforge.io", AF_INET);
 	fail_if(h == NULL);
 	/*freehostent (h);*/
 }
@@ -348,7 +348,7 @@ START_TEST(test_gethostbyname2_r)
 
 	LHIP_PROLOG_FOR_TEST();
 	buf[0] = '\0';
-	a = gethostbyname2_r ("www.google.com", AF_INET,
+	a = gethostbyname2_r ("libhideip.sourceforge.io", AF_INET,
 		&res, buf, sizeof (buf), &tmp, &err);
 	ck_assert_int_eq(a, 0);
 	/*freehostent (&res);*/
@@ -520,7 +520,7 @@ START_TEST(test_getaddrinfo)
 	struct addrinfo ai_hints;
 
 	LHIP_PROLOG_FOR_TEST();
-	a = getaddrinfo ("www.google.com", NULL /* service */,
+	a = getaddrinfo ("libhideip.sourceforge.io", NULL /* service */,
 		prepare_hints (&ai_hints), &addrinfo_all);
 	if ( addrinfo_all != NULL )
 	{
