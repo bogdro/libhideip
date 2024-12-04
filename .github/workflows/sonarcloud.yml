@@ -58,10 +58,9 @@ jobs:
           ls -l -d /usr /usr/bin
           ls -l /usr/bin/ifconfig /usr/sbin/ifconfig || true
           which ifconfig || true
-          sudo chmod u+w /usr/bin
-          sudo touch /usr/bin/ifconfig
-          sudo echo -e '#!/bin/bash\nexit 0' > /usr/bin/ifconfig
-          sudo chmod a+x /usr/bin/ifconfig
+          sudo [ ! -e /usr/bin/ifconfig ] && echo -e '#!/bin/bash\nexit 0' > /usr/bin/ifconfig || true
+          sudo [ ! -e /usr/sbin/ifconfig ] && echo -e '#!/bin/bash\nexit 0' > /usr/sbin/ifconfig || true
+          sudo chmod a+x /usr/bin/ifconfig /usr/sbin/ifconfig || true
       - name: Install sonar-scanner and build-wrapper
         uses: SonarSource/sonarcloud-github-c-cpp@v3
       - name: Configure
@@ -76,7 +75,7 @@ jobs:
           sleep 1
       - name: Run build-wrapper
         run: |
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make CFLAGS='-O0 -g -Wall -Wno-nonnull-compare -fprofile-arcs -ftest-coverage -fprofile-abs-path --coverage' all check || cat test/test-suite.log || cat test/*.log
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make CFLAGS='-DIFCONFIG_DIR="/usr/sbin" -O0 -g -Wall -Wno-nonnull-compare -fprofile-arcs -ftest-coverage -fprofile-abs-path --coverage' all check || cat test/test-suite.log || cat test/*.log
       - name: Gather coverage information
         run: |
           mkdir ${{ env.COVERAGE_DIR }}
