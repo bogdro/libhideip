@@ -495,7 +495,7 @@ shp_cp_i __lhip_real_gethostbyname2_loc (LHIP_VOID)
 
 /* =============================================================== */
 
-i_cp_i_shp_cp_s_shpp_i __lhip_real_gethostbyname2_r_loc (LHIP_VOID)
+i_cp_i_shp_cp_s_shpp_i __lhip_r_gethostbyname2_r_loc (LHIP_VOID)
 {
 	return __lhip_real_gethostbyname2_r;
 }
@@ -761,7 +761,7 @@ ccp_cpp_i_ucp_i __lhip_real_res_querydomain_loc (LHIP_VOID)
 
 /* =============================================================== */
 
-r_ccp_cpp_i_ucp_i __lhip_real_res_nquerydomain_loc (LHIP_VOID)
+r_ccp_cpp_i_ucp_i __lhip_r_res_nquerydomain_loc (LHIP_VOID)
 {
 	return __lhip_real_res_nquerydomain;
 }

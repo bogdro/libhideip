@@ -680,7 +680,7 @@ gethostbyname2_r (
 	fflush (stderr);
 #endif
 
-	if ( __lhip_real_gethostbyname2_r_loc () == NULL )
+	if ( __lhip_r_gethostbyname2_r_loc () == NULL )
 	{
 		LHIP_SET_ERRNO_MISSING();
 		return -1;
@@ -689,7 +689,7 @@ gethostbyname2_r (
 	if ( (name == NULL) || (ret == NULL) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname2_r_loc ())
+		return (*__lhip_r_gethostbyname2_r_loc ())
 			(name, af, ret, buf, buflen, result, h_errnop);
 	}
 
@@ -697,11 +697,11 @@ gethostbyname2_r (
 		|| (__lhip_get_init_stage() != LHIP_INIT_STAGE_FULLY_INITIALIZED) )
 	{
 		LHIP_SET_ERRNO(err);
-		return (*__lhip_real_gethostbyname2_r_loc ())
+		return (*__lhip_r_gethostbyname2_r_loc ())
 			(name, af, ret, buf, buflen, result, h_errnop);
 	}
 
-	my_ret = (*__lhip_real_gethostbyname2_r_loc ())
+	my_ret = (*__lhip_r_gethostbyname2_r_loc ())
 		(name, af, ret, buf, buflen, result, h_errnop);
 	if ( my_ret == 0 )
 	{
