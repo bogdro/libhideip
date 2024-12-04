@@ -37,12 +37,9 @@ START_TEST(test_uname)
 	LHIP_PROLOG_FOR_TEST();
 	a = uname (&u);
 	ck_assert_int_eq(a, 0);
-	if (u.nodename != NULL)
+	if (strncmp (u.nodename, "localhost", strlen (u.nodename)) != 0)
 	{
-		if (strncmp (u.nodename, "localhost", strlen (u.nodename)) != 0)
-		{
-			ck_abort_msg("u.nodename contains something else than 'localhost': '%s'\n", u.nodename);
-		}
+		ck_abort_msg("u.nodename contains something else than 'localhost': '%s'\n", u.nodename);
 	}
 }
 END_TEST
