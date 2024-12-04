@@ -193,7 +193,7 @@ START_TEST(test_execveat_banned_empty_path)
 	}
 	else
 	{
-		ck_abort_msg("test_execveat_banned_empty_path: directory not opened: errno=%d\n", errno);
+		ck_abort_msg("test_execveat_banned_empty_path: " IFCONFIG_DIR "/ifconfig not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
@@ -228,7 +228,7 @@ START_TEST(test_execveat_banned_empty_path_link)
 	}
 	else
 	{
-		ck_abort_msg("test_execveat_banned_empty_path_link: directory not opened: errno=%d\n", errno);
+		ck_abort_msg("test_execveat_banned_empty_path_link: " IFCONFIG_DIR "/ifconfig not opened: errno=%d\n", errno);
 	}
 }
 END_TEST
