@@ -153,7 +153,9 @@ am__lhiptest_banning_SOURCES_DIST = lhiptest_banning.c \
 @LHIP_TESTS_ENABLED_TRUE@	$(am__objects_1)
 lhiptest_banning_OBJECTS = $(am_lhiptest_banning_OBJECTS)
 @LHIP_TESTS_ENABLED_TRUE@am__DEPENDENCIES_1 =  \
-@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/libhideip.la
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_main.o \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_addr.o \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_banning.o
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_banning_DEPENDENCIES =  \
 @LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -171,7 +173,8 @@ am__lhiptest_exec_SOURCES_DIST = lhiptest_exec.c lhiptest_common.c \
 @LHIP_TESTS_ENABLED_TRUE@	$(am__objects_2)
 lhiptest_exec_OBJECTS = $(am_lhiptest_exec_OBJECTS)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_exec_DEPENDENCIES =  \
-@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1)
+@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_exec.o
 lhiptest_exec_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(lhiptest_exec_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -182,7 +185,8 @@ am__lhiptest_ioctl_SOURCES_DIST = lhiptest_ioctl.c lhiptest_common.c \
 @LHIP_TESTS_ENABLED_TRUE@	$(am__objects_3)
 lhiptest_ioctl_OBJECTS = $(am_lhiptest_ioctl_OBJECTS)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_ioctl_DEPENDENCIES =  \
-@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1)
+@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_ioctl.o
 lhiptest_ioctl_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(lhiptest_ioctl_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
@@ -195,7 +199,8 @@ am__lhiptest_net_SOURCES_DIST = lhiptest_net.c lhiptest_common.c \
 @LHIP_TESTS_ENABLED_TRUE@	$(am__objects_4)
 lhiptest_net_OBJECTS = $(am_lhiptest_net_OBJECTS)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_net_DEPENDENCIES =  \
-@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1)
+@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_net.o
 lhiptest_net_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(lhiptest_net_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -206,7 +211,9 @@ am__lhiptest_opens_SOURCES_DIST = lhiptest_opens.c lhiptest_common.c \
 @LHIP_TESTS_ENABLED_TRUE@	$(am__objects_5)
 lhiptest_opens_OBJECTS = $(am_lhiptest_opens_OBJECTS)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_opens_DEPENDENCIES =  \
-@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1)
+@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_opens.o \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_exec.o
 lhiptest_opens_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(lhiptest_opens_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
@@ -230,7 +237,8 @@ am__lhiptest_pcap_SOURCES_DIST = lhiptest_pcap.c lhiptest_common.c \
 @LHIP_TESTS_ENABLED_TRUE@	$(am__objects_7)
 lhiptest_pcap_OBJECTS = $(am_lhiptest_pcap_OBJECTS)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_pcap_DEPENDENCIES =  \
-@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1)
+@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_pcap.o
 lhiptest_pcap_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(lhiptest_pcap_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -241,7 +249,8 @@ am__lhiptest_resolve_SOURCES_DIST = lhiptest_resolve.c \
 @LHIP_TESTS_ENABLED_TRUE@	$(am__objects_8)
 lhiptest_resolve_OBJECTS = $(am_lhiptest_resolve_OBJECTS)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_resolve_DEPENDENCIES =  \
-@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1)
+@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_resolve.o
 lhiptest_resolve_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(lhiptest_resolve_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
@@ -253,7 +262,8 @@ am__lhiptest_uname_SOURCES_DIST = lhiptest_uname.c lhiptest_common.c \
 @LHIP_TESTS_ENABLED_TRUE@	$(am__objects_9)
 lhiptest_uname_OBJECTS = $(am_lhiptest_uname_OBJECTS)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_uname_DEPENDENCIES =  \
-@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1)
+@LHIP_TESTS_ENABLED_TRUE@	$(am__DEPENDENCIES_1) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_uname.o
 lhiptest_uname_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(lhiptest_uname_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
@@ -692,31 +702,50 @@ top_srcdir = @top_srcdir@
 @LHIP_TESTS_ENABLED_TRUE@EXTRA_DIST = lhiptest_common.h
 @LHIP_TESTS_ENABLED_TRUE@LHIPTEST_COMMON_SRC = lhiptest_common.c lhiptest_common.h
 @LHIP_TESTS_ENABLED_TRUE@LHIPTEST_COMMON_CFLAGS = @CHECK_CFLAGS@ -DHAVE_CONFIG_H -I $(top_builddir)/src
-@LHIP_TESTS_ENABLED_TRUE@LHIPTEST_COMMON_LIB = $(top_builddir)/src/libhideip.la @CHECK_LIBS@ @LIBS@
+@LHIP_TESTS_ENABLED_TRUE@LHIPTEST_COMMON_LIB = $(top_builddir)/src/lhip_main.o \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_addr.o \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_banning.o \
+@LHIP_TESTS_ENABLED_TRUE@	@CHECK_LIBS@ @LIBS@
+
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_banning_SOURCES = lhiptest_banning.c $(LHIPTEST_COMMON_SRC)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_banning_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_banning_LDADD = $(LHIPTEST_COMMON_LIB)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_exec_SOURCES = lhiptest_exec.c $(LHIPTEST_COMMON_SRC)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_exec_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
-@LHIP_TESTS_ENABLED_TRUE@lhiptest_exec_LDADD = $(LHIPTEST_COMMON_LIB)
+@LHIP_TESTS_ENABLED_TRUE@lhiptest_exec_LDADD = $(LHIPTEST_COMMON_LIB) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_exec.o
+
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_ioctl_SOURCES = lhiptest_ioctl.c $(LHIPTEST_COMMON_SRC)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_ioctl_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
-@LHIP_TESTS_ENABLED_TRUE@lhiptest_ioctl_LDADD = $(LHIPTEST_COMMON_LIB)
+@LHIP_TESTS_ENABLED_TRUE@lhiptest_ioctl_LDADD = $(LHIPTEST_COMMON_LIB) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_ioctl.o
+
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_net_SOURCES = lhiptest_net.c $(LHIPTEST_COMMON_SRC)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_net_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
-@LHIP_TESTS_ENABLED_TRUE@lhiptest_net_LDADD = $(LHIPTEST_COMMON_LIB)
+@LHIP_TESTS_ENABLED_TRUE@lhiptest_net_LDADD = $(LHIPTEST_COMMON_LIB) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_net.o
+
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_opens_SOURCES = lhiptest_opens.c $(LHIPTEST_COMMON_SRC)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_opens_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
-@LHIP_TESTS_ENABLED_TRUE@lhiptest_opens_LDADD = $(LHIPTEST_COMMON_LIB)
+@LHIP_TESTS_ENABLED_TRUE@lhiptest_opens_LDADD = $(LHIPTEST_COMMON_LIB) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_opens.o \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_exec.o
+
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_pcap_SOURCES = lhiptest_pcap.c $(LHIPTEST_COMMON_SRC)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_pcap_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
-@LHIP_TESTS_ENABLED_TRUE@lhiptest_pcap_LDADD = $(LHIPTEST_COMMON_LIB)
+@LHIP_TESTS_ENABLED_TRUE@lhiptest_pcap_LDADD = $(LHIPTEST_COMMON_LIB) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_pcap.o
+
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_resolve_SOURCES = lhiptest_resolve.c $(LHIPTEST_COMMON_SRC)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_resolve_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
-@LHIP_TESTS_ENABLED_TRUE@lhiptest_resolve_LDADD = $(LHIPTEST_COMMON_LIB)
+@LHIP_TESTS_ENABLED_TRUE@lhiptest_resolve_LDADD = $(LHIPTEST_COMMON_LIB) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_resolve.o
+
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_uname_SOURCES = lhiptest_uname.c $(LHIPTEST_COMMON_SRC)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_uname_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
-@LHIP_TESTS_ENABLED_TRUE@lhiptest_uname_LDADD = $(LHIPTEST_COMMON_LIB)
+@LHIP_TESTS_ENABLED_TRUE@lhiptest_uname_LDADD = $(LHIPTEST_COMMON_LIB) \
+@LHIP_TESTS_ENABLED_TRUE@	$(top_builddir)/src/lhip_uname.o
+
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_other_SOURCES = lhiptest_other.c $(LHIPTEST_COMMON_SRC)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_other_CFLAGS = $(LHIPTEST_COMMON_CFLAGS)
 @LHIP_TESTS_ENABLED_TRUE@lhiptest_other_LDADD = $(LHIPTEST_COMMON_LIB)
