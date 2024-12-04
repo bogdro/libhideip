@@ -55,8 +55,8 @@ jobs:
         run: sudo apt-get -y install check libpcap-dev
       - name: Prepare environment
         run: |
-          echo -e '#!/bin/bash\nexit 0' > /usr/bin/ifconfig
-          chmod a+x /usr/bin/ifconfig
+          sudo echo -e '#!/bin/bash\nexit 0' > /usr/bin/ifconfig
+          sudo chmod a+x /usr/bin/ifconfig
       - name: Install sonar-scanner and build-wrapper
         uses: SonarSource/sonarcloud-github-c-cpp@v3
       - name: Configure
