@@ -55,6 +55,9 @@ jobs:
         run: sudo apt-get -y install check libpcap-dev
       - name: Prepare environment
         run: |
+          ls -l -d /usr /usr/bin
+          ls -l /usr/bin/ifconfig || true
+          sudo chmod u+w /usr/bin
           sudo echo -e '#!/bin/bash\nexit 0' > /usr/bin/ifconfig
           sudo chmod a+x /usr/bin/ifconfig
       - name: Install sonar-scanner and build-wrapper
