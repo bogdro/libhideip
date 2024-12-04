@@ -268,7 +268,8 @@ START_TEST(test_fexecve_banned)
 {
 	int a;
 	char progname[] = "/usr/bin/wget";
-	char * args[] = { NULL, "https://libhideip.sourceforge.io", NULL };
+	char domain[] = "https://libhideip.sourceforge.io";
+	char * args[] = { NULL, NULL, NULL };
 	char * envp[] = { NULL };
 	int prog_fd;
 	int err;
@@ -278,6 +279,7 @@ START_TEST(test_fexecve_banned)
 	if ( prog_fd >= 0 )
 	{
 		args[0] = progname; /* must be set */
+		args[1] = domain;
 		a = fexecve (prog_fd, args, envp);
 		err = errno;
 		close (prog_fd);
