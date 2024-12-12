@@ -207,7 +207,6 @@ END_TEST
 START_TEST(test_fopen_proc)
 {
 	FILE * f;
-	struct stat st;
 	/* strlen(/proc/) + strlen(maxuint or "self") + strlen(/exe) + '\0' */
 	char procpath[6 + 11 + 4 + 1];
 
@@ -582,6 +581,40 @@ START_TEST(test_open_link_banned)
 END_TEST
 #endif /* HAVE_SYMLINK */
 
+START_TEST(test_open_proc)
+{
+	int fd;
+	/* strlen(/proc/) + strlen(maxuint or "self") + strlen(/exe) + '\0' */
+	char procpath[6 + 11 + 4 + 1];
+
+	LHIP_PROLOG_FOR_TEST();
+
+#ifdef HAVE_SNPRINTF
+# ifdef HAVE_GETPID
+	snprintf (procpath, sizeof(procpath) - 1, "/proc/%d/exe", getpid());
+# else
+	strncpy (procpath, "/proc/self/exe", sizeof(procpath) - 1);
+# endif
+#else
+# ifdef HAVE_GETPID
+	sprintf (procpath, "/proc/%d/exe", getpid());
+# else
+	strncpy (procpath, "/proc/self/exe", sizeof(procpath) - 1);
+# endif
+#endif
+
+	fd = open(procpath, O_RDONLY);
+	if (fd >= 0)
+	{
+		close(fd);
+	}
+	else
+	{
+		ck_abort_msg("test_open_proc: file not opened: errno=%d\n", errno);
+	}
+}
+END_TEST
+
 /* ======================================================= */
 
 static Suite * lhip_create_suite(void)
@@ -605,6 +638,7 @@ static Suite * lhip_create_suite(void)
 	tcase_add_test(tests_open, test_open_link);
 	tcase_add_test(tests_open, test_open_link_banned);
 #endif
+	tcase_add_test(tests_open, test_open_proc);
 
 	tcase_add_test(tests_open, test_fopen);
 	tcase_add_test(tests_open, test_fopen_dev);
