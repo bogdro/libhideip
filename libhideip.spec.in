@@ -34,6 +34,10 @@ neutral data.
 %define lhip_lic GPLv3+
 %define lhip_summary Library for IP address hiding
 
+# Settings (/usr/lib/rpm/macros.d/macros.spec-helper, /usr/lib/rpm/macros)
+%define dont_remove_libtool_files 1
+# define _unpackaged_files_terminate_build 0
+
 Summary:	%{lhip_summary}
 Name:		%{lhip_name}
 Version:	%{lhip_version}
@@ -76,7 +80,6 @@ libtool --finish %{_libdir}
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
-# % define _unpackaged_files_terminate_build 0
 %files
 
 %defattr(-,root,root)
