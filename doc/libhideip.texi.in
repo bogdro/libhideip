@@ -412,7 +412,7 @@ specify which programs should LibHideIP not mess with. Put each entry on its own
 If additional banning files haven't been disabled (@ref{How to compile?}), they can
 be located in users' home directories (e.g. @file{/home/user1/.libhideip.progban}).
 You can also put the file in any location and set the environment variable
-@code{LIBHIDEIP_BANFILE} to point at that file, e.g.
+@env{LIBHIDEIP_BANFILE} to point at that file, e.g.
 
 	@samp{export LIBHIDEIP_BANFILE=/opt/config/libhideip.progban}
 
