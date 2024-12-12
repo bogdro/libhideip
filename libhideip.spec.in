@@ -61,15 +61,17 @@ BuildRequires:	gcc, glibc, glibc-devel, make
 
 %install
 %make_install
+libtool --finish %{_libdir}
 
 %preun
-#sed -i 's/^.*libhideip.so//g' /etc/ld.so.preload
+#sed -i '/libhideip/ d' /etc/ld.so.preload
 
 %post
-ldconfig
+/sbin/ldconfig %{_libdir}
 #install-info
 
-%postun -p /sbin/ldconfig
+%postun
+/sbin/ldconfig %{_libdir}
 
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
