@@ -37,7 +37,7 @@ neutral data.
 Summary:	%{lhip_summary}
 Name:		%{lhip_name}
 Version:	%{lhip_version}
-Release:	%{lhip_release}
+Release:	%{lhip_release}%{?dist}
 URL:		%{lhip_url}
 BugURL:		%{lhip_url}
 License:	%{lhip_lic}
@@ -99,7 +99,7 @@ libtool --finish %{_libdir}
 %package devel
 
 Summary:	%{lhip_summary} - development package
-Release:	%{lhip_release}
+Release:	%{lhip_release}%{?dist}
 URL:		%{lhip_url}
 BugURL:		%{lhip_url}
 License:	%{lhip_lic}
