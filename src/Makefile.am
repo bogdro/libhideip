@@ -31,7 +31,7 @@ EXTRA_DIST = lhip_cfg.h.in randomize_names_gawk.sh randomize_names_perl.sh \
 # interface changed => C++, R:=0
 # - interface add => A++
 # - interface removed => A:=0
-libhideip_la_LDFLAGS = -version-info 9:0:0
+libhideip_la_LDFLAGS = -version-info 10:0:0
 #libhideip_la_LIBADD = @LIBS@
 
 #nobase_include_HEADERS = lhip_priv.h

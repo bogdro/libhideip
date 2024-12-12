@@ -84,8 +84,8 @@ libtool --finish %{_libdir}
 
 %defattr(-,root,root)
 %{_libdir}/libhideip.so
-%{_libdir}/libhideip.so.9
-%{_libdir}/libhideip.so.9.0.0
+%{_libdir}/libhideip.so.10
+%{_libdir}/libhideip.so.10.0.0
 %{_libdir}/libhideip.la
 %doc %{_infodir}/libhideip.info%_extension
 %doc %{_mandir}/man3/libhideip.3%_extension
