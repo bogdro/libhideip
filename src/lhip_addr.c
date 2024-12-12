@@ -142,6 +142,7 @@ static const unsigned int __lhip_our_names_addr_size = LHIP_MAX_HOSTNAMES;
 #endif
 static unsigned int __lhip_number_of_hostnames = 0;
 static const char local_ip[] = "127.0.0.1";
+static const char local_name[] = "localhost";
 /*
 static char * __lhip_our_hostnames[LHIP_MAX_HOSTNAMES];
 static struct sockaddr * __lhip_our_addresses[LHIP_MAX_HOSTNAMES];
@@ -974,6 +975,52 @@ __lhip_change_data (
 				i++;
 			}
 		}
+	}
+}
+
+/* =============================================================== */
+
+/**
+ * Changes the given addrinfo structure contents so that it contains only
+ *  generic data (like "localhost" or "127.0.0.1")
+ * @param ret the structure to change
+ */
+void
+__lhip_change_addrinfo_data (
+#ifdef LHIP_ANSIC
+	struct addrinfo * const ret)
+#else
+	ret)
+	struct addrinfo * const ret;
+#endif
+{
+	struct addrinfo * tmp = ret;
+	size_t namelen;
+
+	if ( ret == NULL )
+	{
+		return;
+	}
+	while ( tmp != NULL )
+	{
+		if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
+		{
+			__lhip_set_ipv4_value (
+				&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr));
+		}
+		else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
+		{
+			__lhip_set_ipv6_value (
+				&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr));
+		}
+		if ( tmp->ai_canonname != NULL )
+		{
+			namelen = strlen (tmp->ai_canonname);
+			LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
+			__lhip_copy_string (tmp->ai_canonname, local_name, namelen);
+		}
+
+		tmp = tmp->ai_next;
 	}
 }
 

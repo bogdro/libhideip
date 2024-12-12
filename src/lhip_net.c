@@ -1205,10 +1205,8 @@ getaddrinfo (
 	LHIP_MAKE_ERRNO_VAR(err);
 	int ret;
 	int j;
-	struct addrinfo *tmp;
 	const struct hostent * our_name_ipv4;
 	const struct hostent * our_name_ipv6;
-	size_t namelen;
 
 	__lhip_main ();
 #ifdef LHIP_DEBUG
@@ -1244,28 +1242,7 @@ getaddrinfo (
 		{
 			if ( strcmp (node, our_name_ipv4->h_name) == 0 )
 			{
-				tmp = *res;
-				while ( tmp != NULL )
-				{
-					if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
-					{
-						__lhip_set_ipv4_value (
-							&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr));
-					}
-					else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
-					{
-						__lhip_set_ipv6_value (
-							&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr));
-					}
-					if ( tmp->ai_canonname != NULL )
-					{
-						namelen = strlen (tmp->ai_canonname);
-						LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
-						__lhip_copy_string (tmp->ai_canonname, local_name, namelen);
-					}
-
-					tmp = tmp->ai_next;
-				}
+				__lhip_change_addrinfo_data(*res);
 			}
 			else if ( our_name_ipv4->h_aliases != NULL )
 			{
@@ -1274,28 +1251,8 @@ getaddrinfo (
 				{
 					if ( strcmp (node, our_name_ipv4->h_aliases[j]) == 0 )
 					{
-						tmp = *res;
-						do
-						{
-							if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
-							{
-								__lhip_set_ipv4_value (
-									&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr));
-							}
-							else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
-							{
-								__lhip_set_ipv6_value (
-									&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr));
-							}
-							if ( tmp->ai_canonname != NULL )
-							{
-								namelen = strlen (tmp->ai_canonname);
-								LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
-								__lhip_copy_string (tmp->ai_canonname, local_name, namelen);
-							}
-
-							tmp = tmp->ai_next;
-						} while ( tmp != NULL );
+						__lhip_change_addrinfo_data(*res);
+						break;
 					}
 					j++;
 				}
@@ -1305,28 +1262,7 @@ getaddrinfo (
 		{
 			if ( strcmp (node, our_name_ipv6->h_name) == 0 )
 			{
-				tmp = *res;
-				do
-				{
-					if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
-					{
-						__lhip_set_ipv4_value (
-							&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr));
-					}
-					else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
-					{
-						__lhip_set_ipv6_value (
-							&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr));
-					}
-					if ( tmp->ai_canonname != NULL )
-					{
-						namelen = strlen (tmp->ai_canonname);
-						LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
-						__lhip_copy_string (tmp->ai_canonname, local_name, namelen);
-					}
-
-					tmp = tmp->ai_next;
-				} while ( tmp != NULL );
+				__lhip_change_addrinfo_data(*res);
 			}
 			else if ( our_name_ipv6->h_aliases != NULL )
 			{
@@ -1335,28 +1271,8 @@ getaddrinfo (
 				{
 					if ( strcmp (node, our_name_ipv6->h_aliases[j]) == 0 )
 					{
-						tmp = *res;
-						do
-						{
-							if ( (tmp->ai_family == AF_INET) && (tmp->ai_addr != NULL) )
-							{
-								__lhip_set_ipv4_value (
-									&(((struct sockaddr_in *)(tmp->ai_addr))->sin_addr));
-							}
-							else if ( (tmp->ai_family == AF_INET6) && (tmp->ai_addr != NULL) )
-							{
-								__lhip_set_ipv6_value (
-									&(((struct sockaddr_in6 *)(tmp->ai_addr))->sin6_addr));
-							}
-							if ( tmp->ai_canonname != NULL )
-							{
-								namelen = strlen (tmp->ai_canonname);
-								LHIP_MEMSET (tmp->ai_canonname, 0, namelen);
-								__lhip_copy_string (tmp->ai_canonname, local_name, namelen);
-							}
-
-							tmp = tmp->ai_next;
-						} while ( tmp != NULL );
+						__lhip_change_addrinfo_data(*res);
+						break;
 					}
 					j++;
 				}

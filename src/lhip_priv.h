@@ -501,6 +501,8 @@ extern int GCC_WARN_UNUSED_RESULT				__lhip_is_local_addr LHIP_PARAMS ((
 									const struct hostent * const h));
 extern void							__lhip_change_data LHIP_PARAMS ((
 									struct hostent * const ret));
+extern void							__lhip_change_addrinfo_data LHIP_PARAMS ((
+									struct addrinfo * const ret));
 extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv4 LHIP_PARAMS ((void));
 extern struct hostent * GCC_WARN_UNUSED_RESULT			__lhip_get_our_name_ipv6 LHIP_PARAMS ((void));
 extern int GCC_WARN_UNUSED_RESULT				__lhip_get_init_stage LHIP_PARAMS ((void));
