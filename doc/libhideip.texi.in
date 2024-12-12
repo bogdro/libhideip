@@ -86,7 +86,7 @@ There is @strong{NO NEED} to rebuild your software, because LibHideIP is
 a pre-loadable library, meaning you just need to @strong{RUN} the software
 with LibHideIP loaded.
 
-Intercepting the raw @samp{syscall()} function is impossible, because the
+Intercepting the raw @samp{syscall} function is impossible, because the
 number of parameters varies from one syscall to another.
 
 However, there are limitations. LibHideIP can do nothing if:
@@ -141,13 +141,13 @@ Requirements for compiling the library:
 @item development package for the C library (like @file{glibc-devel}
 and @file{glibc-headers}).@*@*
 @strong{NOTE} Some glibc versions (2.11 is known of this) have a bug in their
-@samp{dl(v)sym()} implementation, which may cause LibHideIP to hang during searching
+@samp{dl(v)sym} implementation, which may cause LibHideIP to hang during searching
 for the original versions of the substituted C functions. If you observe
 this, it is best to upgrade glibc. If not possible, you can start deleting
-substituted functions from @samp{open()} and check each time if your current
+substituted functions from @samp{open} and check each time if your current
 version started to work (yes, this decreases security).
 
-@strong{NOTE} Also, some glibc versions have a bug in their @samp{gethostbyaddr_r()}
+@strong{NOTE} Also, some glibc versions have a bug in their @samp{gethostbyaddr_r}
 and related functions' implementations, causing overflows (probably stack) which impact
 the environment variables' usage and thus may disable banning files except
 the global file. Probably fixed in version 2.22.
@@ -160,7 +160,7 @@ It has to have @code{RTLD_NEXT} defined. LibHideIP wouldn't work without this, s
 won't compile without this.
 
 The @file{stdarg.h}/@file{varargs.h} header contains stuff needed to intercept
-@samp{ioctl()} and the opening functions.
+@samp{ioctl} and the opening functions.
 
 @item The @file{libdl} library (usually part of the C library) for dynamic
 function addressing (unless the required functions are in the C library)
@@ -211,8 +211,8 @@ Type
 to compile the library.
 
 LibHideIP assumes that your host has maximum 100 aliases and addresses,
-unless you have the @samp{malloc()} function. If you think this number is not
-enough and you don't have the @samp{malloc()} function, configure LibHideIP with
+unless you have the @samp{malloc} function. If you think this number is not
+enough and you don't have the @samp{malloc} function, configure LibHideIP with
 
 	@samp{./configure --with-max-host-names=n}
 
