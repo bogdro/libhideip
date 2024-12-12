@@ -84,6 +84,7 @@ ldconfig
 %{_libdir}/libhideip.la
 %doc %{_infodir}/libhideip.info%_extension
 %doc %{_mandir}/man3/libhideip.3%_extension
+%ghost %config(missingok,noreplace) %attr(644,-,-) %{_sysconfdir}/libhideip.progban
 %doc README
 %doc COPYING
 %doc AUTHORS
