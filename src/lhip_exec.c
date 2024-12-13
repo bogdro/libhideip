@@ -480,7 +480,7 @@ int __lhip_is_forbidden_file (
 	__lhip_linkpath = __lhip_get_target_link_path (name_copy);
 #else
 	__lhip_copy_string (__lhip_linkpath, name, sizeof (__lhip_linkpath)-1);
-	__lhip_copy_string (__lhip_linkpath, _lhip_get_target_link_path (__lhip_linkpath), sizeof (__lhip_linkpath)-1);
+	__lhip_copy_string (__lhip_linkpath, __lhip_get_target_link_path (__lhip_linkpath), sizeof (__lhip_linkpath)-1);
 #endif
 #ifdef HAVE_MALLOC
 	if ( __lhip_linkpath != NULL )
