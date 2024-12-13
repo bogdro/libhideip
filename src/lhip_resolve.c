@@ -550,7 +550,8 @@ getaddrinfo_a(
 
 	__lhip_main ();
 # ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: getaddrinfo_a(%d, 0x%lx, %d, 0x%lx)\n", mode, list, nitems, sevp);
+	fprintf (stderr, "libhideip: getaddrinfo_a(%d, 0x%lx, %d, 0x%lx)\n",
+		mode, (unsigned long int)list, nitems, (unsigned long int)sevp);
 	fflush (stderr);
 # endif
 	if ( __lhip_real_getaddrinfo_a_loc () == NULL )

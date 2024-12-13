@@ -548,7 +548,7 @@ void __lhip_read_local_addresses (LHIP_VOID)
 	for ( i = 0; i < __lhip_number_of_hostnames; i++ )
 	{
 		fprintf (stderr, "LibHideIP: 6+%lu: name=%s, h_addr_list=0x%lx, h_addrtype=%d, " \
-			 "AF_INET=%d, AF_INET6=%d, h_length=%d\n", i,
+			 "AF_INET=%d, AF_INET6=%d, h_length=%d\n", (unsigned long)i,
 			(__lhip_our_names_addr[i].h_name == NULL)? "null" :
 				__lhip_our_names_addr[i].h_name,
 			(unsigned long int)__lhip_our_names_addr[i].h_addr_list,

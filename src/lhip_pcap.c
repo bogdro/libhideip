@@ -247,7 +247,7 @@ pcap_open_dead_with_tstamp_precision (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_open_dead_with_tstamp_precision(%d, %d, %d)\n",
+	fprintf (stderr, "libhideip: pcap_open_dead_with_tstamp_precision(%d, %d, %ud)\n",
 		linktype, snaplen, t);
 	fflush (stderr);
 #endif
@@ -352,7 +352,7 @@ pcap_open_offline_with_tstamp_precision (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_open_offline_with_tstamp_precision(%s, %d)\n",
+	fprintf (stderr, "libhideip: pcap_open_offline_with_tstamp_precision(%s, %ud)\n",
 		(fname == NULL)? "null" : fname, t);
 	fflush (stderr);
 #endif
@@ -420,7 +420,7 @@ pcap_fopen_offline_with_tstamp_precision (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_fopen_offline_with_tstamp_precision(0x%lx, %d)\n",
+	fprintf (stderr, "libhideip: pcap_fopen_offline_with_tstamp_precision(0x%lx, %ud)\n",
 		(unsigned long int)fp, t);
 	fflush (stderr);
 #endif
@@ -488,7 +488,7 @@ pcap_hopen_offline_with_tstamp_precision (
 	__lhip_main ();
 
 #ifdef LHIP_DEBUG
-	fprintf (stderr, "libhideip: pcap_hopen_offline_with_tstamp_precision(0x%lx, %d)\n",
+	fprintf (stderr, "libhideip: pcap_hopen_offline_with_tstamp_precision(0x%lx, %ud)\n",
 		(unsigned long int)a, t);
 	fflush (stderr);
 #endif
