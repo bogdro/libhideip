@@ -4,8 +4,6 @@
 # LibHideIP - A library for hiding local IP address.
 #	-- configure.ac, part of the build system.
 #
-# @configure_input@
-#
 # Copyright (C) 2008-2024 Bogdan Drozdowski, bogdro (at) users . sourceforge . net
 # License: GNU General Public License, v3+
 #
