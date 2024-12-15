@@ -162,6 +162,8 @@ struct ifconf
 		struct ifreq *ifcu_req;
 	} ifc_ifcu;
 };
+# define ifc_buf ifc_ifcu.ifcu_buf
+# define ifc_req ifc_ifcu.ifcu_req
 # if (defined __solaris__) && (defined AF_INET6)
 struct lifconf
 {
