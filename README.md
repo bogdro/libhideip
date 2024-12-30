@@ -2,7 +2,7 @@
 
 LibHideIP, a library which hides your local IP address from programs.
 
-These function replacements in LibHideIP first call the original functions
+The function replacements in LibHideIP first call the original functions
 to do their job and then replace the returned data with generic data to
 prevent leakage of sensitive information.
 
