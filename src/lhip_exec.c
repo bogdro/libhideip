@@ -357,7 +357,7 @@ static char * __lhip_get_target_link_path (
 				__lhip_newlinkdir[dirname_len + 1
 					+ (size_t)lsize] = '\0';
 				__lhip_copy_string (__lhip_newlinkpath, __lhip_newlinkdir,
-					dirname_len + 1 + (size_t)lsize + 1);
+					dirname_len + 1 + (size_t)lsize);
 # ifdef HAVE_MALLOC
 				free (__lhip_newlinkdir);
 # endif /* HAVE_MALLOC */
@@ -686,7 +686,7 @@ static int __lhip_is_forbidden_program (
 						if ( path_dir != NULL )
 						{
 							__lhip_copy_string (path_dir, path,
-								path_len);
+								path_len + 1);
 							__lhip_append_path (path_dir, __lhip_linkpath, j);
 							path_dir[path_len + 1 + new_path_len] = '\0';
 						}
