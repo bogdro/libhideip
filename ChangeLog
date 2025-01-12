@@ -1,10 +1,115 @@
+2025-01-03	Bogdan Drozdowski <bogdro /at- users . sourceforge . net>
+
+	* LibHideIP version 2.3
+	  Fixed compile errors after name randomisation. Checking for more
+	  compile warnings. Portability updates - LibHideIP now compiles on
+	  Solaris/SunOS. Added support for systems with a less advanced /proc
+	  filesystem. Code quality updates. Updates in the build system.
+	  Updates in unit tests and new tests. Documentation updates.
+	* configure.ac: Check the number of arguments for gethostbyaddr_r(),
+	  gethostbyname_r() and gethostent_r(). Check the type of the second
+	  argument to ioctl(). If rpc/rpc.h is found, don't check for rpc.h.
+	  Check for the -Wnull-dereference, -Wunused-parameter, -Walloc-zero,
+	  and -Wdangling-else compiler options. Add the auxiliary build
+	  directory build-aux and move some of the build helper files there.
+	  Check for the getpid() function.
+	* src/lhip_net.c (gethostbyaddr_r, gethostbyname_r, gethostent_r),
+	  src/lhip_priv.h: Declare the right number of arguments for
+	  gethostbyaddr_r(), gethostbyname_r() and gethostent_r(). Fixes
+	  compile on SunOS partially.
+	* src/lhip_ioctl.c: Include unistd.h (where ioctl() is on SunOS).
+	* src/lhip_ioctl.c (ioctl): Use the discovered type of the second
+	  argument to ioctl().
+	* src/lhip_addr.c (__lhip_read_local_addresses): Update parameter list
+	  when calling gethostbyaddr_r(), gethostbyname_r() or gethostent_r().
+	* src/lhip_net.c (bindresvport, bindresvport6): Declare conditionally
+	  and not on SunOS where the parameters are different and subject to
+	  change.
+	* src/banning-generic.c, src/lhip_banning.c: Fixed compiling after
+	  name randomization.
+	* src/lhip_addr.c (__lhip_change_data): Overwrite h_aliases instead of
+	  setting them to NULL. Can fix some crashes.
+	* src/lhip_opens.c: Fixed argument types of va_arg.
+	* src/lhip_exec.c (__lhip_is_forbidden_file,
+	  __lhip_is_forbidden_program): Fixed potential NULL pointer accesses
+	  when memory couldn't be allocated and memory leaks.
+	* src/lhip_exec.c (__lhip_get_target_link_path_fd),
+	  src/banning-generic.c (__banning_get_exename): Use the current PID
+	  first, for systems where /proc/self doesn't exist.
+	* src/lhip_addr.c (__lhip_is_local_addr, __lhip_check_ipv6_value),
+	  src/lhip_net.c (getnameinfo, bind): Compare the address directly
+	  with the field, not the whole structure.
+	* src/lhip_exec.c (__lhip_get_target_link_path): Better buffer limit
+	  checking. Removed unnecessary setting the final zero byte. Use the
+	  off64_t type when calling stat64().
+	* src/lhip_cfg.h.in: Added constants for the number of arguments for
+	  gethostbyaddr_r(), gethostbyname_r() and gethostent_r(). Added a
+	  constant for the type of the second argument to ioctl(). Added a
+	  flag to allow compiling on Solaris/SunOS. Added the _ALL_SOURCE and
+	  _NETBSD_SOURCE flags.
+	* src/lhip_priv.h: Use the discovered type of the second argument to
+	  ioctl().
+	* src/lhip_main.c (__lhip_copy_string), src/lhip_priv.h, src/*.c:
+	  Replaced strncpy with a dedicated function where applicable.
+	* src/lhip_addr.c (__lhip_change_addrinfo_data), src/lhip_net.c
+	  (getaddrinfo): Move common code for overwriting addrinfo structures
+	  to a separate function.
+	* src/lhip_cfg.h.in, src/lhip_public.c.in, src/libhideip.h.in: Mark
+	  files as generated in header comments.
+	* src/*.c, src/lhip_priv.h: Many code quality updates (SonarCloud):
+	  #undef macros only if defined, write only one declaration per line,
+	  use the 'const' qualifier more, set variables to default values only
+	  if they're not being set later, move #includes to top of the file,
+	  simplify code, shorten names.
+	* test/lhiptest_opens.c (test_fopen_proc), test/lhiptest_net.c
+	  (test_bind_banned6): Check if the file we're opening exists.
+	* test/lhiptest_opens.c (test_open_proc): Added a test for opening a
+	  file in /proc using open().
+	* test/lhiptest_exec.c (test_execveat_banned_empty_path,
+	  test_execveat_banned_empty_path_link): Fixed error messages.
+	* test/lhiptest_exec.c: Allow passing the directory of 'ifconfig'.
+	* test/lhiptest_net.c, test/lhiptest_resolve.c: Changed test domain.
+	* test/lhiptest_other.c (test_symb_func): Changed the symbol name.
+	* test/lhiptest_resolve.c: Free memory in res_nXXX() functions.
+	* test/lhiptest_uname.c (test_uname): Removed unnecessary check.
+	* test/lhiptest_exec.c (test_fexecve_banned): Fixed a warning about
+	  the 'const' qualifier.
+	* test/*.c: Moved common includes and defines to lhiptest_common.h.
+	  Replaced the deprecated fail() with ck_abort_msg().
+	* test/Makefile.am: Link tests directly to the object files, not the
+	  built library, for better coverage measuring.
+	* m4/ax_func_which_gethostbyaddr_r.m4,
+	  m4/ax_func_which_gethostbyname_r.m4,
+	  m4/ax_func_which_gethostent_r.m4: New macros to check the
+	  number of arguments for gethostbyaddr_r(), gethostbyname_r() and
+	  gethostent_r().
+	* m4/ax_prototype.m4: Disable the "unused-variable" warning so that it
+	  doesn't interfere when checking function prototypes.
+	* libhideip.spec.in:  Added "texinfo" to BuildRequires. Added the
+	  %{?dist} tag to 'Release:', as recommended by the Fedora packaging
+	  guidelines:
+	  https://docs.fedoraproject.org/en-US/packaging-guidelines/DistTag/.
+	  Fixed running 'ldconfig'. Added a flag to keep libtool files. Added
+	  running 'libtool finish' during installation. Simplified cleaning
+	  /etc/ld.so.preload in pre-uninstall.
+	* INSTALL-LHIP.txt: Renamed from "INSTALL", which autotools overwrite.
+	* doc/libhideip.texi.in: Added information about using FMSec
+	  (https://fmsec.sourceforge.io) to load LibHideIP for single programs.
+	  Small syntax updates.
+	* INSTALL, compile, depcomp, doc/texinfo.tex, missing, test-driver,
+	  config.guess, config.sub, install-sh, ltmain.sh, m4/libtool.m4,
+	  m4/ltsugar.m4: Forced update using new Autotools.
+	* src/*.c, src/*.h, src/*.h.in, src/*.c.in, test/*.c, **/Makefile.am,
+	  libhideip.spec.in, configure.ac: Added or updated the license
+	  block and copyright.
+
 2022-12-13	Bogdan Drozdowski <bogdro \at\ users . sourceforge . net>
 
 	* LibHideIP version 2.2
 	  Significant portability updates. LibHideIP now compiles on FreeBSD
 	  and macOS. Intercepting new functions and improvements in the old.
 	  More checking for banned programs. Safer checking and wiping of
-	  data. New unit tests. code quality improvements. Improvements in
+	  data. New unit tests. Code quality improvements. Improvements in
 	  the build system. Other small changes.
 	* configure.ac: Added checking for the canonicalize_file_name(),
 	  realpath(), bindresvport() and bindresvport6() functions. Added

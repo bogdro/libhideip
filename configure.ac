@@ -21,9 +21,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 AC_PREREQ([2.71])
-AC_INIT([LibHideIP],[2.2],[bogdro@users.sourceforge.net], [libhideip], [https://libhideip.sourceforge.io])
+AC_INIT([LibHideIP],[2.3],[bogdro@users.sourceforge.net],[libhideip],[https://libhideip.sourceforge.io])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/libhideip.texi
